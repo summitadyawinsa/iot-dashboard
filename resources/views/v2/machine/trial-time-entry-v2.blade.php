@@ -82,8 +82,8 @@
                                 </div>
                                 <div>
                                     <label for="standard_sph">NIK</label>
-                                    <input id="nik" type="text"
-                                        class="form-input w-full text-black dark:text-white" required />
+                                    <input id="nik" type="text" class="form-input w-full text-black dark:text-white"
+                                        required />
                                 </div>
                                 <div class="mb-5">
                                     <label for="avail-select">Password</label>
@@ -92,8 +92,8 @@
                                             type="password" required />
                                         <button onclick="stepOne()" id="btnStepOne" class="btn btn-primary btn-sm">
                                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                fill="none" viewBox="0 0 24 24">
+                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                                viewBox="0 0 24 24">
                                                 <path stroke="currentColor" stroke-linecap="round"
                                                     stroke-linejoin="round" stroke-width="2"
                                                     d="M19 12H5m14 0-4 4m4-4-4-4" />
@@ -108,8 +108,8 @@
                                 </div>
                                 <div class="mb-5">
                                     <label for="avail-select">Pay Hour</label>
-                                    <input class="form-input w-full text-black dark:text-white" id="payHour"
-                                        type="text" readonly />
+                                    <input class="form-input w-full text-black dark:text-white" id="payHour" type="text"
+                                        readonly />
                                 </div>
                                 <div class="mb-5" style="display: none">
                                     <label for="avail-select">Plan Clock In Date</label>
@@ -138,9 +138,9 @@
                                 </div>
                                 <div class="mb-5">
                                     <label for="avail-select">Actual Clock Out Time</label>
-                                    <input class="form-input w-full text-black dark:text-white"
-                                        id="actualClockOutTime" type="time" value="{{ now()->format('H:i') }}"
-                                        onchange="calculatePayhour()" required />
+                                    <input class="form-input w-full text-black dark:text-white" id="actualClockOutTime"
+                                        type="time" value="{{ now()->format('H:i') }}" onchange="calculatePayhour()"
+                                        required />
                                 </div>
                                 <div class="mb-5" style="display: none">
                                     <label for="avail-select">Plan Lunch Out Time</label>
@@ -149,9 +149,8 @@
                                 </div>
                                 <div class="mb-5">
                                     <label for="avail-select">Actual Lunch Out Time</label>
-                                    <input class="form-input w-full text-black dark:text-white"
-                                        id="actualLunchOutTime" type="time" onchange="calculatePayhour()"
-                                        required />
+                                    <input class="form-input w-full text-black dark:text-white" id="actualLunchOutTime"
+                                        type="time" onchange="calculatePayhour()" required />
                                 </div>
                                 <div class="mb-5" style="display: none">
                                     <label for="avail-select">Plan Lunch In Time</label>
@@ -162,13 +161,12 @@
                                     <label for="avail-select">Actual Lunch In Time</label>
                                     <div class="flex justify-between">
                                         <input class="form-input w-full text-black dark:text-white"
-                                            id="actualLunchInTime" type="time" onchange="calculatePayhour()"
-                                            required />
+                                            id="actualLunchInTime" type="time" onchange="calculatePayhour()" required />
                                         <button onclick="stepTwo()" id="btnStepTwo"
                                             class="btn btn-primary btn-sm hidden">
                                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                fill="none" viewBox="0 0 24 24">
+                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                                viewBox="0 0 24 24">
                                                 <path stroke="currentColor" stroke-linecap="round"
                                                     stroke-linejoin="round" stroke-width="2"
                                                     d="M19 12H5m14 0-4 4m4-4-4-4" />
@@ -185,15 +183,15 @@
                                             required>
                                             <option value="P" selected>P - Production (Default)</option>
                                             <option value="I">I Indirect</option>
-                                            <option value="S">S Setup</option>
+                                            <!-- <option value="S">S Setup</option>
                                             <option value="J">J Project</option>
-                                            <option value="V">V Service</option>
+                                            <option value="V">V Service</option> -->
                                         </select>
                                         <button onclick="stepThree()" id="btnStepThree"
                                             class="btn btn-primary btn-sm hidden">
                                             <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                fill="none" viewBox="0 0 24 24">
+                                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                                viewBox="0 0 24 24">
                                                 <path stroke="currentColor" stroke-linecap="round"
                                                     stroke-linejoin="round" stroke-width="2"
                                                     d="M19 12H5m14 0-4 4m4-4-4-4" />
@@ -245,7 +243,8 @@
                                 <div class="mb-2">
                                     <label for="production_time_modal" class="block text-sm font-medium mb-2">Labor
                                         note</label>
-                                    <textarea id="labor_note" rows="2" class="form-textarea mt-1 block w-full"></textarea>
+                                    <textarea id="labor_note" rows="2"
+                                        class="form-textarea mt-1 block w-full"></textarea>
                                 </div>
                                 <div class="flex grid grid-cols-2 gap-2" style="display: none">
                                     <div class="mb-5">
@@ -283,7 +282,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function(e) {
+        document.addEventListener("DOMContentLoaded", function (e) {
             const pathId = window.location.pathname.split('/')
             const categoryLine = pathId[pathId.length - 1]
             const blok = pathId[1];
@@ -292,9 +291,9 @@
             }
             const ApiUrl = `https://${window.location.host}/api/machine/get-machine-running`
             axios.post(ApiUrl, {
-                    categoryLine: categoryLine,
-                    blok: blok
-                })
+                categoryLine: categoryLine,
+                blok: blok
+            })
                 .then(response => {
                     const container = document.getElementById('listMachine')
                     container.innerHTML = ''
@@ -350,15 +349,40 @@
                         `;
                         } else {
                             statusHTML = `
-                            <span class="inline-flex items-center justify-center text-sm md:text-xs lg:text-xs font-medium rounded-full px-2 py-1 bg-gray-500 text-white dark:text-white">
-                    <span class="w-2 h-2 md:w-1.5 md:h-1.5 bg-white rounded-full me-2"></span>
-                    Unknown
-                </span>
-
-                        `;
+            <button type="button" class="btn btn-warning py-2 md:py-1" id="btn_finish" onclick="timeEntry('${item.machine_id}')">
+                <svg id="finish_icon_${item.machine_id}" xmlns="https://www.w3.org/2000/svg"
+                    class="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" width="24" height="24" viewBox="0 0 24 24"
+                    fill="none">
+                    <path
+                        d="M17 3.33782C15.5291 2.48697 13.8214 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 10.5778 21.7031 9.22492 21.1679 8"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-dasharray="0.5 3.5" />
+                    <path
+                        d="M22 12C22 10.1786 21.513 8.47087 20.6622 7M12 2C13.8214 2 15.5291 2.48697 17 3.33782"
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M12 9V13H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+                <svg id="finish_loader_${item.machine_id}" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor"
+                    stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                    class="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 animate-[spin_2s_linear_infinite] inline-block align-middle shrink-0 hidden">
+                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+                Finish
+                <span id="production_date_${item.machine_id}" hidden>${item.production_date}</span>
+            </button>
+              <span class="lg:text-lg md:text-sm" id="start_${item.machine_id}"></span>
+        `;
                         }
                         if ((item.laborEntryMethod === 'T' || item.laborEntryMethod === 'B') && (item
-                                .status_downtime === 1 || item.status_downtime === true || item
+                            .status_downtime === 1 || item.status_downtime === true || item
                                 .status_downtime === '1')) {
                             cardDT +=
                                 `
@@ -535,10 +559,10 @@
             data.append('production_date', document.getElementById(`production_date_input_${machine_id}`).value)
             data.append('downtime_qty', document.getElementById(`downtime_input_${machine_id}`).value)
             axios.post(`https://${window.location.host}/api/machine/finish-downtime`, data, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     console.log(response)
                     Swal.fire({
@@ -569,10 +593,10 @@
             data.append('machine_id', machine_id)
             const urlApi = `https://${window.location.host}/api/machine/v2/set_finish`
             axios.post(urlApi, data, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     const data = response.data
                     const machine = data.machine
@@ -598,10 +622,10 @@
                 listJig.classList.remove('hidden');
 
                 axios.post(`https://${window.location.host}/api/machine/v2/tool-running-machine`, {}, {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    })
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
                     .then(response => {
                         console.log(response);
                         const container = document.getElementById('listMachineJig');
@@ -727,10 +751,10 @@
                 data.append('note', note);
 
                 axios.post(`https://${window.location.host}/api/machine/v2/set-downtime-jig`, data, {
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    })
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
                     .then((response) => {
                         Swal.fire({
                             title: 'Berhasil!',
@@ -762,10 +786,10 @@
             data.append('productionDate', document.getElementById(`production_date_${ToolID}`).value)
             data.append('toolID', tool)
             axios.post(`https://${window.location.host}/api/machine/v2/finish-downtime-tool`, data, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     console.log(response)
                     const message = response.data
@@ -800,10 +824,10 @@
             data.append('production_date', document.getElementById(`production_date_${ToolID}`).value)
             data.append('jobNum', document.getElementById(`job_num_${ToolID}`).value)
             axios.post(`https://${window.location.host}/api/machine/v2/set-finish-tool`, data, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     const status = response.data.status
                     console.log(response)
@@ -934,71 +958,71 @@
             const data = new URLSearchParams()
             data.append('machineID', machine_id)
             axios.post(`https://${window.location.host}/api/machine/v2/time-entry`, data, {
-                    Headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }).then(response => {
-                    const message = response.data
-                    document.getElementById(`finish_icon_${machine_id}`).classList.remove('hidden');
-                    document.getElementById(`finish_loader_${machine_id}`).classList.add('hidden');
-                    document.getElementById('timeEntryBoard').classList.remove('hidden')
-                    document.getElementById('listMachine').classList.add('hidden')
-                    document.getElementById('filterCategory').classList.add('hidden')
-                    const machine = message.machine
-                    const jobNumber = document.getElementById('jobNumber').value = machine.job_num
-                    const selectEmp = document.getElementById('employeeID')
-                    selectEmp.innerHTML = `<option value="${machine.employee_id}">${machine.employee_name}</option>`
-                    $('#employeeID').select2({
-                        width: '100%',
-                        allowClear: true,
-                        ajax: {
-                            url: `https://${window.location.host}/api/machine/v2/get-emp-select`,
-                            type: 'POST',
-                            dataType: 'json',
-                            delay: 250,
-                            data: function(params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page || 1
-                                };
-                            },
-                            processResults: function(data, params) {
-                                params.page = params.page || 1;
-                                return {
-                                    results: data.results,
-                                    pagination: {
-                                        more: data.pagination?.more || false
-                                    }
-                                };
-                            },
-                            cache: true
+                Headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                const message = response.data
+                document.getElementById(`finish_icon_${machine_id}`).classList.remove('hidden');
+                document.getElementById(`finish_loader_${machine_id}`).classList.add('hidden');
+                document.getElementById('timeEntryBoard').classList.remove('hidden')
+                document.getElementById('listMachine').classList.add('hidden')
+                document.getElementById('filterCategory').classList.add('hidden')
+                const machine = message.machine
+                const jobNumber = document.getElementById('jobNumber').value = machine.job_num
+                const selectEmp = document.getElementById('employeeID')
+                selectEmp.innerHTML = `<option value="${machine.employee_id}">${machine.employee_name}</option>`
+                $('#employeeID').select2({
+                    width: '100%',
+                    allowClear: true,
+                    ajax: {
+                        url: `https://${window.location.host}/api/machine/v2/get-emp-select`,
+                        type: 'POST',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term,
+                                page: params.page || 1
+                            };
                         },
-                        minimumInputLength: 1,
-                        placeholder: 'Pilih karyawan'
-                    });
-                    const shiftFromMachine = machine.shift.split(' ')[1];
-                    const shiftSelect = document.getElementById('shiftSelect');
-                    const filteredShifts = message.shift_options.filter(shift => shift.id !== shiftFromMachine);
-                    let optionsHtml = `<option value="${shiftFromMachine}" selected>SHIFT ${shiftFromMachine}</option>`;
-                    filteredShifts.forEach(shift => {
-                        optionsHtml += `<option value="${shift.id}">${shift.text}</option>`;
-                    });
-                    shiftSelect.innerHTML = optionsHtml;
-                    const actualClockIn = machine.started_at.split(' ')
-                    let group
-                    if (machine.category_line_id === 'ASSY-002' || machine.category_line_id === 'ASSY-014') {
-                        group = machine.machine_id.split('-')[1]
-                    } else {
-                        group = machine.machine_id.split('-')[0]
-                    }
-                    document.getElementById('productionDate').value = machine.production_date
-                    document.getElementById('actualClockInDate').value = actualClockIn[0]
-                    document.getElementById('actualClockInTime').value = actualClockIn[1]
-                    document.getElementById('laborQty').value = parseInt(machine.qty_actual)
-                    document.getElementById('discrepQty').value = parseInt(machine.qty_ng) || 0
-                    document.getElementById('resourceGrpID').value = group
-                    document.getElementById('resourceID').value = machine.machine_id
-                })
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data.results,
+                                pagination: {
+                                    more: data.pagination?.more || false
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    placeholder: 'Pilih karyawan'
+                });
+                const shiftFromMachine = machine.shift.split(' ')[1];
+                const shiftSelect = document.getElementById('shiftSelect');
+                const filteredShifts = message.shift_options.filter(shift => shift.id !== shiftFromMachine);
+                let optionsHtml = `<option value="${shiftFromMachine}" selected>SHIFT ${shiftFromMachine}</option>`;
+                filteredShifts.forEach(shift => {
+                    optionsHtml += `<option value="${shift.id}">${shift.text}</option>`;
+                });
+                shiftSelect.innerHTML = optionsHtml;
+                const actualClockIn = machine.started_at.split(' ')
+                let group
+                if (machine.category_line_id === 'ASSY-002' || machine.category_line_id === 'ASSY-014') {
+                    group = machine.machine_id.split('-')[1]
+                } else {
+                    group = machine.machine_id.split('-')[0]
+                }
+                document.getElementById('productionDate').value = machine.production_date
+                document.getElementById('actualClockInDate').value = actualClockIn[0]
+                document.getElementById('actualClockInTime').value = actualClockIn[1]
+                document.getElementById('laborQty').value = parseInt(machine.qty_actual)
+                document.getElementById('discrepQty').value = parseInt(machine.qty_ng) || 0
+                document.getElementById('resourceGrpID').value = group
+                document.getElementById('resourceID').value = machine.machine_id
+            })
                 .catch(error => {
                     console.log(error)
                 })
@@ -1026,10 +1050,10 @@
             data.append('nik', nik)
             data.append('password', password)
             axios.post(`https://${window.location.host}/api/machine/v2/create-new-header`, data, {
-                    'headers': {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                'headers': {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     const message = response.data
                     const laborHedSeq = message.data.laborHedSeq
@@ -1103,10 +1127,10 @@
             ])
             console.log(data)
             axios.post(`https://${window.location.host}/api/machine/v2/update-header`, data, {
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                })
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
                 .then(response => {
                     document.getElementById('btnStepThree').classList.remove('hidden')
                     document.getElementById('btnStepTwo').classList.add('hidden')
@@ -1260,66 +1284,66 @@
             data.append('machineID', machine_id)
             data.append('toolID', tool_id)
             axios.post(`https://${window.location.host}/api/machine/v2/time-entry-tool`, data, {
-                    Headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    }
-                }).then(response => {
-                    const message = response.data
-                    document.getElementById(`finish_icon_${ToolID}`).classList.remove('hidden');
-                    document.getElementById(`finish_loader_${ToolID}`).classList.add('hidden');
-                    document.getElementById('timeEntryBoard').classList.remove('hidden')
-                    document.getElementById('listMachineJig').classList.add('hidden')
-                    document.getElementById('filterCategory').classList.add('hidden')
-                    const machine = message.machine
-                    const jobNumber = document.getElementById('jobNumber').value = machine.job_num
-                    const selectEmp = document.getElementById('employeeID')
-                    selectEmp.innerHTML = `<option value="${machine.employee_id}">${machine.employee_name}</option>`
-                    $('#employeeID').select2({
-                        width: '100%',
-                        allowClear: true,
-                        ajax: {
-                            url: `https://${window.location.host}/api/machine/v2/get-emp-select`,
-                            type: 'POST',
-                            dataType: 'json',
-                            delay: 250,
-                            data: function(params) {
-                                return {
-                                    q: params.term,
-                                    page: params.page || 1
-                                };
-                            },
-                            processResults: function(data, params) {
-                                params.page = params.page || 1;
-                                return {
-                                    results: data.results,
-                                    pagination: {
-                                        more: data.pagination?.more || false
-                                    }
-                                };
-                            },
-                            cache: true
+                Headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(response => {
+                const message = response.data
+                document.getElementById(`finish_icon_${ToolID}`).classList.remove('hidden');
+                document.getElementById(`finish_loader_${ToolID}`).classList.add('hidden');
+                document.getElementById('timeEntryBoard').classList.remove('hidden')
+                document.getElementById('listMachineJig').classList.add('hidden')
+                document.getElementById('filterCategory').classList.add('hidden')
+                const machine = message.machine
+                const jobNumber = document.getElementById('jobNumber').value = machine.job_num
+                const selectEmp = document.getElementById('employeeID')
+                selectEmp.innerHTML = `<option value="${machine.employee_id}">${machine.employee_name}</option>`
+                $('#employeeID').select2({
+                    width: '100%',
+                    allowClear: true,
+                    ajax: {
+                        url: `https://${window.location.host}/api/machine/v2/get-emp-select`,
+                        type: 'POST',
+                        dataType: 'json',
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term,
+                                page: params.page || 1
+                            };
                         },
-                        minimumInputLength: 1,
-                        placeholder: 'Pilih karyawan'
-                    });
-                    const shiftFromMachine = machine.shift.split(' ')[1];
-                    const shiftSelect = document.getElementById('shiftSelect');
-                    const filteredShifts = message.shift_options.filter(shift => shift.id !== shiftFromMachine);
-                    let optionsHtml = `<option value="${shiftFromMachine}" selected>SHIFT ${shiftFromMachine}</option>`;
-                    filteredShifts.forEach(shift => {
-                        optionsHtml += `<option value="${shift.id}">${shift.text}</option>`;
-                    });
-                    shiftSelect.innerHTML = optionsHtml;
-                    const actualClockIn = machine.started_at.split(' ')
-                    const group = machine.machine_id.split('-')[1]
-                    document.getElementById('productionDate').value = machine.production_date
-                    document.getElementById('actualClockInDate').value = actualClockIn[0]
-                    document.getElementById('actualClockInTime').value = actualClockIn[1]
-                    document.getElementById('laborQty').value = parseInt(machine.qty_actual)
-                    document.getElementById('discrepQty').value = parseInt(machine.qty_ng) || 0
-                    document.getElementById('resourceGrpID').value = group
-                    document.getElementById('resourceID').value = machine.machine_id
-                })
+                        processResults: function (data, params) {
+                            params.page = params.page || 1;
+                            return {
+                                results: data.results,
+                                pagination: {
+                                    more: data.pagination?.more || false
+                                }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 1,
+                    placeholder: 'Pilih karyawan'
+                });
+                const shiftFromMachine = machine.shift.split(' ')[1];
+                const shiftSelect = document.getElementById('shiftSelect');
+                const filteredShifts = message.shift_options.filter(shift => shift.id !== shiftFromMachine);
+                let optionsHtml = `<option value="${shiftFromMachine}" selected>SHIFT ${shiftFromMachine}</option>`;
+                filteredShifts.forEach(shift => {
+                    optionsHtml += `<option value="${shift.id}">${shift.text}</option>`;
+                });
+                shiftSelect.innerHTML = optionsHtml;
+                const actualClockIn = machine.started_at.split(' ')
+                const group = machine.machine_id.split('-')[1]
+                document.getElementById('productionDate').value = machine.production_date
+                document.getElementById('actualClockInDate').value = actualClockIn[0]
+                document.getElementById('actualClockInTime').value = actualClockIn[1]
+                document.getElementById('laborQty').value = parseInt(machine.qty_actual)
+                document.getElementById('discrepQty').value = parseInt(machine.qty_ng) || 0
+                document.getElementById('resourceGrpID').value = group
+                document.getElementById('resourceID').value = machine.machine_id
+            })
                 .catch(error => {
                     console.log(error)
                 })

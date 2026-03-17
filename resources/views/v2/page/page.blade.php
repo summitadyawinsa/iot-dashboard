@@ -68,8 +68,7 @@
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="white"
                             xmlns="https://www.w3.org/2000/svg">
                             <path d="M1 21h22L12 2 1 21z" stroke="white" stroke-width="2" fill="none" />
-                            <line x1="12" y1="8" x2="12" y2="14" stroke="white"
-                                stroke-width="2" />
+                            <line x1="12" y1="8" x2="12" y2="14" stroke="white" stroke-width="2" />
                             <circle cx="12" cy="17" r="1.5" fill="white" />
                         </svg>
                     </button>
@@ -81,8 +80,8 @@
                             <h3 class="text-lg font-semibold mb-4">Filter Table</h3>
                             <button type="button" class="btn btn-warning btn-sm flex items-center"
                                 onclick="document.getElementById('modalFilter').classList.add('hidden')">
-                                <svg xmlns="https://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <svg xmlns="https://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -98,14 +97,12 @@
                             <div class="mb-4">
                                 <label for="filterDate" class="block text-sm font-medium text-gray-500">Start
                                     date</label>
-                                <input type="date" id="start" class="form-input w-full"
-                                    style="color-scheme: dark;">
+                                <input type="date" id="start" class="form-input w-full" style="color-scheme: dark;">
                             </div>
                             <div class="mb-4">
                                 <label for="filterDate" class="block text-sm font-medium text-gray-500">End
                                     date</label>
-                                <input type="date" id="end" class="form-input w-full"
-                                    style="color-scheme: dark;">
+                                <input type="date" id="end" class="form-input w-full" style="color-scheme: dark;">
                             </div>
                         </div>
                         <div class="flex justify-between">
@@ -124,8 +121,7 @@
                                         <button class="btn btn-primary" style="visibility: hidden"
                                             onclick="filterForm()" id="btnFilter">Filter</button>
 
-                                        <select name="selectTable" id="selectTable"
-                                            class="form-select w-52 lg:text-xs md:text-sm p-2 rounded-md border border-gray-300
+                                        <select name="selectTable" id="selectTable" class="form-select w-52 lg:text-xs md:text-sm p-2 rounded-md border border-gray-300
                                                     bg-white text-gray-700
                                                     dark:bg-[#1e293b] dark:text-gray-200 dark:border-gray-600
                                                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
@@ -316,12 +312,12 @@
             formData.append('lineID', lineId);
 
             fetch("{{ url('machine/export-history-log') }}", {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
                 .then(response => {
                     if (!response.ok) throw new Error('Gagal mengunduh file');
                     return response.blob();
@@ -350,62 +346,62 @@
                     });
                 });
         }
-        $(document).ready(function() {
+        $(document).ready(function () {
             let pathId = window.location.pathname.split('/');
             let lineId = pathId[pathId.length - 1];
             let linePage = pathId[1]
             let urlTable = `https://${window.location.host}/api/main/${lineId}`;
             let columns = [{
-                    data: 'machine_id',
-                    name: 'machine_id'
-                },
-                {
-                    data: 'job_num',
-                    name: 'job_num'
-                },
-                {
-                    data: 'part_no',
-                    name: 'part_no'
-                },
-                {
-                    data: 'qty_plan',
-                    name: 'qty_plan',
-                    render: function(data, type, row) {
-                        return Number(data).toLocaleString('en-US', {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        });
-                    }
-                },
-                {
-                    data: 'qty_actual',
-                    name: 'qty_actual',
-                    render: function(data, type, row) {
-                        return Number(data).toLocaleString('en-US', {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 0
-                        });
-                    }
-                },
-                {
-                    data: 'started_at',
-                    name: 'started_at'
-                },
-                {
-                    data: 'finished_at',
-                    name: 'finished_at'
-                },
-                {
-                    data: 'operation_time',
-                    name: 'operation_time'
-                },
-                {
-                    data: 'planvsact',
-                    name: 'planvsact',
-                    orderable: false,
-                    searchable: false,
-                    width: '70px'
+                data: 'machine_id',
+                name: 'machine_id'
+            },
+            {
+                data: 'job_num',
+                name: 'job_num'
+            },
+            {
+                data: 'part_no',
+                name: 'part_no'
+            },
+            {
+                data: 'qty_plan',
+                name: 'qty_plan',
+                render: function (data, type, row) {
+                    return Number(data).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
                 }
+            },
+            {
+                data: 'qty_actual',
+                name: 'qty_actual',
+                render: function (data, type, row) {
+                    return Number(data).toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                }
+            },
+            {
+                data: 'started_at',
+                name: 'started_at'
+            },
+            {
+                data: 'finished_at',
+                name: 'finished_at'
+            },
+            {
+                data: 'operation_time',
+                name: 'operation_time'
+            },
+            {
+                data: 'planvsact',
+                name: 'planvsact',
+                orderable: false,
+                searchable: false,
+                width: '70px'
+            }
             ];
             if (lineId === 'RBT-5H45') {
                 $('#model-column').show()
@@ -432,7 +428,7 @@
                 ],
                 pageLength: 25,
                 columns: columns,
-                createdRow: function(row, data) {
+                createdRow: function (row, data) {
                     const machine_id = data.machine_id
                     const qtyPlan = parseFloat((data.qty_plan + '').replace(/\./g, '').replace(/,/g,
                         '.')) || 0;
@@ -508,7 +504,7 @@
                     $(row).css('background', backgroundStyle);
                     $(row).attr('title', titleText);
                     $(row).css('cursor', 'pointer');
-                    $(row).off('click').on('click', function() {
+                    $(row).off('click').on('click', function () {
                         const machineName = data.machine_id.split('/')
                         const toolID = machineName[1]
                         const machineID = machineName[0]
@@ -521,10 +517,10 @@
                         }
                     });
                 },
-                drawCallback: function() {
+                drawCallback: function () {
                     const tbody = $('#stamping-table tbody');
                     const pendingRows = tbody.find('tr.row-pending');
-                    pendingRows.each(function() {
+                    pendingRows.each(function () {
                         tbody.append(this);
                     });
                 }
@@ -541,25 +537,25 @@
                     [3, 'desc']
                 ],
                 columns: [{
-                        data: 'ResourceID',
-                        name: 'ResourceID'
-                    },
-                    {
-                        data: 'JobNum',
-                        name: 'JobNum'
-                    },
-                    {
-                        data: 'PartNum',
-                        name: 'PartNum'
-                    },
-                    {
-                        data: 'DueDate',
-                        name: 'DueDate'
-                    },
-                    {
-                        data: 'JobCode',
-                        name: 'JobCode'
-                    }
+                    data: 'ResourceID',
+                    name: 'ResourceID'
+                },
+                {
+                    data: 'JobNum',
+                    name: 'JobNum'
+                },
+                {
+                    data: 'PartNum',
+                    name: 'PartNum'
+                },
+                {
+                    data: 'DueDate',
+                    name: 'DueDate'
+                },
+                {
+                    data: 'JobCode',
+                    name: 'JobCode'
+                }
                 ]
             });
             //Tabel History
@@ -569,7 +565,7 @@
                 ajax: {
                     url: `https://${window.location.host}/api/main/history/${lineId}`,
                     type: 'POST',
-                    data: function(d) {
+                    data: function (d) {
                         if ($('#start').val()) d.start = $('#start').val();
                         if ($('#end').val()) d.end = $('#end').val();
                     }
@@ -578,62 +574,62 @@
                     [5, 'desc']
                 ],
                 columns: [{
-                        data: 'machine_id',
-                        name: 'machine_id'
-                    },
-                    {
-                        data: 'job_num',
-                        name: 'job_num'
-                    },
-                    {
-                        data: 'part_no',
-                        name: 'part_no'
-                    },
-                    {
-                        data: 'qty_plan',
-                        name: 'qty_plan',
-                        render: function(data, type, row) {
-                            return Number(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-                        }
-                    },
-                    {
-                        data: 'qty_actual',
-                        name: 'qty_actual',
-                        render: function(data, type, row) {
-                            return Number(data).toLocaleString('en-US', {
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                            });
-                        }
-                    },
-                    {
-                        data: 'started_at',
-                        name: 'started_at'
-                    },
-                    {
-                        data: 'finished_at',
-                        name: 'finished_at'
-                    },
-                    {
-                        data: 'operation_time',
-                        name: 'operation_time',
-                        render: function(data, type, row) {
-                            const value = parseFloat(data);
-                            return isNaN(value) ? '0.00' : value.toFixed(2);
-                        }
-                    },
-                    {
-                        data: 'planvsact',
-                        name: 'planvsact',
-                        orderable: false,
-                        searchable: false,
-                        width: '70px'
+                    data: 'machine_id',
+                    name: 'machine_id'
+                },
+                {
+                    data: 'job_num',
+                    name: 'job_num'
+                },
+                {
+                    data: 'part_no',
+                    name: 'part_no'
+                },
+                {
+                    data: 'qty_plan',
+                    name: 'qty_plan',
+                    render: function (data, type, row) {
+                        return Number(data).toLocaleString('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        });
                     }
+                },
+                {
+                    data: 'qty_actual',
+                    name: 'qty_actual',
+                    render: function (data, type, row) {
+                        return Number(data).toLocaleString('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        });
+                    }
+                },
+                {
+                    data: 'started_at',
+                    name: 'started_at'
+                },
+                {
+                    data: 'finished_at',
+                    name: 'finished_at'
+                },
+                {
+                    data: 'operation_time',
+                    name: 'operation_time',
+                    render: function (data, type, row) {
+                        const value = parseFloat(data);
+                        return isNaN(value) ? '0.00' : value.toFixed(2);
+                    }
+                },
+                {
+                    data: 'planvsact',
+                    name: 'planvsact',
+                    orderable: false,
+                    searchable: false,
+                    width: '70px'
+                }
                 ],
-                createdRow: function(row, data) {
+                createdRow: function (row, data) {
                     const startedAt = data.started_at;
                     const finishedAt = data.finished_at;
                     const qtyPlan = parseFloat(data.qty_plan) || 0;
@@ -652,14 +648,14 @@
                     }
                     $(row).css('background', backgroundStyle);
                     $(row).css('cursor', 'pointer');
-                    $(row).off('click').on('click', function() {
+                    $(row).off('click').on('click', function () {
                         const numberShift = data.shift.split(' ')[1]
                         window.location.href =
                             `https://${window.location.host}/${linePage}/dashboard/${data.machine_id}/${data.job_num}/${data.production_date}/${numberShift}`;
                     });
                 }
             });
-            $('#searchFilter').on('click', function(e) {
+            $('#searchFilter').on('click', function (e) {
                 e.preventDefault();
                 history.ajax.reload();
                 document.getElementById('modalFilter').classList.add('hidden');
@@ -688,7 +684,7 @@
                     })[0];
 
                     if (rowIdx !== undefined) {
-                        console.log(response)
+                        // console.log(response)
                         let rowData = table.row(rowIdx).data();
                         const qtyActual = parseFloat(response.qty_actual) || 0;
                         rowData.qty_actual = qtyActual;
@@ -739,13 +735,13 @@
                 type: 'POST',
                 dataType: 'json',
                 delay: 250,
-                data: function(params) {
+                data: function (params) {
                     return {
                         q: params.term,
                         page: params.page || 1,
                     };
                 },
-                processResults: function(data, params) {
+                processResults: function (data, params) {
                     params.page = params.page || 1;
                     return {
                         results: data.results,

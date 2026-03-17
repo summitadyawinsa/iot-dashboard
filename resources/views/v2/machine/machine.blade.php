@@ -173,9 +173,9 @@
                             <select id="labor_type_three" class="form-select mt-1 block w-full" required>
                                 <option value="P" selected>P - Production (Default)</option>
                                 <option value="I">I Indirect</option>
-                                <option value="S">S Setup</option>
+                                <!-- <option value="S">S Setup</option>
                                 <option value="J">J Project</option>
-                                <option value="V">V Service</option>
+                                <option value="V">V Service</option> -->
                             </select>
                         </div>
                         <div class="mb-2">

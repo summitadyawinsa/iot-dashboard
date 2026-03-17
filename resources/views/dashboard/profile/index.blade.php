@@ -9,44 +9,112 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="{{ asset('assets/css/select.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        #analytics:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background: #fff;
+        }
+
+        #analytics:fullscreen * {
+            pointer-events: auto;
+        }
+    </style>
     <div id="analytics">
+        <input type="text" id="user_id" value="{{ Auth::user()->id }}" hidden>
         <div class="p-6 space-y-6 bg-gray-100 dark:bg-gray-900 min-h-screen transition" id="dashboard_profile_view">
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">
                     Profile Dashboard
                 </h1>
-                <button id="config_btn"
-                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
-                    Configuration
-                </button>
+                <div class="flex gap-2">
+                    <button class="btn btn-primary btn-sm btn-icon" id="view_more">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                    </button>
+                    <button id="fullscreen_btn"
+                        class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                        title="Toggle Fullscreen">
+                        <svg id="fullscreen_icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 3.75h6v1.5h-4.5v4.5h-1.5v-6Zm16.5 0v6h-1.5v-4.5h-4.5v-1.5h6ZM3.75 20.25v-6h1.5v4.5h4.5v1.5h-6Zm16.5-6v6h-6v-1.5h4.5v-4.5h1.5Z" />
+                        </svg>
+                    </button>
+                    <button id="config_btn"
+                        class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                        Configuration
+                    </button>
+                </div>
             </div>
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
-                    <div class="flex items-center gap-4">
-                        <img src="https://ui-avatars.com/api/?name=Aziz+FR" class="w-20 h-20 rounded-full border">
+                    <div class="flex justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Aziz+FR"
+                                    class="w-20 h-20 rounded-full border object-cover" id="img_pp">
+                                <button type="button" id="btn_open_img"
+                                    class="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-1.5 shadow-md transition hidden"
+                                    onclick="document.getElementById('photo_input').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 7h4l2-2h6l2 2h4v13H3V7z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                </button>
+                                <input type="file" id="photo_input" class="hidden" accept="image/*">
+                            </div>
+                            <div>
+                                <h2 class="text-md font-semibold text-gray-800 dark:text-white" id="name_text">
+                                    -
+                                </h2>
+                                <p class="text-gray-500 dark:text-gray-400" id="nik_name">
+                                    -
+                                </p>
+                            </div>
+                        </div>
                         <div>
-                            <h2 class="text-xl font-semibold text-gray-800 dark:text-white" id="name_text">
-                                Aziz Fatkhu Rohman
-                            </h2>
-                            <p class="text-gray-500 dark:text-gray-400" id="nik_name">
-                                200525-001
-                            </p>
+                            <button id="edit_btn"
+                                class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                                title="Toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6" width="24" height="24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                </svg>
+                            </button>
+                            <button id="update_btn"
+                                class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition hidden"
+                                title="Toggle">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6" width="24" height="24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
-
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between">
                             <span class="text-gray-500">Line</span>
-                            <span class="font-medium text-gray-800 dark:text-white" id="line_text">
+                            <span class="text-sm text-gray-800 dark:text-white" id="line_text">
 
                             </span>
                         </div>
-                        <div class="flex justify-between">
+                        <!-- <div class="flex justify-between">
                             <span class="text-gray-500">Machine</span>
-                            <button class="font-medium text-gray-800 dark:text-white" id="machine_text">
+                            <button class="text-sm text-gray-800 dark:text-white" id="machine_text">
 
                             </button>
-                        </div>
+                        </div> -->
                         <div class="flex justify-between">
                             <span class="text-gray-500">Status</span>
                             <span class="px-2 py-1 text-xs rounded bg-green-100" id="status_text"
@@ -54,75 +122,61 @@
                                 Active
                             </span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Job Order</span>
-                            <span class="font-medium text-gray-800 dark:text-white" id="job_text">
-
-                            </span>
-                        </div>
                         <!-- <div class="flex justify-between">
-                            <span class="text-gray-500">Health</span>
-                            <span class="font-medium text-gray-800 dark:text-white">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style="color: yellow">
-                                    <path
-                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967h4.175c.969 0 1.371 1.24.588 1.81l-3.378 2.455 1.287 3.966c.3.922-.755 1.688-1.54 1.118L10 13.347l-3.37 2.456c-.784.57-1.838-.196-1.539-1.118l1.287-3.966-3.378-2.455c-.783-.57-.38-1.81.588-1.81h4.175l1.286-3.967z" />
-                                </svg>
+                            <span class="text-gray-500">Production Date</span>
+                            <span class="text-sm text-gray-800 dark:text-white" id="prod_date_text">
+
                             </span>
                         </div> -->
                     </div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">
-                        Activity Summary
-                    </h3>
+                    <div class="w-full">
+                        <div class="flex justify-between mb-1 text-sm">
+                            <span>Production Progress</span>
+                            <span id="progress_percent">0%</span>
+                        </div>
 
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                            <div id="progress_bar" class="bg-blue h-4 rounded-full transition-all duration-500"
+                                style="width: 0%;background-color: #3490dc;">
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Total Job</p>
-                            <p class="text-2xl font-bold dark:text-white" id="total_job">-</p>
+                            <p class="text-sm dark:text-white">Sum Job</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_job">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Total Downtime</p>
-                            <p class="text-2xl font-bold dark:text-white" id="total_downtime">-</p>
+                            <p class="text-sm dark:text-white">Sum DT</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_downtime">-</p>
+                        </div>
+                        <!-- <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Sum Qty Plan</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_qty_plan">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Total Qty Plan</p>
-                            <p class="text-2xl font-bold dark:text-white" id="total_qty_plan">-</p>
-                        </div>
-                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Total Qty Actual</p>
-                            <p class="text-2xl font-bold dark:text-white" id="total_qty_actual">-</p>
-                        </div>
+                            <p class="text-sm dark:text-white">Sum Qty Act</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_qty_actual">-</p>
+                        </div> -->
                     </div>
-                    <div class="grid grid-cols-3 gap-4 mt-3">
-                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Avability</p>
-                            <p class="text-2xl font-bold dark:text-white" id="availability">-</p>
-                        </div>
-                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Performance</p>
-                            <p class="text-2xl font-bold dark:text-white" id="performance">-</p>
-                        </div>
-                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
-                            <p class="text-sm dark:text-white">Quality</p>
-                            <p class="text-2xl font-bold dark:text-white" id="quality">-</p>
-                        </div>
-                    </div>
+                    <div id="dtChart" style="width: 100%;"></div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">
-                        Progress Chart
-                    </h3>
-                    <div id="activityChart" height="200"></div>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-                    <div class="flex justify-between mb-3">
-                        <h3 class="font-semibold text-gray-800 dark:text-white mb-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 md:col-span-2">
+                    <div class="flex justify-between mb-2">
+                        <h3 class="font-semibold text-gray-800 dark:text-white" id="prod_date_text">
                             Machine Info
                         </h3>
                         <div class="flex">
+                            <button class="btn btn-primary btn-sm btn-icon hidden" id="btn_technician_arrived">
+                                Technician Arrived
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6" width="24" height="24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                            </button>
                             <button class="btn btn-primary btn-sm btn-icon hidden" id="btn_machine_resume">
                                 Resume
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -144,29 +198,29 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Machine</p>
-                            <p class="text-2xl font-bold dark:text-white" id="machine_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="machine_info_text">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Part</p>
-                            <p class="text-2xl font-bold dark:text-white" id="part_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="part_info_text">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Job Number</p>
-                            <p class="text-2xl font-bold dark:text-white" id="jo_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="jo_info_text">-</p>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-4 mt-2">
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Qty Plan</p>
-                            <p class="text-2xl font-bold dark:text-white" id="qty_plan_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_plan_info_text">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Qty Actual</p>
-                            <p class="text-2xl font-bold dark:text-white" id="qty_actual_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_actual_info_text">-</p>
                         </div>
                         <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
                             <p class="text-sm dark:text-white">Qty NG</p>
-                            <p class="text-2xl font-bold dark:text-white" id="qty_ng_info_text">-</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_ng_info_text">-</p>
                         </div>
                     </div>
                     <div class="mt-2" id="div_dt_list">
@@ -185,14 +239,42 @@
                             </div>
                         </div>
                     </div>
+                    <div id="gsphChart" style="width:100%;"></div>
                 </div>
+            </div>
+        </div>
+        <div class="p-6 space-y-6 bg-gray-100 dark:bg-gray-900 min-h-screen transition hidden" id="oee_view">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+                    OEE & Activities
+                </h1>
+                <button id="back_btn_view"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                    Back
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
                     <h3 class="font-semibold text-gray-800 dark:text-white mb-4">
                         OEE Chart
                     </h3>
                     <div id="oeeChart" height="200"></div>
+                    <div class="grid grid-cols-3 gap-4 mt-3">
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">A</p>
+                            <p class="text-sm font-bold dark:text-white" id="availability">-</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">P</p>
+                            <p class="text-sm font-bold dark:text-white" id="performance_val">-</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Q</p>
+                            <p class="text-sm font-bold dark:text-white" id="quality">-</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 md:col-span-2">
                     <h3 class="font-semibold text-gray-800 dark:text-white mb-6">
                         Recent Activity
                     </h3>
@@ -410,16 +492,166 @@
             });
             main_dashboard()
             downtime_list()
+            progress_bar()
+            chart_main()
+            init_dt_chart()
         })
+        let gsphChart
+        function chart_main() {
+            const employeeID = $("#user_id").val()
+
+            $.ajax({
+                url: "{{ url('api/profile/main_gsph') }}",
+                type: 'POST',
+                data: {
+                    employee: employeeID,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (response) {
+
+                    let gsphData = [];
+                    let timeCategory = [];
+
+                    response.data.forEach(function (item) {
+                        gsphData.push(parseFloat(item.gsph));
+                        timeCategory.push(item.cut_off_time);
+                    });
+
+                    const gsph_chart = {
+                        chart: {
+                            type: 'area',
+                            height: 300
+                        },
+                        title: {
+                            text: 'GSPH',
+                            align: 'center'
+                        },
+                        series: [{
+                            name: 'GSPH',
+                            data: gsphData
+                        }],
+                        stroke: {
+                            curve: 'smooth'
+                        },
+                        xaxis: {
+                            categories: timeCategory
+                        }
+                    };
+
+                    gsphChart = new ApexCharts(document.querySelector("#gsphChart"), gsph_chart);
+                    gsphChart.render();
+                },
+                error: function (xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+        let dtChart;
+        function init_dt_chart() {
+            const employeeID = $("#user_id").val();
+            $.ajax({
+                url: "{{ url('api/profile/main-dt') }}",
+                type: 'POST',
+                data: {
+                    empId: employeeID
+                },
+                success: function (response) {
+
+                    const dtMap = {};
+
+                    response.dt_log.forEach(item => {
+
+                        const name = item.name;
+
+                        // konversi jam → menit
+                        const minutes = Number(item.downtime) * 60;
+
+                        if (!dtMap[name]) {
+                            dtMap[name] = 0;
+                        }
+
+                        dtMap[name] += minutes;
+
+                    });
+
+                    // singkatan label
+                    const shortLabel = (text) => {
+                        return text
+                            .split(" ")
+                            .map(w => w[0])
+                            .join("")
+                            .toUpperCase();
+                    };
+
+                    const categories = [];
+                    const data = [];
+
+                    Object.keys(dtMap).forEach(name => {
+
+                        categories.push(shortLabel(name));
+
+                        data.push(Number(dtMap[name].toFixed(2)));
+
+                    });
+
+                    const options = {
+
+                        chart: {
+                            type: 'bar',
+                            height: 250
+                        },
+
+                        title: {
+                            text: 'Downtime List',
+                            align: 'center'
+                        },
+
+                        series: [{
+                            name: 'Downtime (Minutes)',
+                            data: data
+                        }],
+
+                        xaxis: {
+                            categories: categories
+                        },
+                        plotOptions: {
+                            bar: {
+                                borderRadius: 4,
+                                columnWidth: '35%'
+                            }
+                        },
+
+                        dataLabels: {
+                            enabled: true
+                        }
+
+                    };
+
+                    dtChart = new ApexCharts(document.querySelector("#dtChart"), options);
+                    dtChart.render();
+
+                },
+                error: function (xhr) {
+                    console.log(xhr);
+                }
+            });
+
+        }
         function main_dashboard() {
-            const path = window.location.pathname;
-            const segments = path.split('/').filter(Boolean);
-            const employeeID = segments[segments.length - 1];
+            const employeeID = $("#user_id").val()
+            const today = new Date();
+
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            const formattedDate = `${year}-${month}-${day}`;
             $.ajax({
                 url: "{{ url('api/profile/main') }}",
                 type: 'POST',
                 data: {
-                    employeeID: employeeID
+                    employeeID: employeeID,
+                    production_date: formattedDate
                 },
                 success: function (response) {
                     if (response.status == 'error') {
@@ -428,10 +660,14 @@
                         $("#div_dt_now").addClass('hidden')
                     }
                     const data = response.data
+                    if (data.avatar) {
+                        document.getElementById('img_pp').src = `https://dashboard.summitadyawinsa.co.id/uploads/${data.avatar}`
+                    }
                     $("#name_text").text(data.name ?? '-')
-                    $("#nik_text").text(data.employee_id)
-                    $("#machine_text").text(data.machine_id ?? '-')
-                    $('#job_text').text(data.job_num ?? '-')
+                    $("#nik_name").text(data.username ?? '-')
+                    // $("#machine_text").text(data.machine_id ?? '-')
+                    const pro_date = 'Machine Info ' + data.production_date ?? '-'
+                    $('#prod_date_text').text(pro_date)
                     if (!data.machine_id && !data.job_num) {
                         $("#status_text").text('Non Active')
                     }
@@ -448,15 +684,27 @@
                     $("#qty_actual_info_text").text(qty_actual.toFixed(0) ?? '-')
                     $("#qty_ng_info_text").text(qty_ng.toFixed(0) ?? '-')
                     if (data.start_dt !== null && data.nama_dt !== null) {
-                        $("#div_dt_list").addClass('hidden')
-                        $("#btn_machine_resume").removeClass('hidden')
-                        $("#btn_machine_finish").addClass('hidden')
-                        $("#div_dt_now").removeClass('hidden')
-                        $("#nama_dt").text(data.nama_dt)
-                        startDowntimeCounter(data.start_dt)
+                        if (data.dt_type == 'MTN') {
+                            $("#div_dt_list").addClass('hidden')
+                            $("#btn_machine_resume").addClass('hidden')
+                            $("#btn_technician_arrived").removeClass('hidden')
+                            $("#btn_machine_finish").addClass('hidden')
+                            $("#div_dt_now").removeClass('hidden')
+                            $("#nama_dt").text(data.nama_dt)
+                            startDowntimeCounter(data.start_dt)
+                        } else {
+                            $("#div_dt_list").addClass('hidden')
+                            $("#btn_machine_resume").removeClass('hidden')
+                            $("#btn_technician_arrived").addClass('hidden')
+                            $("#btn_machine_finish").addClass('hidden')
+                            $("#div_dt_now").removeClass('hidden')
+                            $("#nama_dt").text(data.nama_dt)
+                            startDowntimeCounter(data.start_dt)
+                        }
                     } else {
                         $("#div_dt_list").removeClass('hidden')
                         $("#btn_machine_resume").addClass('hidden')
+                        $("#btn_technician_arrived").addClass('hidden')
                         $("#btn_machine_finish").removeClass('hidden')
                         $("#div_dt_now").addClass('hidden')
                         if (dtInterval) clearInterval(dtInterval)
@@ -465,14 +713,14 @@
                     if (response.activity !== null) {
                         renderActivityTimeline(response.activity);
                     }
-                    if(response.act_summary !== null){
+                    if (response.act_summary !== null) {
                         const sum = response.act_summary
                         $("#total_downtime").text(sum.total_downtime)
-                        $("#total_qty_plan").text(sum.total_qty_plan)
+                        // $("#total_qty_plan").text(Number(sum.total_qty_plan).toLocaleString('id-ID'))
                         $("#total_job")
-                        $("#total_qty_actual").text(sum.total_qty_plan)
+                        // $("#total_qty_actual").text(Number(sum.total_qty_actual).toLocaleString('id-ID'))
                         $("#availability").text(sum.availability)
-                        $("#performance").text(sum.performance)
+                        $("#performance_val").text(sum.performance)
                         $("#quality").text(sum.quality)
                     }
                 },
@@ -564,6 +812,7 @@
 
         function downtime_list() {
             $('#downtime_list').select2({
+                dropdownParent: $('#analytics'),
                 placeholder: 'Selected Downtime',
                 allowClear: true,
                 width: '100%',
@@ -600,6 +849,7 @@
 
         function showRemarkAlert(downtime) {
             Swal.fire({
+                target: document.getElementById('analytics'),
                 html: `
             <div class="text-start">
                 <p><strong>Downtime:</strong> ${downtime.text}</p>
@@ -690,24 +940,70 @@
             $("#config_view").addClass('hidden')
             $("#dashboard_profile_view").removeClass('hidden')
         })
-        // $("#next_health_btn").on('click', function () {
-        //     const physical_condition = $('input[name="physical_condition"]:checked').val()
-        //     const sleep_condition = $('input[name="sleep_condition"]:checked').val()
-        //     const medicine_condition = $('input[name="medicine_condition"]:checked').val()
-        //     const drug_condition = $('input[name="drug_condition"]:checked').val()
-        //     const mental_condition = $('input[name="mental_condition"]:checked').val()
-        //     if (!physical_condition || !sleep_condition || !medicine_condition || !drug_condition || !
-        //         mental_condition) {
-        //         Swal.fire({
-        //             icon: "error",
-        //             title: "Oops...",
-        //             text: "Semua kolom wajib diisi!"
-        //         });
-        //         return
-        //     }
-        //     $("#condition_check_form").addClass('hidden')
-        //     $("#config_machine_form").removeClass('hidden')
-        // })
+        $("#back_btn_view").on('click', function () {
+            $("#oee_view").addClass('hidden')
+            $("#dashboard_profile_view").removeClass('hidden')
+        })
+        let oeeChart
+        $("#view_more").on('click', function () {
+            const empID = $("#user_id").val()
+            $.ajax({
+                url: "{{ url('api/profile/view_more') }}",
+                type: 'post',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    employee_id: empID,
+                    machine_id: $("#machine_info_text").text(),
+                }, success: function (response) {
+                    $("#dashboard_profile_view").addClass('hidden')
+                    $("#oee_view").removeClass('hidden')
+                    $("#availability").text(response.oee_availability)
+                    $("#performance_val").text(response.oee_performance)
+                    $("#quality").text(response.ooe_quality)
+                    var oeeOption = {
+                        chart: {
+                            height: 280,
+                            type: "radialBar"
+                        },
+
+                        series: [response.percentage_rata_rata],
+
+                        plotOptions: {
+                            radialBar: {
+                                hollow: {
+                                    margin: 15,
+                                    size: "70%"
+                                },
+
+                                dataLabels: {
+                                    showOn: "always",
+                                    name: {
+                                        offsetY: -10,
+                                        show: true,
+                                        color: "#888",
+                                        fontSize: "13px"
+                                    },
+                                    value: {
+                                        color: "#111",
+                                        fontSize: "30px",
+                                        show: true
+                                    }
+                                }
+                            }
+                        },
+
+                        stroke: {
+                            lineCap: "round",
+                        },
+                        labels: ["OEE"]
+                    };
+
+                    oeeChart = new ApexCharts(document.querySelector("#oeeChart"), oeeOption);
+                    oeeChart.render();
+                }
+            })
+        })
+
         $("#category").on('change', function () {
             shift()
         })
@@ -966,9 +1262,6 @@
         //     $("#config_view").removeClass('hidden')
         // })
         $("#submit_btn").on('click', function () {
-            // const path = window.location.pathname;
-            // const segments = path.split('/').filter(Boolean);
-            // const empID = segments[segments.length - 1];
             // const physical_condition = $('input[name="physical_condition"]:checked').val();
             // const sleep_condition = $('input[name="sleep_condition"]:checked').val();
             // const medicine_condition = $('input[name="medicine_condition"]:checked').val();
@@ -1024,8 +1317,42 @@
                 }
             });
         });
+        $("#btn_technician_arrived").on('click', function () {
+            $.ajax({
+                url: "{{ url('api/config/technician_arrived') }}",
+                type: 'post',
+                data: {
+                    machine: $("#machine_info_text").text(),
+                    job_num: $("#jo_info_text").text()
+                }, success: function (response) {
+                    const msg = response.message
+                    $("#btn_machine_resume").removeClass('hidden')
+                    $("#btn_technician_arrived").addClass('hidden')
+                    if (response.status !== 200) {
+                        Swal.fire({
+                            icon: "error",
+                            title: 'Error',
+                            text: message
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "success",
+                            title: 'Success',
+                            text: message
+                        });
+                    }
+                }, error: function (xhr) {
+                    Swal.fire({
+                        icon: "error",
+                        title: 'Error',
+                        text: 'Unknown Error'
+                    });
+                }
+            })
+        })
         $("#btn_machine_finish").on('click', function () {
             Swal.fire({
+                target: document.getElementById('analytics'),
                 title: "Are you sure?",
                 text: "You are about to finish this job.!",
                 icon: "warning",
@@ -1043,6 +1370,7 @@
                             job_num: $("#jo_info_text").text()
                         }, success: function (response) {
                             Swal.fire({
+                                target: document.getElementById('analytics'),
                                 icon: "success",
                                 title: "Success",
                                 text: "Mesin berhasil di finish"
@@ -1051,6 +1379,7 @@
                         }, error: function (xhr) {
                             console.log(xhr.responseJSON.message)
                             Swal.fire({
+                                target: document.getElementById('analytics'),
                                 icon: "error",
                                 title: "Server Error",
                                 text: 'Terjadi kesalahan'
@@ -1062,86 +1391,237 @@
         })
     </script>
     <script>
-        var actOption = {
+        const fullscreenBtn = document.getElementById('fullscreen_btn');
+        const fullscreenIcon = document.getElementById('fullscreen_icon');
+        const content = document.getElementById('analytics');
+
+        fullscreenBtn.addEventListener('click', () => {
+
+            if (!document.fullscreenElement) {
+                content.requestFullscreen();
+
+                fullscreenIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 9H5.25V5.25m0 0L9 9m-3.75-3.75L9 9m6 6h3.75v3.75m0 0L15 15m3.75 3.75L15 15" />
+        `;
+            } else {
+                document.exitFullscreen();
+
+                fullscreenIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 3.75h6v1.5h-4.5v4.5h-1.5v-6Zm16.5 0v6h-1.5v-4.5h-4.5v-1.5h6ZM3.75 20.25v-6h1.5v4.5h4.5v1.5h-6Zm16.5-6v6h-6v-1.5h4.5v-4.5h1.5Z" />
+        `;
+            }
+
+        });
+        function progress_bar() {
+            const employeeID = $("#user_id").val()
+            $.ajax({
+                url: "{{ url('api/profile/progress_bar') }}",
+                type: 'POST',
+                data: {
+                    employeeID: employeeID
+                }, success: function (response) {
+                    const data = response.data;
+                    let actual = data.actual;
+                    let target = data.target;
+                    let percent = (actual / target) * 100;
+                    percent_bar = Math.min(percent, 100);
+                    document.getElementById("progress_bar").style.width = percent_bar + "%";
+                    document.getElementById("progress_percent").innerText = percent.toFixed(1) + "%";
+                }
+            })
+        }
+
+        var options = {
+            series: [{
+                name: 'Inflation',
+                data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8]
+            }],
             chart: {
-                height: 280,
-                type: "radialBar"
+                height: 350,
+                type: 'bar',
             },
-
-            series: [67],
-
             plotOptions: {
-                radialBar: {
-                    hollow: {
-                        margin: 15,
-                        size: "70%"
-                    },
-
+                bar: {
+                    borderRadius: 10,
                     dataLabels: {
-                        showOn: "always",
-                        name: {
-                            offsetY: -10,
-                            show: true,
-                            color: "#888",
-                            fontSize: "13px"
-                        },
-                        value: {
-                            color: "#111",
-                            fontSize: "30px",
-                            show: true
-                        }
-                    }
+                        position: 'top', // top, center, bottom
+                    },
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return val + "%";
+                },
+                offsetY: -20,
+                style: {
+                    fontSize: '12px',
+                    colors: ["#304758"]
                 }
             },
 
-            stroke: {
-                lineCap: "round",
-            },
-            labels: ["Progress"]
-        };
-
-        var actChart = new ApexCharts(document.querySelector("#activityChart"), actOption);
-        actChart.render();
-        var oeeOption = {
-            chart: {
-                height: 280,
-                type: "radialBar"
-            },
-
-            series: [67],
-
-            plotOptions: {
-                radialBar: {
-                    hollow: {
-                        margin: 15,
-                        size: "70%"
-                    },
-
-                    dataLabels: {
-                        showOn: "always",
-                        name: {
-                            offsetY: -10,
-                            show: true,
-                            color: "#888",
-                            fontSize: "13px"
-                        },
-                        value: {
-                            color: "#111",
-                            fontSize: "30px",
-                            show: true
+            xaxis: {
+                categories: ["07.30", "08.30", "09.30", "10.30", "11.30", "12.30", "13.30", "14.30", "15.30", "16.30"],
+                position: 'top',
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                },
+                crosshairs: {
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            colorFrom: '#D8E3F0',
+                            colorTo: '#BED1E6',
+                            stops: [0, 100],
+                            opacityFrom: 0.4,
+                            opacityTo: 0.5,
                         }
                     }
+                },
+                tooltip: {
+                    enabled: true,
                 }
             },
+            yaxis: {
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false,
+                },
+                labels: {
+                    show: false,
+                    formatter: function (val) {
+                        return val + "%";
+                    }
+                }
 
-            stroke: {
-                lineCap: "round",
             },
-            labels: ["Progress"]
+            title: {
+                text: 'Monthly Inflation in Argentina, 2002',
+                floating: true,
+                offsetY: 330,
+                align: 'center',
+                style: {
+                    color: '#444'
+                }
+            }
         };
 
-        var oeeChart = new ApexCharts(document.querySelector("#oeeChart"), oeeOption);
-        oeeChart.render();
+        var chart = new ApexCharts(document.querySelector("#counterChart"), options);
+        chart.render();
     </script>
+    <script>
+        const socket = new WebSocket('wss://websocket.summitadyawinsa.co.id');
 
+        socket.onopen = () => {
+            console.log('Connected to WebSocket server');
+            socket.send(JSON.stringify({
+                action: "subscribe",
+                channel: "machine"
+            }));
+        };
+        socket.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data)
+                const response = msg.data.message
+                const eventTitle = msg.event
+                const machine = $("#machine_info_text").text()
+                // console.log(eventTitle)
+                if (eventTitle === 'update_stroke') {
+                    console.log(response)
+                    const machineID = response.machine_id;
+                    const conditionID = response.condition_id;
+                    const qty_actual = Number(response.qty_actual)
+                    const qty_plan = Number(response.qty_plan)
+                    const qty_ng = Number(response.qty_ng)
+                    const oee_availability = Number(response.oee_availability)
+                    const oee_performance = Number(response.oee_performance)
+                    const ooe_quality = Number(response.ooe_quality)
+                    if ((conditionID === true || conditionID === 1 || conditionID === '1') && machineID == machine) {
+                        let percent = (qty_actual / qty_plan) * 100;
+                        percent_bar = Math.min(percent, 100);
+                        document.getElementById("progress_bar").style.width = percent_bar + "%";
+                        document.getElementById("progress_percent").innerText = percent.toFixed(1) + "%";
+                        $("#qty_actual_info_text").text(qty_actual.toFixed(0))
+                        $("#qty_ng_info_text").text(qty_ng)
+                        $("#availability").text(oee_availability.toFixed(0))
+                        $("#performance_val").text(oee_performance.toFixed(0))
+                        $("#quality").text(ooe_quality.toFixed(0))
+                        const oee = (oee_availability + oee_performance + ooe_quality) / 3;
+                        const oeeFinal = Math.min(oee, 100);
+                        if (oeeChart) {
+                            oeeChart.updateSeries([Number(oeeFinal.toFixed(1))]);
+                        }
+                        const labels = Object.keys(response.gsphLabel).map(h => h.padStart(2, '0') + ":00");
+                        const values = Object.values(response.gsphLabel).map(Number);
+                        if (gsphChart) {
+                            gsphChart.updateOptions({
+                                xaxis: {
+                                    categories: labels
+                                }
+                            });
+
+                            gsphChart.updateSeries([{
+                                name: 'GSPH',
+                                data: values
+                            }]);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Invalid message from WebSocket:', event.data);
+            }
+        }
+        socket.onclose = () => {
+            console.log('Disconnected from WebSocket')
+        }
+        socket.onerror = (err) => {
+            console.log('WebSocket error:', err)
+        }
+        document.getElementById('photo_input').addEventListener('change', function (e) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                document.getElementById('img_pp').src = event.target.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+        $("#edit_btn").on('click', function () {
+            $("#btn_open_img").removeClass('hidden')
+            $("#edit_btn").addClass('hidden')
+            $("#update_btn").removeClass('hidden')
+        })
+        $("#update_btn").on('click', function () {
+            let file = $("#photo_input")[0].files[0];
+            if (!file) {
+                alert("Pilih foto dulu");
+                return;
+            }
+            const employeeID = $("#user_id").val()
+            let formData = new FormData();
+            formData.append('photo', file);
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('employeeID', employeeID)
+            $.ajax({
+                url: "{{ url('api/profile/upload-photo') }}",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    alert("Foto berhasil diupdate");
+                    location.reload();
+                },
+                error: function (err) {
+                    console.log(err);
+                    alert("Upload gagal");
+                }
+            });
+        })
+    </script>
 </x-layout.default>

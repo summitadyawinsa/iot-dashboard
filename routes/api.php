@@ -13,6 +13,7 @@ use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\HealthConditionController;
 use App\Http\Controllers\JobNumController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -390,10 +391,22 @@ Route::prefix('job_num')->group(function () {
 });
 Route::prefix('profile')->group(function () {
     Route::post('main', [ProfileController::class, 'main']);
+    Route::post('progress_bar', [ProfileController::class, 'progress_bar']);
+    Route::post('upload-photo', [ProfileController::class, 'uploadPhoto']);
+    Route::post('view_more', [ProfileController::class, 'view_more']);
+    Route::post('main_gsph', [ProfileController::class, 'main_gsph']);
+    Route::post('main-dt', [ProfileController::class, 'main_dt']);
+});
+Route::prefix('user-management')->group(function () {
+    Route::post('list', [UserManagementController::class, 'list']);
+    Route::post('store-users', [UserManagementController::class, 'store_user']);
+    Route::post('find-data', [UserManagementController::class, 'find_data']);
+    Route::post('update-user', [UserManagementController::class, 'update_user']);
+    Route::post('delete-user', [UserManagementController::class, 'delete_user']);
 });
 Route::prefix('config')->group(function () {
     Route::post('setup', [ConfigController::class, 'setup']);
-    Route::post('finish_machine',[ConfigController::class,'finish_machine']);
+    Route::post('finish_machine', [ConfigController::class, 'finish_machine']);
     Route::post('shift_get_all', [ConfigController::class, 'shift_get_all']);
     Route::post('get_machine', [ConfigController::class, 'get_machine']);
     Route::post('get_job_all', [ConfigController::class, 'get_job_all']);
@@ -401,4 +414,5 @@ Route::prefix('config')->group(function () {
     Route::post('get_employee', [ConfigController::class, 'get_employee']);
     Route::post('save_downtime', [ConfigController::class, 'save_downtime']);
     Route::post('stop_downtime', [ConfigController::class, 'stop_downtime']);
+    Route::post('technician_arrived', [ConfigController::class, 'technician_arrived']);
 });

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\LogMachineController;
 use App\Http\Controllers\Api\V1\PurchasingController;
 use Illuminate\Support\Facades\DB;
 use App\Models\LogMachine;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 Route::get('/', function () {
@@ -950,8 +951,12 @@ Route::prefix('standard_operational_procedure')->group(function () {
         ]);
     });
 });
-Route::get('dashboard-profile/{id}', function () {
-    return view('dashboard.profile.index');
+Route::get('dashboard-profile/', function () {
+    $user_id = Auth::user()->id;
+    return view('dashboard.profile.index', ['user_id', $user_id]);
+})->middleware('auth');
+Route::get('user-management',function(){
+    return view('dashboard.user_management.index');
 })->middleware('auth');
 Route::prefix('auth')->group(function () {
     Route::view('login', 'auth.login')->name('login');

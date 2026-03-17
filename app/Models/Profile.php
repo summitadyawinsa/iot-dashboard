@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -16,13 +17,8 @@ class Profile extends Model
                     ->on('b.production_date', '=', 'c.production_date')
                     ->where('c.is_active', 1);
             })
-            ->leftJoin('oee_log_machine as e', function ($join) {
-                $join->on('b.machine_id', '=', 'e.machine_id')
-                    ->on('b.job_num', '=', 'e.job_num')
-                    ->on('b.production_date', '=', 'e.production_date');
-            })
             ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
-            ->select('a.name', 'a.username', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt')
+            ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
             ->where('a.id', $emp_id)
             ->first();
     }
@@ -41,9 +37,12 @@ class Profile extends Model
             ->where('production_date', $machine->production_date)
             ->get();
     }
-    public function act_summary($emp_id)
+    public function act_summary($emp_id, $production_date)
     {
-        $data = DB::table('history_header_machine as a')
+        $users = DB::table('users')
+            ->where('id', $emp_id)
+            ->first();
+        $data = DB::table('log_header_machine as a')
             ->leftJoin('log_downtime as b', function ($join) {
                 $join->on('a.machine_id', '=', 'b.machine_id')
                     ->on('a.job_num', '=', 'b.job_num')
@@ -54,7 +53,8 @@ class Profile extends Model
                     ->on('a.job_num', '=', 'c.job_num')
                     ->on('a.production_date', '=', 'c.production_date');
             })
-            ->where('a.employee_id', $emp_id)
+            ->where('a.employee_id', $users->employee_id)
+            ->where('a.production_date', $production_date)
             ->selectRaw('
             SUM(a.qty_plan) as total_qty_plan,
             SUM(a.qty_actual) as total_qty_actual,
@@ -156,5 +156,42 @@ class Profile extends Model
             'performance' => round($oee_performance, 2),
             'quality' => round($oee_quality, 2),
         ];
+    }
+    public function dt_log($machine_id, $job_num, $shift, $production_date)
+    {
+        return DB::table('log_downtime as a')
+            ->leftJoin('downtime_list as b', 'b.id', '=', 'a.downtime_id')
+            ->select('b.name','a.downtime')
+            ->where('a.machine_id', $machine_id)
+            ->where('a.job_num', $job_num)
+            ->where('a.shift', $shift)
+            ->where('a.production_date', $production_date)
+            ->limit(5)
+            ->get();
+    }
+    public function machine_data($empID)
+    {
+        return DB::table('users as a')
+            ->leftJoin('log_header_machine as b', 'a.employee_id', '=', 'b.employee_id')
+            ->select('b.qty_plan as target', 'b.qty_actual as actual')
+            ->where('a.id', $empID)
+            ->first();
+    }
+    public function main_gsph($employee_id)
+    {
+        $emp_id = DB::table('users')
+            ->where('id', $employee_id)
+            ->value('employee_id');
+        $data_machine = DB::table('log_header_machine')
+            ->where('employee_id', $emp_id)
+            ->where('is_active', 1)
+            ->first();
+        return DB::table('gsph_record')
+            ->where('machine_id', $data_machine->machine_id)
+            ->where('cut_off', Carbon::today())
+            ->where('shift', $data_machine->shift)
+            ->where('job_num', $data_machine->job_num)
+            ->select('machine_id', 'gsph', DB::raw("FORMAT(cut_off_time,'HH:mm') as cut_off_time"))
+            ->get();
     }
 }

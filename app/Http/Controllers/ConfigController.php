@@ -60,7 +60,7 @@ class ConfigController extends Controller
                     'standard_sph' => $machine['std_jph'],
                     'production_date' => $production_date,
                     'customer' => $customer,
-                    'condition_id' => 1,
+                    // 'condition_id' => 1,
                     'is_active' => 1,
                     'employee_id' => $emp[0],
                     'employee_name' => $emp[1],
@@ -221,22 +221,46 @@ class ConfigController extends Controller
                 'shift' => $machine_data->shift,
                 'production_date' => $machine_data->production_date
             ]);
-            Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update', [
-                "machine_id" => $machine,
-                "condition_id" => 2,
-                "job_num" => $machine_data->job_num
-            ]);
-            Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/tickets/create', [
-                "machine_id" => $machine,
-                "title" => $downtime_list->name,
-                "downtime_category" => $downtime_list->type,
-                "impact_breakdown" => "Yes",
-                "downtime_type" => "Unplanned"
-            ]);
-            return response()->json([
-                'status' => 200,
-                'message' => 'success'
-            ]);
+            if ($downtime_list->type == 'MTN') {
+                $update = Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/dies-status/update', [
+                    // "machine_id" => $machine,
+                    "PartNum" => $machine_data->part_no,
+                    "condition_id" => 2,
+                ]);
+                $response_update = $update->json();
+                if ($response_update['success'] == true) {
+                    $create = Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/tickets/create', [
+                        "machine_id" => $machine,
+                        "title" => $downtime_list->name,
+                        // "downtime_category" => $downtime_list->type,
+                        "downtime_category" => 'Machine',
+                        "impact_breakdown" => "Yes",
+                        "downtime_type" => "Unplanned"
+                    ]);
+                    $response_create = $create->json();
+                    if ($response_create['success'] == true) {
+                        return response()->json([
+                            'status' => 200,
+                            'message' => 'Data berhasil di kirim'
+                        ]);
+                    } else {
+                        return response()->json([
+                            'status' => 401,
+                            'message' => 'Gagal Kirim data'
+                        ]);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 401,
+                        'message' => 'Gagal update'
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Data berhasil di kirim'
+                ]);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 500,
@@ -253,9 +277,8 @@ class ConfigController extends Controller
             $this->config->downtime_update($machine, $job_num, $machine_data->production_date);
             $this->config->activity_update($machine, $job_num, $machine_data->production_date);
             Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update', [
-                "machine_id" => $machine,
+                "PartNum" => $machine_data->part_no,
                 "condition_id" => 1,
-                "job_num" => $machine_data->job_num
             ]);
             return response()->json([
                 'status' => 200,
@@ -273,23 +296,57 @@ class ConfigController extends Controller
         $machine = $request->machine;
         $job_num = $request->job_num;
         try {
+            $cur_machine = $this->config->current_machine($machine, $job_num);
+            $this->config->insert_history_machine([
+                'machine_id' => $machine,
+                'line_id' => $cur_machine->line_id,
+                'line_detail_id' => $cur_machine->line_detail_id,
+                'category_line_id' => $cur_machine->category_line_id,
+                'machine_code' => $cur_machine->machine_code,
+                'machine_name' => $cur_machine->machine_name,
+                'tonage' => $cur_machine->tonage,
+                'average_ct' => $cur_machine->average_ct,
+                'standard_sph' => $cur_machine->standard_sph,
+                'started_at' => $cur_machine->started_at,
+                'operation_time' => $cur_machine->operation_time,
+                'break_12' => $cur_machine->break_12,
+                'break_18' => $cur_machine->break_18,
+                'break_02' => $cur_machine->break_02,
+                'production_date' => $cur_machine->production_date,
+                'part_no' => $cur_machine->part_no,
+                'job_num' => $cur_machine->job_num,
+                'qty_plan' => $cur_machine->qty_plan,
+                'qty_actual' => $cur_machine->qty_actual,
+                'qty_ng' => $cur_machine->qty_ng,
+                'shift' => $cur_machine->shift,
+                'current_gsph' => $cur_machine->current_gsph,
+                'finished_at' => now('Asia/Jakarta'),
+                // 'is_active' => false,
+                // 'condition_id' => 0,
+                // 'status_finish' => true,
+                'customer' => $cur_machine->customer,
+                'employee_id' => $cur_machine->employee_id,
+                'employee_name' => $cur_machine->employee_name,
+                'qty_ok' => $cur_machine->qty_ok
+            ]);
             $data = [
-                'machine_id' =>$machine,
-                'part_no'=>null,
-                'job_num'=>null,
-                'qty_plan'=>0,
-                'qty_actual'=>0,
-                'qty_ng'=>0,
-                'shift'=>null,
-                'current_gsph'=>null,
-                'finished_at'=>now('Asia/Jakarta'),
-                'is_active'=>false,
-                'status_finish'=>true,
-                'customer'=>null,
-                'employee_id'=>null,
+                'machine_id' => $machine,
+                'part_no' => null,
+                'job_num' => null,
+                'qty_plan' => 0,
+                'qty_actual' => 0,
+                'qty_ng' => 0,
+                'shift' => null,
+                'current_gsph' => null,
+                'finished_at' => now('Asia/Jakarta'),
+                'is_active' => false,
+                // 'condition_id' => 0,
+                'status_finish' => true,
+                'customer' => null,
+                'employee_id' => null,
 
             ];
-            $this->config->update($machine,$data);
+            $this->config->update_setup($machine, $data);
             Http::withoutVerifying()->post(
                 'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
                 [
@@ -299,13 +356,24 @@ class ConfigController extends Controller
                 ]
             );
             return response()->json([
-                'status'=>201
+                'status' => 201
             ]);
         } catch (\Throwable $th) {
-             return response()->json([
-                'status'=>500,
-                'message'=>$th->getMessage()
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()
             ]);
         }
+    }
+    public function technician_arrived(Request $request)
+    {
+        // dd($request->all());
+        $machine_id = $request->machine;
+        $data = Http::withoutVerifying()->post("https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/machine/{$machine_id}/stop-alarm");
+        // return response()->json($data);
+        return response()->json([
+            'status' => $data->status(),
+            'message' => $data->body()
+        ]);
     }
 }

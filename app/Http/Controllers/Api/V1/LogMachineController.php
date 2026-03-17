@@ -958,11 +958,13 @@ class LogMachineController extends Controller
             'qty_actual' => $machineUpdate->qty_actual,
             'qty_ok' => $qtyOK,
             'qty_plan' => $machineUpdate->qty_plan,
+            'qty_ng' => $machineUpdate->qty_ng,
             'act_gsph' => $machineUpdate->current_gsph,
             'act_cycletime' => 3600 / $machineUpdate->current_gsph,
             'ooe_quality' => $oee_quality,
             'oee_performance' => $oee_performance,
             'oee-availability' => $oee_availability,
+            'oee_availability' => $oee_availability,
             'oprMenit' => $oprTimeMenit,
             'dtDuration' => $totalDowntimeMinutes,
             'oprTimeDT' => $operTimeDT,
@@ -4383,11 +4385,16 @@ class LogMachineController extends Controller
             $shiftOptions = [
                 ['id' => '1', 'text' => 'SHIFT 1'],
                 ['id' => '6', 'text' => 'SHIFT 2 (2 SHIFT G1)'],
+                ['id' => '7', 'text' => 'SHIFT 2 (2 SHIFT G1) JUMAT'],
+                ['id' => '11', 'text' => 'SHIFT 2 (OT WEEK END)'],
+                ['id' => '12', 'text' => 'SHIFT 1 (OT WEEK END)'],
+                ['id' => '13', 'text' => 'SHIFT 1 (OT WEEK END V2)'],
             ];
         } else {
             $shiftOptions = [
                 ['id' => '1', 'text' => 'SHIFT 1'],
                 ['id' => '2', 'text' => 'SHIFT 2 (2 SHIFT G2)'],
+                ['id' => '3', 'SHIFT 2 (2 SHIFT G2) JUMAT'],
             ];
         }
         if ($data) {

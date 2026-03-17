@@ -185,4 +185,11 @@ class Config extends Model
                 'end_date' => now('Asia/Jakarta')
             ]);
     }
+    public function current_machine($machine, $job_num)
+    {
+        return DB::table('log_header_machine')
+            ->where('machine_id', $machine)
+            ->where('job_num', $job_num)
+            ->first();
+    }
 }
