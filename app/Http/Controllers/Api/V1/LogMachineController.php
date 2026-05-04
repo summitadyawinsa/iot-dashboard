@@ -17,13 +17,16 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Config;
 
 class LogMachineController extends Controller
 {
     protected $LogMachine;
-    public function __construct(LogMachine $logMachine)
+    protected $config;
+    public function __construct(LogMachine $logMachine, Config $config)
     {
         $this->LogMachine = $logMachine;
+        $this->config = $config;
     }
 
     public function index($id)
@@ -953,6 +956,20 @@ class LogMachineController extends Controller
         } else {
             $qtyOK = $counter - $machineUpdate->qty_ng;
         }
+        if ($id === 'SSW-TG4R-4') {
+            $machineCheck = LogMachine::find($id);
+            if ($machineCheck && $machineCheck->qty_plan > 0) {
+                if ($counter == $machineCheck->qty_plan) {
+                    Http::withoutVerifying()->post(
+                        url('config/finish_machine'),
+                        [
+                            'machine' => $id,
+                            'job_num' => $machineCheck->job_num
+                        ]
+                    );
+                }
+            }
+        }
         $message = [
             'operation_time' => $machineUpdate->started_at . ' ' . now() . ' ' . $operation_time,
             'qty_actual' => $machineUpdate->qty_actual,
@@ -1218,10 +1235,13 @@ class LogMachineController extends Controller
         $machineUpdate = DB::table('log_machine_tool')
             ->where('machine_id', $id)
             ->where('tool_id', $tool)
+            ->where('is_active', true)
+            ->where('condition_id', true)
             ->first();
         $message = [
             'operation_time' => $machineUpdate->started_at . ' ' . now() . ' ' . $operation_time,
             'qty_actual' => $machineUpdate->qty_actual,
+            'qty_ng' => $machineUpdate->qty_ng,
             'qty_plan' => $machineUpdate->qty_plan,
             'act_gsph' => $machineUpdate->current_gsph,
             'act_cycletime' => 3600 / $machineUpdate->current_gsph,
@@ -1413,6 +1433,7 @@ class LogMachineController extends Controller
             'A6' => 'STP-007',
             'RBT-5H45' => 'ASSY-002',
             'RBT-5J45' => 'ASSY-014',
+            'SSW' => 'ASSY-009',
             default => null,
         };
         if ($line_id === null) {
@@ -1459,7 +1480,12 @@ class LogMachineController extends Controller
                 return $row->qty_plan;
             })
             ->editColumn('qty_actual', function ($row) {
-                return $row->qty_actual;
+                if ($row->qty_plan == 0) {
+                    $data = 0;
+                } else {
+                    $data = $row->qty_actual;
+                }
+                return $data;
             })
             ->addColumn('qty_ok', function ($row) {
                 return number_format($row->qty_ok, 0, '', '.') ?? '-';
@@ -1533,6 +1559,7 @@ class LogMachineController extends Controller
             'A6' => 'STP-007',
             'RBT-5H45' => 'ASSY-002',
             'RBT-5J45' => 'ASSY-014',
+            'SSW' => 'ASSY-009',
             default => null,
         };
 
@@ -1595,14 +1622,17 @@ class LogMachineController extends Controller
     //Fungsi dashboard versi 2
     public function dashboard_v2($id)
     {
+        // dd($id);
         date_default_timezone_set('Asia/Jakarta');
         $date_sql = date('Y-m-d');
         $machine = LogMachine::find($id);
+        // dd($machine);
         $oee = DB::table('oee_log_machine')
             ->where('job_num', $machine->job_num)
             ->where('production_date', $machine->production_date)
             ->where('shift', $machine->shift)
             ->get();
+        // dd($oee);
         $downtimes = DB::table('log_downtime')
             ->where('machine_id', $id)
             ->where('job_num', $machine->job_num)
@@ -1610,6 +1640,7 @@ class LogMachineController extends Controller
             ->where('shift', $machine->shift)
             ->orderBy('started_at')
             ->get();
+        // dd($downtimes);
         $totalDowntimeMinutes = $downtimes->sum('downtime');
         if ($machine) {
             $oee_quality = ($machine->qty_actual > 0 && $machine->qty_ng > 0)
@@ -1645,11 +1676,25 @@ class LogMachineController extends Controller
                 $operation_time -= $potongIstirahat;
                 $operasi_time = $operation_time / 60;
                 $waktuOperasi = $operasi_time - $totalDowntimeMinutes;
-                $standardCT = 60 / $machine->standard_sph;
-                $actualCT = $waktuOperasi / $machine->qty_actual;
+                // $standardCT = 60 / $machine->standard_sph
+                $standardCT = $machine->standard_sph > 0
+                    ? 60 / $machine->standard_sph
+                    : 0;
+                // $actualCT = $waktuOperasi / $machine->qty_actual;
+                $actualCT = $machine->qty_actual > 0
+                    ? $waktuOperasi / $machine->qty_actual
+                    : 0;
+
                 $stdQTY_Actual = $standardCT * $waktuOperasi;
-                $oee_performance = $standardCT * $machine->qty_actual / $waktuOperasi * 100;
-                $oee_availability = $waktuOperasi / $operasi_time * 100;
+                // $oee_performance = $standardCT * $machine->qty_actual / $waktuOperasi * 100;
+                // $oee_availability = $waktuOperasi / $operasi_time * 100;
+                $oee_performance = ($waktuOperasi > 0 && $machine->qty_actual > 0)
+                    ? ($standardCT * $machine->qty_actual / $waktuOperasi) * 100
+                    : 0;
+
+                $oee_availability = $operasi_time > 0
+                    ? ($waktuOperasi / $operasi_time) * 100
+                    : 0;
             }
         } else {
             $oee_quality = 100;
@@ -2067,6 +2112,7 @@ class LogMachineController extends Controller
             'A6' => 'STP-007',
             'RBT-5H45' => 'ASSY-002',
             'RBT-5J45' => 'ASSY-014',
+            'SSW' => 'ASSY-009',
             default => null
         };
 
@@ -2220,6 +2266,7 @@ class LogMachineController extends Controller
     public function getCategory($id)
     {
         //Tampilkan log_header_machine_summary
+        // dd($id);
         $data = $this->LogMachine->getCategory($id);
         return response()->json([
             'message' => $data
@@ -2311,7 +2358,7 @@ class LogMachineController extends Controller
         $perPage = 10;
         $employees = Cache::remember('employees_list', 600, function () {
             //API Epicor getEmployee
-            $empApi = Http::withoutVerifying()->post('https://192.168.1.251:8001/APIDEV/Labor/GetEmployee');
+            $empApi = Http::withoutVerifying()->post('https://192.168.1.251:8000/EPIAPI/Labor/GetEmployee');
             return $empApi->json();
         });
         if ($search) {
@@ -2421,6 +2468,14 @@ class LogMachineController extends Controller
                 404,
             );
         }
+        // Http::withoutVerifying()->post(
+        //     'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+        //     [
+        //         "machine_id" => $machineId,
+        //         "condition_id" => 0,
+        //         "job_num" => $job_num
+        //     ]
+        // );
         foreach ($db_job_num as $row) {
             $qty_plan = $row->qty_plan;
             $part_no = $row->item_no;
@@ -2774,6 +2829,7 @@ class LogMachineController extends Controller
             'A6' => 'STP-007',
             'RBT-5H45' => 'ASSY-002',
             'RBT-5J45' => 'ASSY-014',
+            'SSW' => 'ASSY-009',
             default => null,
         };
 
@@ -2934,7 +2990,11 @@ class LogMachineController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $shift = $request->shift;
         $category = strtoupper(trim($request->category_id));
-
+        if ($shift == 1 || $shift == 8 || $shift == 9 || $shift == 10 || $shift == 13) {
+            $shift = 'SHIFT 1';
+        } else {
+            $shift = 'SHIFT 2';
+        }
         // if ($category === 'ASSY') {
         // $start = date('Y-m-d', strtotime('-3 day'));
         // $finish = date('Y-m-d', strtotime('+1 day'));
@@ -2952,12 +3012,18 @@ class LogMachineController extends Controller
             }
         }
         $data = $query->get();
+        // Log::info([
+        //     'shift' => $shift,
+        //     'category' => $category,
+        //     'start' => $start,
+        //     'finish' => $finish
+        // ]);
         return response()->json([
             'data' => $data,
             'start' => $start,
             'finish' => $finish,
             'shift' => $shift,
-            'category' => $category,
+            'category' => $category
         ]);
     }
     public function ShiftList(Request $request)
@@ -3082,6 +3148,14 @@ class LogMachineController extends Controller
                     'total_ng' => $row->qty_ng
                 ]);
         }
+        // Http::withoutVerifying()->post(
+        //     'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+        //     [
+        //         "machine_id" => $id,
+        //         "condition_id" => 0,
+        //         "job_num" => $jobNumber
+        //     ]
+        // );
         $update = LogMachine::where('job_num', $jobNumber)
             ->where('is_active', 1)
             ->update([
@@ -3125,11 +3199,11 @@ class LogMachineController extends Controller
             }
             foreach ($dataNew as $row) {
                 $dataMachine['operation_time'] = 0;
-                $dataMachine['qty_actual'] = 0;
+                // $dataMachine['qty_actual'] = 0;
                 $dataMachine['current_gsph'] = 0;
                 $dataMachine['current_gsph_persen'] = 0;
                 $dataMachine['condition_id'] = 0;
-                $dataMachine['job_num'] = null;
+                // $dataMachine['job_num'] = null;
                 $dataMachine['qty_plan'] = 0;
                 $dataMachine['customer'] = '';
                 $dataMachine['employee_id'] = '';
@@ -3413,8 +3487,11 @@ class LogMachineController extends Controller
             ->select('t.machine_id')
             ->distinct()
             ->get();
+        $id = 'ASSY';
+        $shift = $this->LogMachine->getCategory($id);
         return response()->json([
-            'machine' => $machineID
+            'machine' => $machineID,
+            'shift' => $shift
         ]);
     }
     public function special_setup_machine(Request $request)
@@ -3717,6 +3794,7 @@ class LogMachineController extends Controller
         $data['log_activity'] = $log_activity;
         $data['machine_id'] = $machineID;
         $data['status_action'] = 1;
+        $data['tool_id'] = $toolID;
         $data['downtimeChartLabels'] = $downtimeChartLabels;
         $data['downtimeChartValues'] = $downtimeChartValues;
         $client = new Client("ws://127.0.0.1:8080");
@@ -3833,6 +3911,7 @@ class LogMachineController extends Controller
         $data['log_activity'] = $log_activity;
         $data['machine_id'] = $machineID;
         $data['status_action'] = 2;
+        $data['tool_id'] = $toolID;
         $data['downtimeChartLabels'] = $downtimeChartLabels;
         $data['downtimeChartValues'] = $downtimeChartValues;
         $client = new Client("ws://127.0.0.1:8080");
@@ -3841,7 +3920,7 @@ class LogMachineController extends Controller
             'channel' => 'machine',
             'event' => 'finish-downtime-tool',
             'data' => [
-                'message' => $machineData
+                'message' => $data
             ]
         ];
         $client->send(json_encode($data));
@@ -4022,11 +4101,25 @@ class LogMachineController extends Controller
                 $operation_time -= $potongIstirahat;
                 $operasi_time = $operation_time / 60;
                 $waktuOperasi = $operasi_time - $sumDowntime;
-                $standardCT = 60 / $machine->standard_sph;
-                $actualCT = $waktuOperasi / $machine->qty_actual;
+                // $standardCT = 60 / $machine->standard_sph;
+                // $actualCT = $waktuOperasi / $machine->qty_actual;
+                $standardCT = $machine->standard_sph > 0
+                    ? 60 / $machine->standard_sph
+                    : 0;
+
+                $actualCT = $machine->qty_actual > 0
+                    ? $waktuOperasi / $machine->qty_actual
+                    : 0;
                 $stdQTY_Actual = $standardCT * $waktuOperasi;
-                $oee_performance = $standardCT * $machine->qty_actual / $waktuOperasi * 100;
-                $oee_availability = $waktuOperasi / $operasi_time * 100;
+                // $oee_performance = $standardCT * $machine->qty_actual / $waktuOperasi * 100;
+                // $oee_availability = $waktuOperasi / $operasi_time * 100;
+                $oee_performance = ($waktuOperasi > 0 && $machine->qty_actual > 0)
+                    ? ($standardCT * $machine->qty_actual / $waktuOperasi) * 100
+                    : 0;
+
+                $oee_availability = $operasi_time > 0
+                    ? ($waktuOperasi / $operasi_time) * 100
+                    : 0;
             }
         } else {
             $oee_quality = 100;
@@ -4424,6 +4517,10 @@ class LogMachineController extends Controller
         $shiftOptions = [
             ['id' => '1', 'text' => 'SHIFT 1'],
             ['id' => '6', 'text' => 'SHIFT 2 (2 SHIFT G1)'],
+            ['id' => '7', 'text' => 'SHIFT 2 (2 SHIFT G1) JUMAT'],
+            ['id' => '11', 'text' => 'SHIFT 2 (OT WEEK END)'],
+            ['id' => '12', 'text' => 'SHIFT 1 (OT WEEK END)'],
+            ['id' => '13', 'text' => 'SHIFT 1 (OT WEEK END V2)'],
         ];
         if ($data) {
             return response()->json([

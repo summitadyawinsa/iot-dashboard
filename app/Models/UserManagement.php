@@ -14,11 +14,10 @@ class UserManagement extends Model
     {
         return DB::table('users');
     }
-    public function show_by_name($username, $email)
+    public function show_by_name($username)
     {
         return DB::table('users')
             ->where('username', $username)
-            ->orWhere('email', $email)
             ->exists();
     }
     public function emp_basic($name)
@@ -28,13 +27,13 @@ class UserManagement extends Model
             ->where('Name', $name)
             ->first();
     }
-    public function store_user($name, $username, $email, $password, $EmpID)
+    public function store_user($name, $username, $password, $EmpID)
     {
         return DB::table('users')
             ->insert([
                 'name' => $name,
                 'username' => $username,
-                'email' => $email,
+                'email'=>$EmpID.'@summitadyawinsa.co.id',
                 'employee_id' => $EmpID,
                 'password' => Hash::make($password),
                 'created_at' => now('Asia/Jakarta'),

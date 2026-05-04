@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'epicor_dev' => [
+        'url' => env('EPICOR_DEV'),
+    ],
+    'epicor_app' => [
+        'url' => env('EPICOR_APP'),
+    ],
 
 ];

@@ -45,14 +45,13 @@ class UserManagementController extends Controller
     {
         $name = $request->name;
         $username = $request->username;
-        $email = $request->email;
         $password = $request->password;
-        $show_by_name = $this->userManagement->show_by_name($username, $email);
+        $show_by_name = $this->userManagement->show_by_name($username);
         if ($show_by_name) {
             return response()->json([
                 'icon' => 'error',
                 'title' => 'Error',
-                'text' => 'Employee ID atau Email sudah digunakan'
+                'text' => 'Employee ID'
             ]);
         }
         $emp = $this->userManagement->emp_basic(strtoupper($name));
@@ -63,7 +62,7 @@ class UserManagementController extends Controller
                 'text' => 'Nama tidak ada di epicor'
             ]);
         }
-        $this->userManagement->store_user($name, $username, $email, $password, $emp->EmpID);
+        $this->userManagement->store_user($name, $username, $password, $emp->EmpID);
         return response()->json([
             'icon' => 'success',
             'title' => 'Success',
@@ -89,7 +88,6 @@ class UserManagementController extends Controller
     {
         $name = $request->name;
         $username = $request->username;
-        $email = $request->email;
         $epicor_id = $request->epicor_id;
         try {
             if (!$epicor_id) {
@@ -100,8 +98,7 @@ class UserManagementController extends Controller
             }
             $this->userManagement->updateUser($epicor_id, [
                 'name' => $name,
-                'username' => $username,
-                'email' => $email
+                'username' => $username
             ]);
             return response()->json([
                 'status' => 'success',

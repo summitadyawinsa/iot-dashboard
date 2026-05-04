@@ -140,12 +140,41 @@ class LogMachine extends Model
     }
     public function getCategory($id)
     {
-        return DB::table('log_header_machine_summary as summary')
-            ->join('log_header_machine as machine', 'summary.machine_id', '=', 'machine.machine_id')
-            ->where('machine.category_line_id', 'LIKE', '%' . $id . '%')
-            ->selectRaw('LTRIM(RTRIM(summary.shift)) as shift')
-            ->groupBy(DB::raw('LTRIM(RTRIM(summary.shift))'))
-            ->orderBy(DB::raw('LTRIM(RTRIM(summary.shift))'), 'asc')
+        // return DB::table('log_header_machine_summary as summary')
+        //     ->join('log_header_machine as machine', 'summary.machine_id', '=', 'machine.machine_id')
+        //     ->where('machine.category_line_id', 'LIKE', '%' . $id . '%')
+        //     ->selectRaw('LTRIM(RTRIM(summary.shift)) as shift')
+        //     ->groupBy(DB::raw('LTRIM(RTRIM(summary.shift))'))
+        //     ->orderBy(DB::raw('LTRIM(RTRIM(summary.shift))'), 'asc')
+        //     ->get();
+        if ($id == 'ASSY') {
+            $where = [1, 6, 7, 11, 12, 13];
+        } else {
+            $where = [1, 2, 3, 4, 5, 8, 9, 10];
+        }
+        return DB::connection('sqlsrv4')
+            ->table('Erp.JCShift')
+            ->whereIn('Shift', $where)
+            ->select('Shift', 'Description', 'StartTime', 'EndTime', 'LunchStart', 'LunchEnd')
+            ->selectRaw("
+                ROUND(
+                    (
+                        CASE 
+                            WHEN EndTime < StartTime 
+                                THEN (EndTime + 24 - StartTime)
+                            ELSE (EndTime - StartTime)
+                        END
+                    )
+                    -
+                    (
+                        CASE 
+                            WHEN LunchEnd < LunchStart 
+                                THEN (LunchEnd + 24 - LunchStart)
+                            ELSE (LunchEnd - LunchStart)
+                        END
+                    )
+                , 2) as total_hours
+            ")
             ->get();
     }
     public function shiftJo($shift)
@@ -206,7 +235,7 @@ class LogMachine extends Model
             ->table(DB::raw('[Erp].[JobHead]'))
             ->select('JobNum', 'ProdCode')
             ->whereBetween('ReqDueDate', [$start, $finish])
-            ->where('JobCode', $shift)
+            // ->where('JobCode', $shift)
             ->orderBy('ReqDueDate', 'desc');
     }
     public function insertDT($dataDT)
@@ -260,11 +289,13 @@ class LogMachine extends Model
     public function listLogMachine()
     {
         return DB::table('log_header_machine as header')
-            ->where('header.is_active', 1)
+            // ->where('header.is_active', 1)
             ->leftJoin('log_machine_tool as tool', function ($join) {
                 $join->on('tool.machine_id', '=', 'header.machine_id');
             })
             ->select('header.*', 'tool.tool_id', 'tool.job_num as tool_job_num', 'tool.qty_plan as tool_qty_plan', 'tool.qty_actual as tool_qty_actual', 'tool.qty_ng as tool_qty_ng', 'tool.condition_id as tool_condition_id')
+            ->orderBy('header.machine_id', 'asc')
+            ->orderBy('tool.tool_id', 'asc')
             ->get();
     }
     public function updateMachine($row, $dataMachine)

@@ -38,7 +38,8 @@ class Config extends Model
                 Carbon::now()->subDays(30)->startOfDay(),
                 Carbon::now()->addDay()->endOfDay()
             ])
-            ->where('JobNum', 'LIKE', '%' . $category . '%');
+            ->where('JobNum', 'LIKE', '%' . $category . '%')
+            ->where('JobClosed', 0);
         if (!empty($search)) {
             $query->where('JobNum', 'LIKE', "%{$search}%");
         }
@@ -55,7 +56,8 @@ class Config extends Model
                 Carbon::now()->subDays(30)->startOfDay(),
                 Carbon::now()->addDay()->endOfDay()
             ])
-            ->where('JobNum', 'LIKE', '%' . $category . '%');
+            ->where('JobNum', 'LIKE', '%' . $category . '%')
+            ->where('JobClosed', 0);
 
         if (!empty($search)) {
             $query->where('JobNum', 'LIKE', "%{$search}%");
@@ -127,10 +129,24 @@ class Config extends Model
         }
         return $query->count();
     }
+    public function update_confirm($machine, $data)
+    {
+        DB::table('log_machine_confirm')->updateOrInsert(
+            ['machine_id' => $machine], // kondisi cek
+            $data // data yang diupdate / insert
+        );
+    }
     public function update_setup($machine, $data)
     {
         return DB::table('log_header_machine')
             ->where('machine_id', $machine)
+            ->update($data);
+    }
+    public function update_setup_tool($machine, $data, $tool_id)
+    {
+        return DB::table('log_machine_tool')
+            ->where('machine_id', $machine)
+            ->where('tool_id', $tool_id)
             ->update($data);
     }
     public function setup_jo_lanjutan($machineId, $job_num)
@@ -185,11 +201,167 @@ class Config extends Model
                 'end_date' => now('Asia/Jakarta')
             ]);
     }
-    public function current_machine($machine, $job_num)
+    public function current_machine($job_num)
     {
         return DB::table('log_header_machine')
-            ->where('machine_id', $machine)
+            // ->where('machine_id', $machine)
             ->where('job_num', $job_num)
+            ->orderByDesc('started_at')
             ->first();
+    }
+    public function current_machine_tool($job_num)
+    {
+        return DB::table('log_machine_tool')
+            // ->where('machine_id', $machine)
+            ->where('job_num', $job_num)
+            ->orderByDesc('started_at')
+            ->first();
+    }
+    public function WorkTIme($machine_id)
+    {
+        return DB::table('log_machine_tool')
+            ->where('machine_id', $machine_id)
+            ->whereNotNull('tool_id')
+            ->select('machine_id', 'tool_id', 'standard_sph')
+            ->get();
+    }
+    public function revisionModel($job_num)
+    {
+        return DB::connection('sqlsrv4')
+            ->table(DB::raw('[Erp].[JobHead]'))
+            ->select('RevisionNum')
+            ->where('JobNum', $job_num)
+            ->first();
+    }
+    public function getSummaryIdTool($machine_id, $job_num, $date, $shift, $tool_id)
+    {
+        return DB::table('log_header_machine_summary')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->where('production_date', $date)
+            ->where('shift', $shift)
+            ->where('tool_id', $tool_id)
+            ->first();
+    }
+    public function updateMachineTool($machine_id, $tool_id, $seq_id)
+    {
+        return DB::table('log_machine_tool')
+            ->where('machine_id', $machine_id)
+            ->where('tool_id', $tool_id)
+            ->where('is_active', true)
+            ->update(['summary_id' => $seq_id]);
+    }
+    public function logOeeTool($machine_id, $job_num, $tool_id, $date, $shift)
+    {
+        return DB::table('oee_log_machine')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->where('tool_id', $tool_id)
+            ->where('production_date', $date)
+            ->where('shift', $shift)
+            ->first();
+    }
+    public function aggregateSummaryTool($machine_id, $job_num, $tool_id, $date, $shift)
+    {
+        return DB::table('log_header_machine_summary')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->where('tool_id', $tool_id)
+            ->where('production_date', $date)
+            ->where('shift', $shift)
+            ->selectRaw('
+                SUM(qty_actual) as qty_actual,
+                SUM(qty_ng) as qty_ng,
+                SUM(downtime) as downtime,
+                SUM(operation_time) as operation_time
+            ')
+            ->first();
+    }
+    public function insertGsphRecordTool($machine_id, $date, $time, $tool_id, $job_num, $shift)
+    {
+        return DB::table('gsph_record')
+            ->insert([
+                'machine_id' => $machine_id,
+                'gsph' => 0,
+                'cut_off' => $date,
+                'cut_off_time' => $time,
+                'tool_id' => $tool_id,
+                'job_num' => $job_num,
+                'shift' => $shift,
+                'qty_actual' => 0
+            ]);
+    }
+    public function insertGsphRecord($dataGsph)
+    {
+        return DB::table('gsph_record')
+            ->insert($dataGsph);
+    }
+    public function updateSummary($machineId, $shift, $job_num, $production_date, $qty_plan)
+    {
+        return DB::table('log_header_machine_summary')
+            ->where('machine_id', $machineId)
+            ->where('shift', $shift)
+            ->where('job_num', $job_num)
+            ->where('production_date', $production_date)
+            ->where('qty_plan', $qty_plan)
+            ->where('qty_actual', 0)
+            ->exists();
+    }
+    public function resultOee($machineId, $job_num, $shift, $production_date)
+    {
+        return DB::table('log_header_machine_summary')
+            ->select('machine_id', 'shift', 'job_num', 'production_date', DB::raw('SUM(qty_actual) AS qty_actual'), DB::raw('SUM(qty_ng) AS qty_ng'), DB::raw('SUM(downtime) AS downtime'), DB::raw('SUM(operation_time) AS operation_time'))
+            ->groupBy('machine_id', 'shift', 'job_num', 'production_date')
+            ->where('machine_id', $machineId)
+            ->having('job_num', '=', "$job_num")
+            ->having('shift', '=', "$shift")
+            ->having('production_date', '=', "$production_date" . ' 00:00:00')
+            ->get();
+    }
+    public function updateOee($machineId, $job_num, $shift, $production_date, $avail_time, $operation_time, $downtime, $qty_actual, $qty_ng)
+    {
+        return DB::table('oee_log_machine')
+            ->where('machine_id', $machineId)
+            ->where('job_num', $job_num)
+            ->where('shift', $shift)
+            ->where('production_date', $production_date)
+            ->update([
+                'job_num' => $job_num,
+                'shift' => $shift,
+                'production_date' => $production_date,
+                'available_time' => $avail_time,
+                'operation_time' => $operation_time,
+                'downtime' => $downtime,
+                'total_qty' => $qty_actual,
+                'total_ng' => $qty_ng,
+            ]);
+    }
+    public function insertOee($raw, $job_num, $shift, $production_date, $avail_time, $operation_time, $downtime, $qty_actual, $qty_ng)
+    {
+        return DB::table('oee_log_machine')->insert([
+            'machine_id' => $raw,
+            'job_num' => $job_num,
+            'shift' => $shift,
+            'production_date' => $production_date,
+            'available_time' => $avail_time,
+            'operation_time' => $operation_time,
+            'downtime' => $downtime,
+            'total_qty' => $qty_actual,
+            'total_ng' => $qty_ng,
+        ]);
+    }
+    public function countDbOee($machineId, $job_num, $shift, $production_date)
+    {
+        return DB::table('oee_log_machine')
+            ->where('machine_id', $machineId)
+            ->where('job_num', $job_num)
+            ->where('shift', $shift)
+            ->where('production_date', $production_date)
+            ->count();
+    }
+    public function insert_history_machine($data)
+    {
+        return DB::table('history_header_machine')
+            ->insert($data);
     }
 }

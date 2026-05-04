@@ -81,6 +81,8 @@
                                     </div>
                                     <div>
                                         <label for="avail-select">Work Time</label>
+                                        {{-- <input id="workTime" type="text" class="form-input text-white"
+                                            style="color-scheme: dark;" readonly /> --}}
                                         <select class="form-input" id="workTime" onchange="workTimeSelect()">
                                         </select>
                                     </div>
@@ -96,8 +98,8 @@
                 <div class="flex justify-end">
                     <button type="button" class="btn btn-primary" id="btn_start" onclick="startMachine()">
                         <svg id="start_icon" xmlns="https://www.w3.org/2000/svg"
-                            class="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none">
+                            class="w-5 h-5 ltr:mr-1.5 rtl:ml-1.5 shrink-0" width="24" height="24"
+                            viewBox="0 0 24 24" fill="none">
                             <path d="M10 2H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                             <path
                                 d="M13.8876 10.9348C14.9625 11.8117 15.5 12.2501 15.5 13C15.5 13.7499 14.9625 14.1883 13.8876 15.0652C13.5909 15.3073 13.2966 15.5352 13.0261 15.7251C12.7888 15.8917 12.5201 16.064 12.2419 16.2332C11.1695 16.8853 10.6333 17.2114 10.1524 16.8504C9.6715 16.4894 9.62779 15.7336 9.54038 14.2222C9.51566 13.7947 9.5 13.3757 9.5 13C9.5 12.6243 9.51566 12.2053 9.54038 11.7778C9.62779 10.2664 9.6715 9.51061 10.1524 9.1496C10.6333 8.78859 11.1695 9.11466 12.2419 9.76679C12.5201 9.93597 12.7888 10.1083 13.0261 10.2749C13.2966 10.4648 13.5909 10.6927 13.8876 10.9348Z"
@@ -134,9 +136,9 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function (e) {
+        document.addEventListener("DOMContentLoaded", function(e) {
             var els = document.querySelectorAll(".selectize");
-            els.forEach(function (select) {
+            els.forEach(function(select) {
                 NiceSelect.bind(select);
             });
             $(".form-select").select2({
@@ -144,32 +146,73 @@
                 allowClear: true
             });
         });
+
         function categorySelect() {
             const data = new URLSearchParams()
             data.append('category', document.getElementById('category_id').value)
             axios.post(`https://${window.location.host}/api/special-setup/category`, data, {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            })
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                })
                 .then(response => {
                     // console.log(response)
                     const output = response.data
                     const container = document.getElementById('machineID')
                     container.innerHTML = '<option disabled selected>Pilih Mesin</option>'
                     output.machine.forEach(element => {
-                        container.innerHTML += `<option value="${element.machine_id}">${element.machine_id}</option>`
+                        container.innerHTML +=
+                            `<option value="${element.machine_id}">${element.machine_id}</option>`
                     })
                     const shiftContainer = document.getElementById('shift')
-                    shiftContainer.innerHTML = '<option disabled selected>Pilih Shift</option>'
-                    shiftContainer.innerHTML += `<option value="SHIFT 1">Night</option>`
-                    shiftContainer.innerHTML += `<option value="SHIFT 2">Day</option>`
-                    // output.shift.forEach(element => {
+                    output.shift.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.Shift;
+                        option.textContent = item.Description;
+                        shiftContainer.appendChild(option);
+                    });
+                    // shiftContainer.onchange = function() {
+                    //     const selectedShift = this.value;
 
-                    // })
+                    //     const selectedData = output.shift.find(item => item.Shift == selectedShift);
+
+                    //     const workTime = document.getElementById('workTime');
+                    //     workTime.innerHTML = ''; // reset dulu
+                    //     workTime.innerHTML = '<option disabled selected>Pilih waktu</option>';
+
+                    //     if (selectedData) {
+                    //         const option = document.createElement('option');
+                    //         option.value = selectedData.total_hours;
+                    //         option.textContent = selectedData.total_hours;
+
+                    //         workTime.appendChild(option);
+
+                    //         // 🔥 set selected dengan cara yang benar
+                    //         workTime.value = selectedData.total_hours;
+                    //     }
+                    // };
+                    shiftContainer.onchange = function() {
+    const selectedShift = this.value;
+
+    const selectedData = output.shift.find(item => item.Shift == selectedShift);
+
+    const workTime = document.getElementById('workTime');
+
+    // reset + default
+    workTime.innerHTML = '<option disabled selected>Pilih waktu</option>';
+
+    if (selectedData) {
+        const option = document.createElement('option');
+        option.value = selectedData.total_hours;
+        option.textContent = selectedData.total_hours;
+
+        workTime.appendChild(option);
+    }
+};
                 })
                 .catch(error => {
                     console.log(error)
                 })
         }
+
         function shiftChange() {
             const container = document.getElementById('workTime')
             const shift = document.getElementById('shift').value
@@ -181,11 +224,12 @@
                 container.innerHTML += '<option value="7">7</option>'
             }
         }
+
         function machineSelect() {
             const machineSelect = document.getElementById('machineID');
-            const machine = machineSelect.selectedOptions.length > 0
-                ? machineSelect.selectedOptions[0].value
-                : null;
+            const machine = machineSelect.selectedOptions.length > 0 ?
+                machineSelect.selectedOptions[0].value :
+                null;
             const machineID = machine.split('/')[0]
             const data = new URLSearchParams()
             data.append('machine', machineID)
@@ -214,17 +258,19 @@
                         type: 'POST',
                         dataType: 'json',
                         delay: 250,
-                        data: function (params) {
+                        data: function(params) {
                             return {
                                 q: params.term,
                                 page: params.page || 1
                             };
                         },
-                        processResults: function (data, params) {
+                        processResults: function(data, params) {
                             params.page = params.page || 1;
                             return {
                                 results: data.results,
-                                pagination: { more: data.pagination.more }
+                                pagination: {
+                                    more: data.pagination.more
+                                }
                             };
                         },
                         cache: true
@@ -245,7 +291,9 @@
 
             try {
                 const res = await axios.post(apiUrl, data, {
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
                 });
                 return Array.isArray(res.data?.data) ? res.data.data : [];
             } catch (e) {
@@ -306,8 +354,11 @@
             try {
                 const res = await axios.post(
                     `https://${window.location.host}/api/special-setup/work-time`,
-                    data,
-                    { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+                    data, {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }
                 );
 
                 const listTool = res.data.data || [];
@@ -409,8 +460,10 @@
                 data.append('jobNumber[]', job_num);
             });
             axios.post(`https://${window.location.host}/api/special-setup/start`, data, {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            })
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
                 .then(response => {
                     const message = response.data
                     const status = message.status;

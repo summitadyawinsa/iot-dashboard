@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         #analytics:fullscreen {
             width: 100vw;
@@ -21,7 +22,7 @@
         }
     </style>
     <div id="analytics">
-        <input type="text" id="user_id" value="{{ Auth::user()->id }}" hidden>
+        <input type="text" id="machineID" value="{{ $machineID }}" hidden>
         <div class="p-6 space-y-6 bg-gray-100 dark:bg-gray-900 min-h-screen transition" id="dashboard_profile_view">
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-bold text-gray-800 dark:text-white">
@@ -30,7 +31,7 @@
                 <div class="flex gap-2">
                     <div class="hidden" id="div_pilih_jo">
                         <select
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
            dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -57,14 +58,14 @@
                         </svg>
                     </button>
                     <select
-                        class="w-full px-3 py-2 rounded-md border 
+                        class="w-full px-3 py-2 rounded-md border
                         bg-white text-gray-800 border-gray-300
                         focus:outline-none focus:ring-2 focus:ring-blue-500
                         dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
                         id="select_config">
                         <option selected disabled>Configuration</option>
-                        <option value="standard">Standard SSW</option>
-                        {{-- <option value="special">Special</option> --}}
+                        <option value="standard">Standard</option>
+                        <option value="scan">Scan</option>
                     </select>
                     {{-- <button id="config_btn"
                         class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
@@ -339,11 +340,25 @@
                 </button>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow" id="config_machine_form">
+                {{-- <button id="scan_btn_view"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                    Scan
+                </button> --}}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 dark:text-white-light">
+                    {{-- <div class="hidden" id="div_scan_input">
+                        <label for="production_date">Scan</label>
+                        <input id="scan_input" type="text"
+                            class="w-full px-3 py-2 rounded-md border
+           bg-white text-gray-800 border-gray-300
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
+                            style="color-scheme: dark;" readonly />
+                    </div> --}}
                     <div>
                         <label for="jo-select">Category</label>
                         <select
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -357,7 +372,7 @@
                     <div>
                         <label for="jo-select">Shift</label>
                         <select
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -368,7 +383,7 @@
                     <div>
                         <label for="production_date">Production Date (Job)</label>
                         <input id="production_date" type="date"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -378,7 +393,7 @@
                     <div>
                         <label for="jo-select">Job Num</label>
                         <select
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -389,7 +404,7 @@
                     <div>
                         <label for="standard_sph">Customer</label>
                         <input id="customer" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -423,10 +438,21 @@
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow" id="config_machine_form">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 dark:text-white-light">
+                    {{-- <div id="reader" style="width:300px"></div> --}}
+                    <div>
+                        <label for="production_date">Scan</label>
+                        <input id="scan_input" type="text"
+                            class="w-full px-3 py-2 rounded-md border
+           bg-white text-gray-800 border-gray-300
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
+                            style="color-scheme: dark;" />
+                    </div>
                     <div>
                         <label for="jo-select">Category</label>
                         <select
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -437,19 +463,8 @@
                     </div>
                     <div>
                         <label for="jo-select">Shift</label>
-                        <select
-                            class="w-full px-3 py-2 rounded-md border 
-           bg-white text-gray-800 border-gray-300
-           focus:outline-none focus:ring-2 focus:ring-blue-500
-
-           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
-                            id="special_shift">
-                        </select>
-                    </div>
-                    <div>
-                        <label for="production_date">Production Date (Job)</label>
-                        <input id="special_production_date" type="date"
-                            class="w-full px-3 py-2 rounded-md border 
+                        <input id="special_shift" type="text"
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -457,18 +472,14 @@
                             style="color-scheme: dark;" readonly />
                     </div>
                     <div>
-                        <label for="jo-select">Machine</label>
-                        <select
-                            class="w-full px-3 py-2 rounded-md border 
+                        <label for="production_date">Production Date (Job)</label>
+                        <input id="special_production_date" type="date"
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
            dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
-                            id="special_machine">
-                            <option selected disabled>PIlih Machine</option>
-                            <option value="RSW-5H45-09">RSW-5H45-09</option>
-                            <option value="RSW-5H45-10">RSW-5H45-10</option>
-                        </select>
+                            style="color-scheme: dark;" readonly />
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 sm:grid-cols-1 lg:grid-cols-3 gap-4 p-5 dark:text-white-light items-center"
@@ -501,7 +512,7 @@
                     <div>
                         <label for="jo-select">Job Number</label>
                         <input id="finish_job_number" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -511,7 +522,7 @@
                     <div>
                         <label for="jo-select">Employee</label>
                         <input id="finish_employee" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -521,7 +532,7 @@
                     <div>
                         <label for="production_date">Production Date (Job)</label>
                         <input id="finish_production_date" type="date"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -531,7 +542,7 @@
                     <div>
                         <label for="production_date">Shift</label>
                         <input id="finish_shift" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -541,7 +552,7 @@
                     <div>
                         <label for="jo-select">NIK</label>
                         <input id="finish_nik" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -551,7 +562,7 @@
                     <div>
                         <label for="jo-select">Password</label>
                         <input id="finish_password" type="password"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
@@ -578,7 +589,7 @@
                     <div>
                         <label for="jo-select">Work Date</label>
                         <input id="finish_work_date" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -587,7 +598,7 @@
                     <div>
                         <label for="jo-select">Pay Hour</label>
                         <input id="finish_payhour" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -596,7 +607,7 @@
                     <div>
                         <label for="production_date">Actual Clock In Date</label>
                         <input id="finish_actual_clock_in_date" type="date"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -605,7 +616,7 @@
                     <div>
                         <label for="production_date">Actual Clock In Time (Mulai bekerja)</label>
                         <input id="finish_actual_clock_in_time" type="time"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -614,7 +625,7 @@
                     <div>
                         <label for="jo-select">Actual Lunch Out Time (Keluar Istirahat)</label>
                         <input id="finish_actual_lunch_out_time" type="time"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -623,7 +634,7 @@
                     <div>
                         <label for="jo-select">Actual Lunch In Time (Masuk Istirahat)</label>
                         <input id="finish_actual_lunch_in_time" type="time"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -632,7 +643,7 @@
                     <div>
                         <label for="jo-select">Actual Clock Out Time (Selesai bekerja)</label>
                         <input id="finish_actual_clock_out_time" type="time"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -658,7 +669,7 @@
                     <div>
                         <label for="jo-select">Labor Type</label>
                         <input id="finish_labor_type" type="text"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -667,16 +678,16 @@
                     <div>
                         <label for="jo-select">Labor Qty</label>
                         <input id="finish_labor_qty" type="number"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
-                            style="color-scheme: dark;" readonly />
+                            style="color-scheme: dark;" />
                     </div>
                     <div>
                         <label for="production_date">Discrep Qty</label>
                         <input id="finish_discrep_qty" type="number"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -685,7 +696,7 @@
                     <div>
                         <label for="production_date">Discrep Reason Code</label>
                         <select id="finish_discrep_reason_code"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400">
@@ -698,7 +709,7 @@
                     <div class="col-span-2">
                         <label for="jo-select">Labor Note</label>
                         <textarea id="finish_labor_note"
-                            class="w-full px-3 py-2 rounded-md border 
+                            class="w-full px-3 py-2 rounded-md border
                             bg-white text-gray-800 border-gray-300
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                             dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
@@ -749,13 +760,13 @@
         let gsphChart
 
         function chart_main() {
-            const employeeID = $("#user_id").val()
+            const machineID = $("#machineID").val()
 
             $.ajax({
                 url: "{{ url('api/profile/main_gsph') }}",
                 type: 'POST',
                 data: {
-                    employee: employeeID,
+                    machineID: machineID,
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
@@ -800,12 +811,12 @@
         let dtChart;
 
         function init_dt_chart() {
-            const employeeID = $("#user_id").val();
+            const machineID = $("#machineID").val();
             $.ajax({
                 url: "{{ url('api/profile/main-dt') }}",
                 type: 'POST',
                 data: {
-                    empId: employeeID
+                    machineID: machineID
                 },
                 success: function(response) {
 
@@ -891,9 +902,10 @@
         }
 
         function main_dashboard() {
-            const employeeID = $("#user_id").val()
+            const segments = window.location.pathname.split('/').filter(Boolean);
+            const machineID = segments[segments.length - 1];
+            console.log(machineID)
             const today = new Date();
-
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
@@ -903,7 +915,7 @@
                 url: "{{ url('api/profile/main') }}",
                 type: 'POST',
                 data: {
-                    employeeID: employeeID,
+                    machineID: machineID,
                     production_date: formattedDate
                 },
                 success: function(response) {
@@ -922,9 +934,9 @@
                     // $("#machine_text").text(data.machine_id ?? '-')
                     const pro_date = 'Machine Info ' + data.production_date ?? '-'
                     $('#prod_date_text').text(pro_date)
-                    if (!data.machine_id && !data.job_num) {
+                    if (data.condition_id == 0) {
                         $("#status_text").text('Non Active')
-                        $("#btn_machine_finish").hide()
+                        $("#btn_machine_finish").hide();
                     }
                     $("#line_text").text(data.category_line_id ?? data.category_line)
                     // $("#total_qty_plan").text(data.qty_plan ?? '-')
@@ -1264,28 +1276,28 @@
                             <label class="block mb-2 font-bold text-gray-700 dark:text-white">
                                 ${labelText}
                             </label>
-                            <input 
-                                type="text" 
-                                name="spesial_standard_sph[]" 
-                                value="${standardSPH}" 
-                                class="form-input w-full 
-                                    bg-white dark:bg-gray-700 
-                                    text-gray-800 dark:text-white 
-                                    border-gray-300 dark:border-gray-600 
-                                    focus:ring focus:ring-blue-300 dark:focus:ring-blue-600" 
+                            <input
+                                type="text"
+                                name="spesial_standard_sph[]"
+                                value="${standardSPH}"
+                                class="form-input w-full
+                                    bg-white dark:bg-gray-700
+                                    text-gray-800 dark:text-white
+                                    border-gray-300 dark:border-gray-600
+                                    focus:ring focus:ring-blue-300 dark:focus:ring-blue-600"
                             />
                         </div>
                         <div>
                             <label class="block mb-2 font-bold text-gray-700 dark:text-white">
                                 Job Number
                             </label>
-                            <select 
-                                name="spesial_job_number[]" 
-                                id="${jobNumberSelect}" 
-                                class="form-select w-full 
-                                    bg-white dark:bg-gray-700 
-                                    text-gray-800 dark:text-white 
-                                    border-gray-300 dark:border-gray-600 
+                            <select
+                                name="spesial_job_number[]"
+                                id="${jobNumberSelect}"
+                                class="form-select w-full
+                                    bg-white dark:bg-gray-700
+                                    text-gray-800 dark:text-white
+                                    border-gray-300 dark:border-gray-600
                                     focus:ring focus:ring-blue-300 dark:focus:ring-blue-600">
                             </select>
                         </div>
@@ -1297,38 +1309,38 @@
             });
         });
 
-        function job_list() {
-            const shift = $("#special_shift").val()
-            const category = 'ASSY'
-            const date = $("#special_production_date").val()
-            const machine_id = $("#special_machine").val()
+        // function job_list() {
+        //     const shift = $("#special_shift").val()
+        //     const category = 'ASSY'
+        //     const date = $("#special_production_date").val()
+        //     const machine_id = $("#special_machine").val()
 
-            $.ajax({
-                url: "{{ url('api/config/job_list') }}",
-                type: 'post',
-                data: {
-                    shift: shift,
-                    category: category,
-                    date: date,
-                    machine_id: machine_id
-                },
-                success: function(res) {
-                    $("select[name='spesial_job_number[]']").each(function() {
-                        let options = `<option selected disabled>-- Pilih Job --</option>`;
+        //     $.ajax({
+        //         url: "{{ url('api/config/job_list') }}",
+        //         type: 'post',
+        //         data: {
+        //             shift: shift,
+        //             category: category,
+        //             date: date,
+        //             machine_id: machine_id
+        //         },
+        //         success: function(res) {
+        //             $("select[name='spesial_job_number[]']").each(function() {
+        //                 let options = `<option selected disabled>-- Pilih Job --</option>`;
 
-                        res.forEach(item => {
-                            options += `
-                        <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
-                            ${item.jo_num}
-                        </option>
-                    `;
-                        });
+        //                 res.forEach(item => {
+        //                     options += `
+    //                 <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
+    //                     ${item.jo_num}
+    //                 </option>
+    //             `;
+        //                 });
 
-                        $(this).html(options);
-                    });
-                }
-            })
-        }
+        //                 $(this).html(options);
+        //             });
+        //         }
+        //     })
+        // }
         $("#back_btn,#special_back_btn,#finish_back_btn").on('click', function() {
             window.location.reload()
             // $("#config_view").addClass('hidden')
@@ -1341,13 +1353,13 @@
         })
         let oeeChart
         $("#view_more").on('click', function() {
-            const empID = $("#user_id").val()
+            // const empID = $("#user_id").val()
             $.ajax({
                 url: "{{ url('api/profile/view_more') }}",
                 type: 'post',
                 data: {
                     _token: "{{ csrf_token() }}",
-                    employee_id: empID,
+                    // employee_id: empID,
                     machine_id: $("#machine_info_text").text(),
                 },
                 success: function(response) {
@@ -2096,12 +2108,12 @@
         });
 
         function progress_bar() {
-            const employeeID = $("#user_id").val()
+            const machineID = $("#machineID").val()
             $.ajax({
                 url: "{{ url('api/profile/progress_bar') }}",
                 type: 'POST',
                 data: {
-                    employeeID: employeeID
+                    machineID: machineID
                 },
                 success: function(response) {
                     const data = response.data;
@@ -2463,49 +2475,182 @@
                 }
             })
         })
-        $("#spesial_submit_btn").on('click', function() {
-            const shift = $("#special_shift").val()
-            const production_date = $("#special_production_date").val()
-            const machineID = $("#special_machine").val()
-            const employeeID = "{{ Auth::user()->employee_id }}-{{ Auth::user()->name }}"
-            const toolIDInput = document.querySelectorAll('input[name="spesial_tool_id[]"]');
-            const toolID = Array.from(toolIDInput).map(input => input.value)
-            const standardSPHSelect = document.querySelectorAll('input[name="spesial_standard_sph[]"]');
-            const stdSPH = Array.from(standardSPHSelect).map(input => input.value)
-            const jobNumSelect = document.querySelectorAll('select[name="spesial_job_number[]"]')
-            const jobNum = Array.from(jobNumSelect).map(input => input.value)
-            if (!shift || !production_date || !machineID || !employeeID ||
-                toolID.length < 1 || stdSPH.length < 1 || jobNum.length < 1 ||
-                toolID.some(v => !v) || stdSPH.some(v => !v) || jobNum.some(v => !v)) {
 
-                new window.Swal({
-                    icon: 'error',
-                    text: 'Please fill all fields!',
-                    padding: '2em',
-                    customClass: 'sweet-alerts',
+        function handleScan() {
+            const scanVal = $("#scan_input").val().trim();
+            if (!scanVal) return;
+
+            $.ajax({
+                url: "{{ url('api/config/scan_qr') }}",
+                type: 'POST',
+                data: {
+                    scanVal: $("#scan_input").val()
+                },
+                success: function(resp) {
+                    if (resp.status == true) {
+                        $("#special_shift").val(resp.data.JobCode)
+                        machine_list_scan()
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: resp.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: 'Unknown Error'
+                    });
+                }
+            })
+        }
+
+        // blur
+        $("#scan_input").on('blur', handleScan);
+
+        // enter
+        $("#scan_input").on('keypress', function(e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                handleScan();
+            }
+        });
+        // $("#scan_input").on('blur', function() {
+
+        // });
+
+        function machine_list_scan() {
+            const scanVal = $("#scan_input").val()
+            const job_num = scanVal.split('~')[0]
+            $.ajax({
+                url: "{{ url('api/config/get_machine') }}",
+                type: "post",
+                data: {
+                    job_num: job_num
+                },
+                success: function(response) {
+                    const container = document.getElementById('listJig');
+                    container.innerHTML = '';
+                    const prodMap = {};
+                    response.data.jobOper.forEach(op => {
+                        prodMap[op.oprSeq] = op.prodStandard;
+                    });
+
+                    response.machine.forEach(machine => {
+                        const opDtl = response.data.jobOpDtl.find(
+                            d => d.resourceID === machine.machine_id
+                        );
+
+                        const oprSeq = opDtl?.oprSeq ?? '-';
+                        const prodStandard = oprSeq !== '-' ? prodMap[oprSeq] : '-';
+                        const card = `
+                        <div class="machine-card group rounded-2xl border border-gray-200 dark:border-gray-700
+                                    bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition-all duration-200
+                                    flex flex-col"
+                            data-machine-id="${machine.machine_id}"
+                            data-opr-seq="${oprSeq}">
+
+                            <!-- HEADER -->
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700 flex items-start justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                        ${machine.machine_name}
+                                    </h3>
+                                    <p class="text-xs text-gray-500 dark:text-white mt-0.5">
+                                        ID: ${machine.machine_id}
+                                    </p>
+                                </div>
+
+                                <span class="text-xs font-medium px-2 py-1 rounded-full
+                                            ${oprSeq !== '-'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                                : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-white'}">
+                                    ${oprSeq !== '-' ? 'Active' : 'Unassigned'}
+                                </span>
+                            </div>
+
+                            <!-- BODY -->
+                            <div class="px-5 py-4 flex-1 grid grid-cols-2 gap-4 text-sm">
+                                <div class="space-y-1">
+                                    <p class="text-xs uppercase tracking-wide text-black dark:text-white">
+                                        Opr Seq
+                                    </p>
+                                    <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                        ${oprSeq}
+                                    </p>
+                                </div>
+
+                                <div class="space-y-1">
+                                    <p class="text-xs uppercase tracking-wide text-black dark:text-white">
+                                        Standard JPH
+                                    </p>
+                                    <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                                        ${prodStandard}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- FOOTER -->
+                            <div class="px-5 py-4 border-t border-gray-100 dark:border-gray-700">
+                                <label class="block text-xs font-medium mb-2 text-black dark:text-white">
+                                    Assign Employee
+                                </label>
+
+                                <select
+                                    class="employee_select w-full rounded-xl border border-gray-300 dark:border-gray-600
+                                        bg-gray-50 dark:bg-gray-700
+                                        text-gray-800 dark:text-gray-100
+                                        text-sm px-4 py-2
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500
+                                        group-hover:border-blue-400 transition"
+                                    data-machine-id="${machine.machine_id}"
+                                    data-opr-seq="${oprSeq}"
+                                    data-prod-standard="${prodStandard}">
+                                </select>
+                            </div>
+                        </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', card);
+                    });
+                    employee_select();
+                },
+                error: function(xhr) {
+
+                }
+            })
+        }
+        $("#spesial_submit_btn").on('click', function() {
+            const production_date = $("#special_production_date").val();
+            const scanVal = $("#scan_input").val()
+            const job_num = scanVal.split('~')[0]
+            const shift = $("#special_shift").val();
+            const machine = collect_machine_data();
+            if (
+                !job_num ||
+                !shift
+            ) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Semua kolom wajib diisi!"
                 });
                 return;
             }
-            const data = new FormData()
-            data.append('shift', shift)
-            data.append('production_date', production_date)
-            data.append('machineID', machineID)
-            data.append('employeeID', employeeID)
-            toolID.forEach(tool_id => {
-                data.append('toolID[]', tool_id)
-            })
-            stdSPH.forEach(sph => {
-                data.append('stdSPH[]', sph)
-            })
-            jobNum.forEach(job_num => {
-                data.append('jobNum[]', job_num)
-            })
+
             $.ajax({
-                url: "{{ url('api/config/spesial_start') }}",
-                type: 'post',
-                data: data,
+                url: "{{ url('api/config/setup') }}",
+                type: 'POST',
+                contentType: 'application/json',
                 processData: false,
-                contentType: false,
+                data: JSON.stringify({
+                    production_date,
+                    job_num,
+                    shift,
+                    machine
+                }),
                 success: function(response) {
                     Swal.fire({
                         icon: response.status === 'success' ? 'success' : 'error',
@@ -2521,7 +2666,10 @@
                         text: message
                     });
                 }
-            })
+            });
+        })
+        $("#scan_btn_view").on('click', function() {
+            $("#div_scan_input").removeClass('hidden')
         })
     </script>
 </x-layout.default>

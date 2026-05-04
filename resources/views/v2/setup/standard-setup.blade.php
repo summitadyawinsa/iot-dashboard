@@ -54,7 +54,7 @@
                                     <div>
                                         <label for="inputDefault">Category</label>
                                         <select class="selectize" id="category_id" onchange="getCategory()">
-                                            <option value="STP" selected>Stamping</option>
+                                            <option value="STP">Stamping</option>
                                             <option value="ASSY">Assembly</option>
                                         </select>
                                     </div>
@@ -81,8 +81,10 @@
                                     </div>
                                     <div class="mb-5">
                                         <label for="avail-select">Work Time</label>
-                                        <select class="form-input text-black dark:text-white" id="workTime">
-                                        </select>
+                                        <input id="workTime" type="text"
+                                            class="form-input text-black dark:text-white" readonly />
+                                        {{-- <select class="form-input text-black dark:text-white" id="workTime">
+                                        </select> --}}
                                     </div>
                                     <div class="mb-5">
                                         <input type="time" id="actual_clock_out_time" x-model="actual_clock_out_time"
@@ -153,7 +155,7 @@
                 width: '100%',
                 allowClear: true
             });
-            joList();
+            // joList();
         });
 
         function getCategory() {
@@ -169,16 +171,32 @@
                     const data = response.data.message
                     const container = document.getElementById('shiftSelect')
                     container.innerHTML = '<option value="" selected disabled>Pilih shift</option>'
-                    const optionShift =
-                        `<option value="SHIFT 1">Night</option>
-                        <option value="SHIFT 2">Day</option>`;
-                    container.innerHTML += optionShift
+                    // const optionShift =
+                    //     `<option value="SHIFT 1">Night</option>
+                // <option value="SHIFT 2">Day</option>`;
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.Shift;
+                        option.textContent = item.Description;
+                        container.appendChild(option);
+                    });
+                    container.onchange = function() {
+                        const selectedShift = this.value;
+                        const selectedData = data.find(item => item.Shift == selectedShift);
+                        if (selectedData) {
+                            document.getElementById('workTime').value = selectedData.total_hours;
+                        } else {
+                            document.getElementById('workTime').value = '';
+                        }
+                    };
+                    // container.innerHTML += optionShift
                     const today = new Date();
                     const yyyy = today.getFullYear();
                     const mm = String(today.getMonth() + 1).padStart(2, '0');
                     const dd = String(today.getDate()).padStart(2, '0');
                     const todayStr = `${yyyy}-${mm}-${dd}`;
                     document.getElementById('production_date').value = todayStr;
+                    joList()
                 })
                 .catch(error => {
                     console.log(error)
@@ -259,35 +277,35 @@
                     const cardHTML = `
                 <div class="border-2 border-white block w-full p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 mb-4">
                     ${machineInfo ? `
-                                                    <div class="w-full border-b border-gray-600 flex items-center justify-between py-2">
-                                                        <div class="flex items-center gap-6">
-                                                            <div class="w-8 h-8 rounded-full flex items-center justify-center">
-                                                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"
-                                                                    style="color: ${machineInfo.is_active === '1' ? '#43A047' : '#FDD835'}" stroke="currentColor">
-                                                                    <path d="M12 2v10m6.364-4.364a9 9 0 11-12.728 0"
-                                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                                </svg>
-                                                            </div>
-                                                            <div>
-                                                                <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
-                                                                    Machine ${machineInfo.is_active === '1' ? 'ON' : 'OFF'}
-                                                                </h2>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    ` : `
-                                                    <div class="w-full border-b border-gray-600 flex items-center gap-3 py-2">
-                                                        <div class="w-8 h-8 rounded-full flex items-center justify-center">
-                                                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" style="color:#FDD835" stroke="currentColor">
-                                                                <path d="M12 2v10m6.364-4.364a9 9 0 11-12.728 0"
-                                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                                            </svg>
-                                                        </div>
-                                                        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
-                                                            Machine OFF
-                                                        </h2>
-                                                    </div>
-                                                    `}
+                                                                                        <div class="w-full border-b border-gray-600 flex items-center justify-between py-2">
+                                                                                            <div class="flex items-center gap-6">
+                                                                                                <div class="w-8 h-8 rounded-full flex items-center justify-center">
+                                                                                                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24"
+                                                                                                        style="color: ${machineInfo.is_active === '1' ? '#43A047' : '#FDD835'}" stroke="currentColor">
+                                                                                                        <path d="M12 2v10m6.364-4.364a9 9 0 11-12.728 0"
+                                                                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                                    </svg>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                                                                                        Machine ${machineInfo.is_active === '1' ? 'ON' : 'OFF'}
+                                                                                                    </h2>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        ` : `
+                                                                                        <div class="w-full border-b border-gray-600 flex items-center gap-3 py-2">
+                                                                                            <div class="w-8 h-8 rounded-full flex items-center justify-center">
+                                                                                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" style="color:#FDD835" stroke="currentColor">
+                                                                                                    <path d="M12 2v10m6.364-4.364a9 9 0 11-12.728 0"
+                                                                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                                                </svg>
+                                                                                            </div>
+                                                                                            <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+                                                                                                Machine OFF
+                                                                                            </h2>
+                                                                                        </div>
+                                                                                        `}
                     <div class="grid sm:grid-cols-1 md:grid-cols-1 gap-4 mb-4">
                         <div>
                             <label class="block mb-2 lg:text-lg md:text-sm font-bold dark:text-white">Machine ID</label>
@@ -380,7 +398,7 @@
             };
             data.append('shift', document.getElementById('shiftSelect').value)
             data.append('production_date', document.getElementById('production_date').value);
-            data.append('category_id', document.getElementById('category_id').value)
+            data.append('category_id', $("#category_id").val())
             var currentHost = window.location.host;
             const apiUrl = `https://` + currentHost + `/api/machine/v2/jo_list`;
             axios.post(apiUrl, data, {

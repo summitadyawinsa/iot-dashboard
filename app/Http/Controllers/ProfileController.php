@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Yajra\DataTables\DataTables;
 
 class ProfileController extends Controller
 {
     protected $profile;
-    public function __construct(Profile $profile)
+    protected $LogMachine;
+    public function __construct(Profile $profile, LogMachine $LogMachine)
     {
         $this->profile = $profile;
+        $this->LogMachine = $LogMachine;
     }
     /**
      * Display the user's profile form.
@@ -68,17 +71,35 @@ class ProfileController extends Controller
     }
     public function main(Request $request)
     {
-        $emp_id = $request->employeeID;
-        $production_date = $request->production_date;
         try {
-            $data = $this->profile->main_dashboard($emp_id);
+            $emp_id = $request->employeeID;
+            $machineID = $request->machineID;
+            $production_date = $request->production_date;
+            if ($emp_id) {
+                $data = $this->profile->main_dashboard_by_emp($emp_id);
+                $activity = $this->profile->activity($emp_id);
+                $act_summary = $this->profile->act_summary($emp_id, $production_date);
+                $oee_current = $this->profile->oee_current($emp_id);
+            } else if ($machineID) {
+                $data = $this->profile->main_dashboard_by_machine($machineID);
+                $activity = $this->profile->activity_by_machine($machineID);
+                $act_summary = $this->profile->act_summary_by_machine($machineID, $production_date);
+                $oee_current = $this->profile->oee_current_by_machine($machineID);
+            }
+            // dd($data);
+            // if ($data->tool_id) {
+            //     $option_tool = $this->profile->option_tool($emp_id);
+            // } else {
+            //     $option_tool = null;
+            // }
             return response()->json([
                 'status' => 'success',
                 'message' => 'Data berhasil di ambil',
                 'data' => $data,
-                'activity' => $this->profile->activity($emp_id),
-                'act_summary' => $this->profile->act_summary($emp_id, $production_date),
-                'oee_current' => $this->profile->oee_current($emp_id),
+                'activity' => $activity,
+                'act_summary' => $act_summary,
+                'oee_current' => $oee_current,
+                // 'option_tool' => $option_tool
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -89,11 +110,22 @@ class ProfileController extends Controller
     }
     public function main_dt(Request $request)
     {
-        $emp_id = $request->empId;
         try {
-            $data = $this->profile->main_dashboard($emp_id);
+            $emp_id = $request->empId;
+            $machineID = $request->machineID;
+            if ($emp_id) {
+                $data = $this->profile->main_dashboard_by_emp($emp_id);
+            } else if ($machineID) {
+                $data = $this->profile->main_dashboard_by_machine($machineID);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Parameter employee atau machine wajib diisi'
+                ], 400);
+            }
+            $tool_id = $data->tool_id ?? null;
             return response()->json([
-                'dt_log' => $this->profile->dt_log($data->machine_id, $data->job_num, $data->shift, $data->production_date)
+                'dt_log' => $this->profile->dt_log($data->machine_id, $tool_id, $data->job_num, $data->shift, $data->production_date)
             ]);
         } catch (\Throwable $th) {
             return response()->json([
@@ -106,7 +138,12 @@ class ProfileController extends Controller
     {
         try {
             $empID = $request->employeeID;
-            $machine = $this->profile->machine_data($empID);
+            $machineID = $request->machineID;
+            if ($empID) {
+                $machine = $this->profile->machine_data_by_emp($empID);
+            } else if ($machineID) {
+                $machine = $this->profile->machine_data_by_machine($machineID);
+            }
             return response()->json([
                 'status' => 200,
                 'message' => 'Data berhasil di ambil',
@@ -134,7 +171,7 @@ class ProfileController extends Controller
             }
 
             $file = $request->file('photo');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = $user . '_' . time() . '_' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads'), $filename);
             DB::table('users')
                 ->where('id', $user)
@@ -152,7 +189,6 @@ class ProfileController extends Controller
         $id = $request->machine_id;
         date_default_timezone_set('Asia/Jakarta');
         $date_sql = date('Y-m-d');
-
         $machine = LogMachine::find($id);
 
         if (!$machine) {
@@ -209,10 +245,133 @@ class ProfileController extends Controller
     public function main_gsph(Request $request)
     {
         $employee_id = $request->employee;
-        $main_gsph = $this->profile->main_gsph($employee_id);
+        $machineID = $request->machineID;
+
+        if ($employee_id) {
+            $main_gsph = $this->profile->main_gsph_by_employee($employee_id);
+        } elseif ($machineID) {
+            $main_gsph = $this->profile->main_gsph_by_machine($machineID);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Parameter employee atau machine wajib diisi'
+            ], 400);
+        }
         return response()->json([
             'status' => 'success',
             'data' => $main_gsph
         ]);
+    }
+    public function jo_show(Request $request)
+    {
+        $data = $this->profile->show_jo($request->machine, $request->date);
+        if (!$data) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data tidak ditemukan'
+            ]);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data' => $data
+        ]);
+    }
+    public function change_jo(Request $request)
+    {
+        $data = $this->profile->change_jo($request->jo);
+        return response()->json($data);
+    }
+    public function production_table(Request $request)
+    {
+        $id = 'SSW';
+        $line_id = match ($id) {
+            'A1' => 'STP-002',
+            'A2' => 'STP-003',
+            'A6' => 'STP-007',
+            'RBT-5H45' => 'ASSY-002',
+            'RBT-5J45' => 'ASSY-014',
+            'SSW' => 'ASSY-009',
+            default => null,
+        };
+        if ($line_id === null) {
+            return response()->json([
+                'error' => 'Invalid ID'
+            ], 400);
+        }
+        if (!$request->ajax()) {
+            abort(404);
+        }
+        // $machineIds = [
+        //     'RSW-5H45-07',
+        //     'RSW-5H45-08',
+        //     'RSW-5H45-09',
+        //     'RSW-5H45-10',
+        //     'RSW-5H45-11',
+        //     'RSW-5H45-12',
+        // ];
+        $query = $this->profile->queryTablePage($line_id);
+        return DataTables::of($query)
+            ->editColumn('job_num', function ($row) {
+                if ($row->qty_plan == 0) {
+                    $data = '-';
+                } else {
+                    $data = $row->job_num;
+                }
+                return $data;
+            })
+            ->editColumn('part_no', function ($row) {
+                if ($row->qty_plan == 0) {
+                    $data = '-';
+                } else {
+                    $data = $row->part_no;
+                }
+                return $data;
+            })
+            ->editColumn('qty_plan', function ($row) {
+                return $row->qty_plan;
+            })
+            ->editColumn('qty_actual', function ($row) {
+                return $row->qty_actual;
+            })
+            ->addColumn('qty_ok', function ($row) {
+                return number_format($row->qty_ok, 0, '', '.') ?? '-';
+            })
+            ->editColumn('started_at', function ($row) {
+                if (!$row->job_num || $row->qty_plan == 0) {
+                    $data = '-';
+                } else {
+                    $data = Carbon::parse($row->started_at)->format('H:i:s');
+                }
+                return $data;
+            })
+            ->editColumn('finished_at', function ($row) use ($id) {
+                if ($id === 'RBT-5H45') {
+                    if ($row->status_finish = false || $row->qty_actual <= $row->qty_plan || !$row->started_at) {
+                        $data = '-';
+                    } else {
+                        $data = Carbon::parse($row->finished_at)->format('H:i:s');
+                    }
+                } else {
+                    if (!$row->started_at || $row->status_finish = false || $row->qty_actual <= $row->qty_plan) {
+                        $data = '-';
+                    } else {
+                        $data = Carbon::parse($row->finished_at)->format('H:i:s');
+                    }
+                }
+
+                return $data;
+            })
+            ->addColumn('action', function ($row) {
+                return '
+        <button 
+            class="btn btn-primary btn-sm"
+            data-id="' . $row->machine_id . '"
+        >
+            View
+        </button>
+    ';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 }

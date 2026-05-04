@@ -396,6 +396,8 @@ Route::prefix('profile')->group(function () {
     Route::post('view_more', [ProfileController::class, 'view_more']);
     Route::post('main_gsph', [ProfileController::class, 'main_gsph']);
     Route::post('main-dt', [ProfileController::class, 'main_dt']);
+    Route::post('jo_show', [ProfileController::class, 'jo_show']);
+    Route::post('change_jo', [ProfileController::class, 'change_jo']);
 });
 Route::prefix('user-management')->group(function () {
     Route::post('list', [UserManagementController::class, 'list']);
@@ -406,13 +408,28 @@ Route::prefix('user-management')->group(function () {
 });
 Route::prefix('config')->group(function () {
     Route::post('setup', [ConfigController::class, 'setup']);
+    Route::post('spesial_start', [ConfigController::class, 'spesial_start']);
     Route::post('finish_machine', [ConfigController::class, 'finish_machine']);
     Route::post('shift_get_all', [ConfigController::class, 'shift_get_all']);
     Route::post('get_machine', [ConfigController::class, 'get_machine']);
+    Route::post('work-time', [ConfigController::class, 'special_setup_work_time']);
+    Route::post('job_list', [ConfigController::class, 'job_list']);
     Route::post('get_job_all', [ConfigController::class, 'get_job_all']);
     Route::post('get_downtime', [ConfigController::class, 'get_downtime']);
     Route::post('get_employee', [ConfigController::class, 'get_employee']);
     Route::post('save_downtime', [ConfigController::class, 'save_downtime']);
     Route::post('stop_downtime', [ConfigController::class, 'stop_downtime']);
     Route::post('technician_arrived', [ConfigController::class, 'technician_arrived']);
+    //time entry
+    Route::post('create_new', [ConfigController::class, 'create_new']);
+    Route::post('change_shift', [ConfigController::class, 'change_shift']);
+    Route::post('update_header', [ConfigController::class, 'update_header']);
+    Route::post('labor_submit_entry', [ConfigController::class, 'labor_submit_entry']);
+    Route::post('scan_qr', [ConfigController::class, 'scan_qr']);
+    Route::post('list_machine_by_scan', [ConfigController::class, 'list_machine_by_scan']);
 });
+Route::prefix('production-report')->group(function () {
+    Route::get('/', [ProfileController::class, 'production_table']);
+});
+Route::post('confirm_table', [ConfigController::class, 'confirm_table']);
+Route::post('confirm_submit', [ConfigController::class, 'confirm_submit']);

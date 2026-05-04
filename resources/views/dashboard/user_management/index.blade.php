@@ -28,7 +28,8 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white" id="configTitle">
                     User Management
                 </h1>
-                <button id="create_btn" class="px-4 py-2 rounded-lg font-medium
+                <button id="create_btn"
+                    class="px-4 py-2 rounded-lg font-medium
 bg-gray-800 text-white hover:bg-gray-700
 dark:bg-blue-600 dark:hover:bg-blue-500
 transition duration-200">
@@ -43,11 +44,6 @@ transition duration-200">
                             <th
                                 class="px-4 py-3 border border-black dark:border-white text-left text-sm font-semibold text-black dark:text-white">
                                 Name
-                            </th>
-
-                            <th
-                                class="px-4 py-3 border border-black dark:border-white text-left text-sm font-semibold text-black dark:text-white">
-                                Email
                             </th>
 
                             <th
@@ -88,15 +84,11 @@ transition duration-200">
                         <label for="inputDefault">Employee ID</label>
                         <input id="username" type="text" class="form-input text-black dark:text-white" />
                     </div>
-                    <div>
-                        <label>Email</label>
-                        <input id="email" type="email" class="form-input text-black dark:text-white" />
-                    </div>
                     <div id="password_div">
                         <label for="standard_sph">Password</label>
                         <input id="password" type="password" class="form-input text-black dark:text-white" />
                     </div>
-                    <div id="epicor_div" class="hidden">
+                    <div>
                         <label for="standard_sph">Epicor ID</label>
                         <input id="epicor_id" type="text" class="form-input text-black dark:text-white" readonly />
                     </div>
@@ -115,9 +107,10 @@ transition duration-200">
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         let table_user_mgn;
-        $('document').ready(function () {
+        $('document').ready(function() {
             user_table_func()
         })
+
         function user_table_func() {
             table_user_mgn = $("#table_user_mgn").DataTable({
 
@@ -129,43 +122,50 @@ transition duration-200">
                     type: "POST"
                 },
 
-                columns: [
-                    { data: 'name', name: 'name' },
-                    { data: 'email', name: 'email' },
-                    { data: 'username', name: 'username' },
-                    { data: 'view', name: 'view', orderable: false, searchable: false }
+                columns: [{
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'username',
+                        name: 'username'
+                    },
+                    {
+                        data: 'view',
+                        name: 'view',
+                        orderable: false,
+                        searchable: false
+                    }
                 ],
 
-                createdRow: function (row, data, dataIndex) {
+                createdRow: function(row, data, dataIndex) {
                     $('td', row).addClass(
                         'px-4 py-3 border border-black dark:border-white text-black dark:text-white'
                     )
                 }
             });
         }
-        $("#create_btn").on('click', function () {
+        $("#create_btn").on('click', function() {
             $("#analytics").addClass('hidden')
             $("#create_analytics").removeClass('hidden')
             $("#name").val('')
             $("#username").val('')
-            $("#email").val('')
             $("#password_div").removeClass('hidden')
             $("#epicor_div").addClass('hidden')
             $("#password").val('')
             $("#submit").removeClass('hidden')
             $("#update").addClass('hidden')
         })
-        $("#back_btn").on('click', function () {
+        $("#back_btn").on('click', function() {
             $("#create_analytics").addClass('hidden')
             $("#analytics").removeClass('hidden')
             table_user_mgn.ajax.reload()
         })
-        $("#submit").on('click', function () {
+        $("#submit").on('click', function() {
             const name = $("#name").val()
             const username = $("#username").val()
-            const email = $("#email").val()
             const password = $("#password").val()
-            if (!name || !username || !email || !password) {
+            if (!name || !username || !password) {
                 Swal.fire({
                     icon: "error",
                     title: "Error",
@@ -179,15 +179,16 @@ transition duration-200">
                 data: {
                     name: name,
                     username: username,
-                    email: email,
                     password: password
-                }, success: function (response) {
+                },
+                success: function(response) {
                     Swal.fire({
                         icon: response.icon,
                         title: response.title,
                         text: response.text
                     });
-                }, error: function (xhr) {
+                },
+                error: function(xhr) {
                     Swal.fire({
                         icon: "error",
                         title: "Error",
@@ -196,13 +197,15 @@ transition duration-200">
                 }
             })
         })
+
         function ViewBtn(id) {
             $.ajax({
                 url: "{{ url('api/user-management/find-data') }}",
                 type: 'post',
                 data: {
                     id: id
-                }, success: function (response) {
+                },
+                success: function(response) {
                     if (response.status == 'error') {
                         Swal.fire({
                             icon: "error",
@@ -212,17 +215,17 @@ transition duration-200">
                     } else {
                         $("#analytics").addClass('hidden')
                         $("#create_analytics").removeClass('hidden')
-                        $("#password_div").addClass('hidden')
+                        // $("#password_div").addClass('hidden')
                         $("#epicor_div").removeClass('hidden')
                         const data = response.data
                         $("#name").val(data.name)
                         $("#username").val(data.username)
-                        $("#email").val(data.email)
                         $("#epicor_id").val(data.employee_id)
                         $("#submit").addClass('hidden')
                         $("#update").removeClass('hidden')
                     }
-                }, error: function (xhr) {
+                },
+                error: function(xhr) {
                     Swal.fire({
                         icon: "error",
                         title: "Error",
@@ -231,11 +234,10 @@ transition duration-200">
                 }
             })
         }
-        $("#update").on('click', function () {
+        $("#update").on('click', function() {
             const name = $("#name").val()
             const username = $("#username").val()
-            const email = $("#email").val()
-            if (!name || !username || !email) {
+            if (!name || !username) {
                 Swal.fire({
                     icon: "error",
                     title: "Error",
@@ -249,10 +251,10 @@ transition duration-200">
                 data: {
                     name: name,
                     username: username,
-                    email: email,
                     epicor_id: $("#epicor_id").val()
-                }, success: function (response) {
-                    if (response.message == 'success') {
+                },
+                success: function(response) {
+                    if (response.status == 'success') {
                         Swal.fire({
                             icon: "success",
                             title: "Success",
@@ -265,7 +267,8 @@ transition duration-200">
                             text: response.message
                         });
                     }
-                }, error: function (xhr) {
+                },
+                error: function(xhr) {
                     Swal.fire({
                         icon: "error",
                         title: "Error",
@@ -274,6 +277,7 @@ transition duration-200">
                 }
             })
         })
+
         function DeleteBtn(id) {
             Swal.fire({
                 title: "Apakah anda serius?",
@@ -290,9 +294,9 @@ transition duration-200">
                         type: 'post',
                         data: {
                             id: id
-                        }, success: function (response) {
+                        },
+                        success: function(response) {
                             if (response.status == 'success') {
-                                table_user_mgn.ajax.reload()
                                 Swal.fire({
                                     icon: "success",
                                     title: "Success",
@@ -305,7 +309,9 @@ transition duration-200">
                                     text: response.message
                                 });
                             }
-                        }, error: function (xhr) {
+                            table_user_mgn.ajax.reload()
+                        },
+                        error: function(xhr) {
                             Swal.fire({
                                 icon: "error",
                                 title: "Error",

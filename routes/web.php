@@ -893,6 +893,9 @@ Route::prefix('/assy')->group(function () {
         // return view('v2.machine.machine');
         return view('v2.machine.trial-time-entry-v2');
     });
+    Route::get('confirm/{id}', function () {
+        return view('confirm.index');
+    });
 });
 //Route for setup
 Route::prefix('configuration')->group(function () {
@@ -901,6 +904,9 @@ Route::prefix('configuration')->group(function () {
     });
     Route::get('special-setup', function () {
         return view('v2.setup.special-setup');
+    });
+    Route::get('scan-setup', function () {
+        return view('v2.setup.scan');
     });
 });
 //Export To Excel
@@ -953,12 +959,22 @@ Route::prefix('standard_operational_procedure')->group(function () {
 });
 Route::get('dashboard-profile/', function () {
     $user_id = Auth::user()->id;
-    return view('dashboard.profile.index', ['user_id', $user_id]);
+    return view('dashboard.profile.index', [
+        'user_id' => $user_id
+    ]);
 })->middleware('auth');
-Route::get('user-management',function(){
+Route::get('user-management', function () {
     return view('dashboard.user_management.index');
 })->middleware('auth');
 Route::prefix('auth')->group(function () {
     Route::view('login', 'auth.login')->name('login');
     Route::post('login', [AuthController::class, 'login']);
+});
+Route::get('dashboard-leader', function () {
+    return view('dashboard.leader.index', ['user_id' => Auth::user()->id]);
+})->middleware('auth');
+Route::get('dashboard-profile/{machineID}', function ($machineID) {
+    return view('dashboard.profile.profile', [
+        'machineID' => $machineID
+    ]);
 });

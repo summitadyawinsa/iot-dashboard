@@ -63,8 +63,11 @@
                             <ul x-cloak x-show="activeDropdown === 'dasboard_operator'" x-collapse
                                 class="sub-menu text-gray-500">
                                 <li>
-                                    <a href="{{ url('dashboard-profile') }}">Profile</a>
+                                    <a href="{{ url('dashboard-profile') }}">Profile Operator</a>
                                 </li>
+                                {{-- <li>
+                                    <a href="{{ url('dashboard-leader') }}">Dashboard leader</a>
+                                </li> --}}
                                 <li>
                                     <a href="{{ url('user-management') }}">User management</a>
                                 </li>
@@ -110,7 +113,8 @@
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-cloak x-show="activeDropdown === 'line-a1'" x-collapse class="sub-menu text-gray-500">
+                            <ul x-cloak x-show="activeDropdown === 'line-a1'" x-collapse
+                                class="sub-menu text-gray-500">
                                 <li>
                                     <a href="/stamping/page/A1">Page</a>
                                 </li>
@@ -171,7 +175,8 @@
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-cloak x-show="activeDropdown === 'line-a2'" x-collapse class="sub-menu text-gray-500">
+                            <ul x-cloak x-show="activeDropdown === 'line-a2'" x-collapse
+                                class="sub-menu text-gray-500">
                                 <li>
                                     <a href="/stamping/page/A2">Page</a>
                                 </li>
@@ -232,7 +237,8 @@
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-cloak x-show="activeDropdown === 'line-a6'" x-collapse class="sub-menu text-gray-500">
+                            <ul x-cloak x-show="activeDropdown === 'line-a6'" x-collapse
+                                class="sub-menu text-gray-500">
                                 <li>
                                     <a href="/stamping/page/A6">Page</a>
                                 </li>
@@ -267,8 +273,8 @@
 
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>ASSY</span>
@@ -313,7 +319,7 @@
                                     <a href="/assy/machine/RBT-5H45">Machine</a>
                                 </li>
                                 <li>
-                                    <a href="/assy/trial-time-entry/RBT-5H45">Trial Time Entry</a>
+                                    <a href="/assy/trial-time-entry/RBT-5H45">Time Entry</a>
                                 </li>
                                 {{-- <li>
                                     <a href="/dashboard/summary/assy/RBT-5H45">5H45 Summary</a>
@@ -321,7 +327,7 @@
                                 {{-- <li>
                                     <a href="/dashboard/summary/dresser/assy/RBT-5H45">Dresser Summary</a>
                                 </li> --}}
-                                <li>
+                                {{-- <li>
                                     <a href="/assy/dashboard-by-machine/RSW-5H45-01">Mc. ROBOT 5H45 01</a>
                                 </li>
                                 <li>
@@ -338,7 +344,7 @@
                                 </li>
                                 <li>
                                     <a href="/assy/dashboard-by-machine/RSW-5H45-06">Mc. ROBOT 5H45 06</a>
-                                </li>
+                                </li> --}}
                                 <li>
                                     <a href="/assy/dashboard-by-machine/RSW-5H45-07">Mc. ROBOT 5H45 07</a>
                                 </li>
@@ -440,11 +446,104 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <ul>
+                        <li class="menu nav-item">
+                            <button type="button" class="nav-link group"
+                                :class="{ 'active': activeDropdown === 'SSW' }"
+                                @click="activeDropdown === 'SSW' ? activeDropdown = null : activeDropdown = 'SSW'">
+                                <div class="flex items-center">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg" class="group-hover:!text-primary shrink-0">
+                                        <path fill-rule="evenodd" clip-rule="evenodd"
+                                            d="M8.73167 5.77133L5.66953 9.91436C4.3848 11.6526 3.74244 12.5217 4.09639 13.205C4.10225 13.2164 4.10829 13.2276 4.1145 13.2387C4.48945 13.9117 5.59888 13.9117 7.81775 13.9117C9.05079 13.9117 9.6673 13.9117 10.054 14.2754L10.074 14.2946L13.946 9.72466L13.926 9.70541C13.5474 9.33386 13.5474 8.74151 13.5474 7.55682V7.24712C13.5474 3.96249 13.5474 2.32018 12.6241 2.03721C11.7007 1.75425 10.711 3.09327 8.73167 5.77133Z"
+                                            fill="currentColor"></path>
+                                        <path opacity="0.5"
+                                            d="M10.4527 16.4432L10.4527 16.7528C10.4527 20.0374 10.4527 21.6798 11.376 21.9627C12.2994 22.2457 13.2891 20.9067 15.2685 18.2286L18.3306 14.0856C19.6154 12.3474 20.2577 11.4783 19.9038 10.7949C19.8979 10.7836 19.8919 10.7724 19.8857 10.7613C19.5107 10.0883 18.4013 10.0883 16.1824 10.0883C14.9494 10.0883 14.3329 10.0883 13.9462 9.72461L10.0742 14.2946C10.4528 14.6661 10.4527 15.2585 10.4527 16.4432Z"
+                                            fill="currentColor"></path>
+                                    </svg>
+                                    <span
+                                        class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Line
+                                        SSW</span>
+                                </div>
+                                <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'SSW' }">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                            </button>
+                            <ul x-cloak x-show="activeDropdown === 'SSW'" x-collapse class="sub-menu text-gray-500">
+                                <li>
+                                    <a href="/assy/page/SSW">Page</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/confirm/SSW">Confirm JO</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/summary-by-line/SSW">Summary</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/machine/SSW">Machine</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/trial-time-entry/SSW">Time Entry</a>
+                                </li>
+                                {{-- <li>
+                                    <a href="/dashboard/summary/assy/RBT-5J45">5J45 Summary</a>
+                                </li> --}}
+                                {{-- <li>
+                                    <a href="/dashboard/summary/dresser/assy/RBT-5J45">Dresser Summary</a>
+                                </li> --}}
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-A-5">Mc. SSW-A - 05</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-A-14">Mc. SSW-A - 14</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-1">SSW-B-1</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-2">SSW-B-2</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-3">SSW-B-3</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-4">SSW-B-4</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-5">SSW-B-5</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-7">SSW-B-7</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-FS-1-2">SSW-FS-1-2</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-FS-1-3">SSW-FS-1-3</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-B-1">SSW-FSI-6-3</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-PLANTB-1">SSW-PLANTB-1</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-PLANTB-2">SSW-PLANTB-2</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
 
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Config Monitoring</span>
@@ -487,6 +586,9 @@
                                     <a href="{{ url('configuration/special-setup') }}">Special Setup</a>
                                 </li>
                                 <li>
+                                    <a href="{{ url('configuration/scan-setup') }}">Scan Setup</a>
+                                </li>
+                                <li>
                                     <a href="{{ url('standard_operational_procedure') }}">SOP</a>
                                 </li>
                             </ul>
@@ -496,8 +598,8 @@
 
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Maintenance</span>
@@ -523,7 +625,8 @@
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">PPM
                                         Activity</span>
                                 </div>
-                                <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'ppm-monitor' }">
+                                <div class="rtl:rotate-180"
+                                    :class="{ '!rotate-90': activeDropdown === 'ppm-monitor' }">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
@@ -543,8 +646,8 @@
 
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Finance</span>
@@ -651,8 +754,8 @@
 
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Delivery</span>
@@ -755,8 +858,8 @@
                 </li>
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Production</span>
@@ -781,7 +884,8 @@
                                     <span
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Archievment</span>
                                 </div>
-                                <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'production' }">
+                                <div class="rtl:rotate-180"
+                                    :class="{ '!rotate-90': activeDropdown === 'production' }">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
@@ -801,8 +905,8 @@
                 </li>
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>PPIC</span>
@@ -851,8 +955,8 @@
                 </li>
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Purchasing</span>
@@ -877,7 +981,8 @@
                                         class="ltr:pl-3 rtl:pr-3 text-black dark:text-[#506690] dark:group-hover:text-white-dark">Purchasing
                                         Report</span>
                                 </div>
-                                <div class="rtl:rotate-180" :class="{ '!rotate-90': activeDropdown === 'purchasing' }">
+                                <div class="rtl:rotate-180"
+                                    :class="{ '!rotate-90': activeDropdown === 'purchasing' }">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path d="M9 5L15 12L9 19" stroke="currentColor" stroke-width="1.5"
@@ -913,8 +1018,8 @@
                 </li>
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
-                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-                        fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>QMS</span>
@@ -922,7 +1027,8 @@
                 <li class="nav-item">
                     <ul>
                         <li class="menu nav-item">
-                            <button type="button" class="nav-link group" :class="{ 'active': activeDropdown === 'qms' }"
+                            <button type="button" class="nav-link group"
+                                :class="{ 'active': activeDropdown === 'qms' }"
                                 @click="activeDropdown === 'qms' ? activeDropdown = null : activeDropdown = 'qms'">
                                 <div class="flex items-center">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -965,8 +1071,8 @@
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
                 <div
                     style="background-color: #0ea5e9; width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center;">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffffff"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
                     </svg>
                 </div>
@@ -1058,7 +1164,8 @@
 
             <button id="reset-button" type="button"
                 style="position: absolute; top: 16px; right: 16px; cursor: pointer; padding: 8px; border: none; background: transparent; border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; color: #94a3b8; font-size: 0.8rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
                     <path
                         d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
                 </svg>
@@ -1256,16 +1363,16 @@
                     try {
                         const response = await fetch(
                             `/api/update_pin_${departmentSelect?.value}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                Department: departmentSelect?.value,
-                                OldPin: oldPinInput?.value,
-                                NewPin: newPinInput?.value
-                            })
-                        });
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    Department: departmentSelect?.value,
+                                    OldPin: oldPinInput?.value,
+                                    NewPin: newPinInput?.value
+                                })
+                            });
 
                         const data = await response.json();
 
@@ -1324,19 +1431,19 @@
                     try {
                         const response = await fetch(
                             `/api/check_pin_${departmentSelect?.value}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(csrfToken && {
-                                    'X-CSRF-TOKEN': csrfToken
-                                })
-                            },
-                            body: JSON.stringify({
-                                Department: departmentSelect?.value,
-                                Pin: pinInput?.value
-                            }),
-                            credentials: 'include'
-                        });
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(csrfToken && {
+                                        'X-CSRF-TOKEN': csrfToken
+                                    })
+                                },
+                                body: JSON.stringify({
+                                    Department: departmentSelect?.value,
+                                    Pin: pinInput?.value
+                                }),
+                                credentials: 'include'
+                            });
 
                         const data = await response.json();
 
@@ -1344,37 +1451,37 @@
                             if (pinPopupOverlay) pinPopupOverlay.style.display = 'none';
                             window.location.href =
                                 departmentSelect?.value === 'finance_invoice' ?
-                                    '/dashboard/profitability/invoice' :
-                                    departmentSelect?.value === 'finance_model' ?
-                                        '/dashboard/profitability/Model' :
-                                        departmentSelect?.value === 'finance_rcd' ?
-                                            '/dashboard/profitability/rcd' :
-                                            departmentSelect?.value === 'delivery' ? '/dashboard/delivery' :
-                                                departmentSelect?.value === 'delivery_monitoring' ?
-                                                    '/dashboard/delivery/delivery_monitoring' :
-                                                    departmentSelect?.value === 'delivery_job' ?
-                                                        '/dashboard/delivery/job_monitoring' :
-                                                        departmentSelect?.value === 'delivery_finish_good' ?
-                                                            '/dashboard/delivery/finish_good' :
-                                                            departmentSelect?.value === 'delivery_mit' ?
-                                                                '/dashboard/delivery/mit_dashboard' :
-                                                                departmentSelect?.value === 'delivery_cgr' ?
-                                                                    '/dashboard/delivery/cgr_monitoring' :
-                                                                    departmentSelect?.value === 'sales' ? '/dashboard/sales' :
-                                                                        departmentSelect?.value === 'ppic_job' ? '/dashboard/ppic' :
-                                                                            departmentSelect?.value === 'ppic_stock' ?
-                                                                                '/dashboard/ppic/stock' :
-                                                                                departmentSelect?.value === 'production' ?
-                                                                                    '/dashboard/production' :
-                                                                                    departmentSelect?.value === 'purchasing_project' ?
-                                                                                        '/dashboard/purchasing/po_project_monitoring' :
-                                                                                        departmentSelect?.value === 'purchasing_pr' ?
-                                                                                            '/dashboard/purchasing/monitoring_pr' :
-                                                                                            departmentSelect?.value === 'purchasing_ppic' ?
-                                                                                                '/dashboard/purchasing/po_ppic_monitoring' :
-                                                                                                departmentSelect?.value === 'purchasing_reguler' ?
-                                                                                                    '/dashboard/purchasing/po_reguler_monitoring' :
-                                                                                                    '/dashboard/purchasing/report';
+                                '/dashboard/profitability/invoice' :
+                                departmentSelect?.value === 'finance_model' ?
+                                '/dashboard/profitability/Model' :
+                                departmentSelect?.value === 'finance_rcd' ?
+                                '/dashboard/profitability/rcd' :
+                                departmentSelect?.value === 'delivery' ? '/dashboard/delivery' :
+                                departmentSelect?.value === 'delivery_monitoring' ?
+                                '/dashboard/delivery/delivery_monitoring' :
+                                departmentSelect?.value === 'delivery_job' ?
+                                '/dashboard/delivery/job_monitoring' :
+                                departmentSelect?.value === 'delivery_finish_good' ?
+                                '/dashboard/delivery/finish_good' :
+                                departmentSelect?.value === 'delivery_mit' ?
+                                '/dashboard/delivery/mit_dashboard' :
+                                departmentSelect?.value === 'delivery_cgr' ?
+                                '/dashboard/delivery/cgr_monitoring' :
+                                departmentSelect?.value === 'sales' ? '/dashboard/sales' :
+                                departmentSelect?.value === 'ppic_job' ? '/dashboard/ppic' :
+                                departmentSelect?.value === 'ppic_stock' ?
+                                '/dashboard/ppic/stock' :
+                                departmentSelect?.value === 'production' ?
+                                '/dashboard/production' :
+                                departmentSelect?.value === 'purchasing_project' ?
+                                '/dashboard/purchasing/po_project_monitoring' :
+                                departmentSelect?.value === 'purchasing_pr' ?
+                                '/dashboard/purchasing/monitoring_pr' :
+                                departmentSelect?.value === 'purchasing_ppic' ?
+                                '/dashboard/purchasing/po_ppic_monitoring' :
+                                departmentSelect?.value === 'purchasing_reguler' ?
+                                '/dashboard/purchasing/po_reguler_monitoring' :
+                                '/dashboard/purchasing/report';
                         } else {
                             if (pinError) pinError.textContent = data.message ||
                                 'PIN akses salah';
