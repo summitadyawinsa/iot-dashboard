@@ -1541,8 +1541,10 @@ class LogMachineController extends Controller
     //table Job Pending
     public function table_page_pending($lineId)
     {
+        // dd($lineId);
         $sql = $this->LogMachine->queryTablePending();
-        $bindings = [$lineId];
+        // $bindings = [$lineId];
+        $bindings = [trim($lineId) . '%'];
 
         $results = DB::connection('sqlsrv4')->select($sql, $bindings);
         $collection = collect($results);

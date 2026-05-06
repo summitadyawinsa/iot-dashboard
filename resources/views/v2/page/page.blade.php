@@ -16,10 +16,10 @@
 
         .table th,
         .table td {
-            text-align: center;
-            vertical-align: middle;
+            text-align: center !important;
+            vertical-align: middle !important;
             padding: 8px;
-            border: 2px solid white;
+            /* border: 2px solid white; */
             color: white;
         }
 
@@ -28,11 +28,11 @@
             overflow: hidden;
         }
 
-        /* Kolom chart transparan */
+        /* Kolom chart transparan
         .table td:last-child {
             background-color: #0e1726 !important;
             border: 2px solid white !important
-        }
+        } */
 
         /* Atur tinggi chart agar pas */
         .chart-wrapper {
@@ -49,14 +49,14 @@
         }
     </style>
     <div x-data="form">
-        <ul class="flex space-x-2 rtl:space-x-reverse">
+        {{-- <ul class="flex space-x-2 rtl:space-x-reverse">
             <li>
                 <a href="javascript:;" class="text-primary hover:underline">Dashboard</a>
             </li>
             <li class="before:content-['/'] before:mr-1 rtl:before:ml-1">
-                <span id="namePage"></span>
+                <span id="namePage">Production</span>
             </li>
-        </ul>
+        </ul> --}}
 
         <div class="pt-5 space-y-8">
             <div class="panel">
@@ -138,10 +138,9 @@
                                     </div>
                                     <div class="" id="mainTableCard">
                                         <table class="min-w-full table" id="main-table">
-                                            <thead
-                                                class="text-black dark:text-white uppercase text-center border border-sky-600 bg-sky-600">
+                                            <thead class="text-black dark:text-white uppercase text-center bg-sky-600">
                                                 <tr>
-                                                    <th>Machine</th>
+                                                    <th class="text-center">Machine</th>
                                                     <th id="model-column" style="display: none">Model</th>
                                                     <th>Job Number</th>
                                                     <th>Part No</th>
@@ -150,7 +149,7 @@
                                                     <th id="qtyOK" style="display: none">Qty OK</th>
                                                     <th class="whitespace-nowrap w-40">Start</th>
                                                     <th class="whitespace-nowrap w-40">Finish</th>
-                                                    <th>Prod.Time <br><span class="text-xs">(Hour)</span></th>
+                                                    <th>Prod.Time</th>
                                                     <th>Progress</th>
                                                 </tr>
                                             </thead>
@@ -512,18 +511,22 @@
                         const machineName = data.machine_id.split('/')
                         const toolID = machineName[1]
                         const machineID = machineName[0]
-                        if (toolID) {
-                            window.location.href =
-                                `https://${window.location.host}/${linePage}/dashboard/${machineID}/${toolID}`;
-                        } else {
-                            if (machineID.startsWith('SSW')) {
-                                window.location.href =
-                                    `https://dashboard.summitadyawinsa.co.id/dashboard-profile/${machineID}`;
-                            } else {
-                                window.location.href =
-                                    `https://${window.location.host}/${linePage}/dashboard/${machineID}`;
-                            }
-                        }
+                        window.location.href =
+                            `https://dashboard.summitadyawinsa.co.id/dashboard-profile/${machineID}`;
+                        // if (toolID) {
+                        //     window.location.href =
+                        //         `https://${window.location.host}/${linePage}/dashboard/${machineID}/${toolID}`;
+                        // } else {
+                        //     if (machineID.startsWith('SSW') || machineID.startsWith(
+                        //             'RSW-5J45') || machineID.startsWith(
+                        //             'RSW-5H45')) {
+                        //         window.location.href =
+                        //             `https://dashboard.summitadyawinsa.co.id/dashboard-profile/${machineID}`;
+                        //     } else {
+                        //         window.location.href =
+                        //             `https://${window.location.host}/${linePage}/dashboard/${machineID}`;
+                        //     }
+                        // }
                     });
                 },
                 drawCallback: function() {

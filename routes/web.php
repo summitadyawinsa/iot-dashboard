@@ -957,12 +957,12 @@ Route::prefix('standard_operational_procedure')->group(function () {
         ]);
     });
 });
-Route::get('dashboard-profile/', function () {
-    $user_id = Auth::user()->id;
-    return view('dashboard.profile.index', [
-        'user_id' => $user_id
-    ]);
-})->middleware('auth');
+// Route::get('dashboard-profile/', function () {
+//     $user_id = Auth::user()->id;
+//     return view('dashboard.profile.index', [
+//         'user_id' => $user_id
+//     ]);
+// })->middleware('auth');
 Route::get('user-management', function () {
     return view('dashboard.user_management.index');
 })->middleware('auth');
@@ -974,7 +974,16 @@ Route::get('dashboard-leader', function () {
     return view('dashboard.leader.index', ['user_id' => Auth::user()->id]);
 })->middleware('auth');
 Route::get('dashboard-profile/{machineID}', function ($machineID) {
-    return view('dashboard.profile.profile', [
-        'machineID' => $machineID
-    ]);
+    // return view('dashboard.profile.profile', [
+    //     'machineID' => $machineID
+    // ]);
+    if (str_contains($machineID, 'RSW-5H45')) {
+        return view('dashboard.profile.profile_rsw', [
+            'machineID' => $machineID
+        ]);
+    } else {
+        return view('dashboard.profile.profile', [
+            'machineID' => $machineID
+        ]);
+    }
 });

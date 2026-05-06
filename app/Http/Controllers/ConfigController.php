@@ -155,12 +155,28 @@ class ConfigController extends Controller
             $qty_plan = $row->qty_plan;
             $part_no = $row->item_no;
             $qty_actual = 0;
+            // Http::withoutVerifying()->get('https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector?machine_name=SSW-B-7&part_number=73211C000P');
         }
         DB::beginTransaction();
         try {
             foreach ($machines as $machine) {
                 if (empty($machine['employee_id']) || $machine['employee_id'] == null || $machine['employee_id'] == '') {
                     continue;
+                }
+                $check_part = Http::withoutVerifying()->get(
+                    'https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector',
+                    [
+                        'machine_name' => $machine['machine_id'],
+                        'part_number' => $part_no
+                    ]
+                );
+                $response = $check_part->json();
+                if (!$check_part->successful() || ($response['status'] ?? '') !== 'success') {
+                    DB::rollBack();
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Part number tidak terdaftar atau selector tidak ditemukan'
+                    ], 422);
                 }
                 $emp = explode('~', $machine['employee_id']);
                 $revisionModel = $this->config->revisionModel($job_num);
@@ -653,12 +669,12 @@ class ConfigController extends Controller
                     'message' => 'Data mesin tidak ditemukan'
                 ], 404);
             }
-            if ($cur_machine->qty_plan > $cur_machine->qty_actual) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Qty actual tidak sesuai dengan Qty Plan'
-                ], 422);
-            }
+            // if ($cur_machine->qty_plan > $cur_machine->qty_actual) {
+            //     return response()->json([
+            //         'status' => false,
+            //         'message' => 'Qty actual tidak sesuai dengan Qty Plan'
+            //     ], 422);
+            // }
             $history = [
                 'machine_id' => $machine,
                 'line_id' => $cur_machine->line_id,

@@ -154,6 +154,7 @@
                     machine_id: machine_id
                 },
                 success: function(resp) {
+                    $("#confirmTable").DataTable().ajax.reload()
                     new window.Swal({
                         icon: 'success',
                         text: resp.message,

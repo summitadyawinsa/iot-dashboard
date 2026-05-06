@@ -38,30 +38,33 @@ class Profile extends Model
     }
     public function main_dashboard_by_machine($machineID)
     {
-        $data = DB::table('log_header_machine as b')
-            ->leftJoin('users as a', 'a.employee_id', '=', 'b.employee_id')
-            ->leftJoin('log_downtime as c', function ($join) {
-                $join->on('b.machine_id', '=', 'c.machine_id')
-                    ->on('b.production_date', '=', 'c.production_date')
-                    ->where('c.is_active', 1);
-            })
-            ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
-            ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
-            ->where('b.machine_id', (string) $machineID)
-            ->first();
-        // if ($data->machine_id == null) {
-        //     $data = DB::table('users as a')
-        //         ->leftJoin('log_machine_tool as b', 'a.employee_id', '=', 'b.employee_id')
-        //         ->leftJoin('log_downtime as c', function ($join) {
-        //             $join->on('b.machine_id', '=', 'c.machine_id')
-        //                 ->on('b.production_date', '=', 'c.production_date')
-        //                 ->where('c.is_active', 1);
-        //         })
-        //         ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
-        //         ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
-        //         ->where('a.machine_id', (string) $machineID)
-        //         ->first();
-        // }
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
+            $data = DB::table('log_machine_tool as b')
+                ->leftJoin('users as a', 'a.employee_id', '=', 'b.employee_id')
+                ->leftJoin('log_downtime as c', function ($join) {
+                    $join->on('b.machine_id', '=', 'c.machine_id')
+                        ->on('b.production_date', '=', 'c.production_date')
+                        ->where('c.is_active', 1);
+                })
+                ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
+                ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
+                ->where('b.machine_id', (string) $machine_id[0])
+                ->where('b.tool_id', $machine_id[1])
+                ->first();
+        } else {
+            $data = DB::table('log_header_machine as b')
+                ->leftJoin('users as a', 'a.employee_id', '=', 'b.employee_id')
+                ->leftJoin('log_downtime as c', function ($join) {
+                    $join->on('b.machine_id', '=', 'c.machine_id')
+                        ->on('b.production_date', '=', 'c.production_date')
+                        ->where('c.is_active', 1);
+                })
+                ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
+                ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
+                ->where('b.machine_id', (string) $machineID)
+                ->first();
+        }
         return $data;
     }
     public function option_tool($emp_id)
@@ -105,34 +108,35 @@ class Profile extends Model
     }
     public function activity_by_machine($machineID)
     {
-        $machine = DB::table('log_header_machine as a')
-            ->leftJoin('users as b', 'b.employee_id', '=', 'a.employee_id')
-            ->where('a.machine_id', $machineID)
-            ->where('a.is_active', 1)
-            ->select('a.machine_id', 'a.job_num', 'a.production_date')
-            ->first();
-        if (!$machine) {
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
             $machine = DB::table('log_machine_tool as a')
                 ->leftJoin('users as b', 'b.employee_id', '=', 'a.employee_id')
-                ->where('a.machine_id', $machineID)
+                ->where('a.machine_id', $machine_id[0])
+                ->where('a.tool_id', $machine_id[1])
                 ->where('a.is_active', 1)
                 ->select('a.machine_id', 'a.job_num', 'a.production_date', 'a.tool_id')
                 ->first();
-            if (!$machine) {
-                return [];
-            }
-            return DB::table('log_activity')
+            $log = DB::table('log_activity')
                 ->where('machine_id', $machine->machine_id)
                 ->where('job_num', $machine->job_num)
                 ->where('production_date', $machine->production_date)
                 ->where('tool_id', $machine->tool_id)
                 ->get();
+        } else {
+            $machine = DB::table('log_header_machine as a')
+                ->leftJoin('users as b', 'b.employee_id', '=', 'a.employee_id')
+                ->where('a.machine_id', $machineID)
+                ->where('a.is_active', 1)
+                ->select('a.machine_id', 'a.job_num', 'a.production_date')
+                ->first();
+            $log = DB::table('log_activity')
+                ->where('machine_id', $machine->machine_id)
+                ->where('job_num', $machine->job_num)
+                ->where('production_date', $machine->production_date)
+                ->get();
         }
-        return DB::table('log_activity')
-            ->where('machine_id', $machine->machine_id)
-            ->where('job_num', $machine->job_num)
-            ->where('production_date', $machine->production_date)
-            ->get();
+        return $log;
     }
     public function act_summary($emp_id, $production_date)
     {
@@ -229,12 +233,9 @@ class Profile extends Model
     }
     public function act_summary_by_machine($machineID, $production_date)
     {
-        $machine = DB::table('log_header_machine')
-            ->where('machine_id', $machineID)
-            ->where('production_date', $production_date)
-            ->first();
-        if ($machine) {
-            $data = DB::table('log_header_machine as a')
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
+            $data = DB::table('log_machine_tool as a')
                 ->leftJoin('log_downtime as b', function ($join) {
                     $join->on('a.machine_id', '=', 'b.machine_id')
                         ->on('a.job_num', '=', 'b.job_num')
@@ -245,7 +246,8 @@ class Profile extends Model
                         ->on('a.job_num', '=', 'c.job_num')
                         ->on('a.production_date', '=', 'c.production_date');
                 })
-                ->where('a.machine_id', $machineID)
+                ->where('a.machine_id', $machine_id[0])
+                ->where('a.tool_id', $machine_id[1])
                 ->where('a.production_date', $production_date)
                 ->selectRaw('
             SUM(a.qty_plan) as total_qty_plan,
@@ -257,7 +259,7 @@ class Profile extends Model
         ')
                 ->first();
         } else {
-            $data = DB::table('log_machine_tool as a')
+            $data = DB::table('log_header_machine as a')
                 ->leftJoin('log_downtime as b', function ($join) {
                     $join->on('a.machine_id', '=', 'b.machine_id')
                         ->on('a.job_num', '=', 'b.job_num')
@@ -396,11 +398,9 @@ class Profile extends Model
     }
     public function oee_current_by_machine($machineID)
     {
-        $machine = DB::table('log_header_machine')
-            ->where('machine_id', $machineID)
-            ->first();
-        if ($machine) {
-            $data = DB::table('log_header_machine as a')
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
+            $data = DB::table('log_machine_tool as a')
                 ->leftJoin('log_downtime as b', function ($join) {
                     $join->on('a.machine_id', '=', 'b.machine_id')
                         ->on('a.job_num', '=', 'b.job_num')
@@ -414,10 +414,11 @@ class Profile extends Model
             SUM(a.standard_sph) as total_standard_sph,
             SUM(b.downtime) as total_downtime
         ')
-                ->where('a.machine_id', $machineID)
+                ->where('a.machine_id', $machine_id[0])
+                ->where('a.tool_id', $machine_id[1])
                 ->first();
         } else {
-            $data = DB::table('log_machine_tool as a')
+            $data = DB::table('log_header_machine as a')
                 ->leftJoin('log_downtime as b', function ($join) {
                     $join->on('a.machine_id', '=', 'b.machine_id')
                         ->on('a.job_num', '=', 'b.job_num')
@@ -502,12 +503,15 @@ class Profile extends Model
     }
     public function machine_data_by_machine($machineID)
     {
-        $data = DB::table('log_header_machine as b')
-            ->select('b.qty_plan as target', 'b.qty_actual as actual')
-            ->where('b.machine_id', $machineID)
-            ->first();
-        if ($data->target == null) {
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
             $data = DB::table('log_machine_tool as b')
+                ->select('b.qty_plan as target', 'b.qty_actual as actual')
+                ->where('b.machine_id', $machine_id[0])
+                ->where('b.tool_id', $machine_id[1])
+                ->first();
+        } else {
+            $data = DB::table('log_header_machine as b')
                 ->select('b.qty_plan as target', 'b.qty_actual as actual')
                 ->where('b.machine_id', $machineID)
                 ->first();
@@ -539,23 +543,35 @@ class Profile extends Model
     }
     public function main_gsph_by_machine($machineID)
     {
-        $data_machine = DB::table('log_header_machine')
-            ->where('machine_id', $machineID)
-            ->where('is_active', 1)
-            ->first();
-        if (!$data_machine) {
+        if ($machineID == 'RSW-5H45-10~4' || $machineID == 'RSW-5H45-10~3' || $machineID == 'RSW-5H45-10~2' || $machineID == 'RSW-5H45-10~1' || $machineID == 'RSW-5H45-09~1' || $machineID == 'RSW-5H45-09~2') {
+            $machine_id = explode('~', $machineID);
             $data_machine = DB::table('log_machine_tool')
+                ->where('machine_id', $machine_id[0])
+                ->where('tool_id', $machine_id[1])
+                ->where('is_active', 1)
+                ->first();
+            $gsph = DB::table('gsph_record')
+                ->where('machine_id', $data_machine->machine_id)
+                ->where('tool_id', $data_machine->tool_id)
+                ->where('cut_off', Carbon::today())
+                ->where('shift', $data_machine->shift)
+                ->where('job_num', $data_machine->job_num)
+                ->select('machine_id', 'gsph', DB::raw("FORMAT(cut_off_time,'HH:mm') as cut_off_time"))
+                ->get();
+        } else {
+            $data_machine = DB::table('log_header_machine')
                 ->where('machine_id', $machineID)
                 ->where('is_active', 1)
                 ->first();
+            $gsph = DB::table('gsph_record')
+                ->where('machine_id', $data_machine->machine_id)
+                ->where('cut_off', Carbon::today())
+                ->where('shift', $data_machine->shift)
+                ->where('job_num', $data_machine->job_num)
+                ->select('machine_id', 'gsph', DB::raw("FORMAT(cut_off_time,'HH:mm') as cut_off_time"))
+                ->get();
         }
-        return DB::table('gsph_record')
-            ->where('machine_id', $data_machine->machine_id)
-            ->where('cut_off', Carbon::today())
-            ->where('shift', $data_machine->shift)
-            ->where('job_num', $data_machine->job_num)
-            ->select('machine_id', 'gsph', DB::raw("FORMAT(cut_off_time,'HH:mm') as cut_off_time"))
-            ->get();
+        return $gsph;
     }
     public function show_jo($machine, $date)
     {

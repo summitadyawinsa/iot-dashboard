@@ -62,9 +62,9 @@
                             </button>
                             <ul x-cloak x-show="activeDropdown === 'dasboard_operator'" x-collapse
                                 class="sub-menu text-gray-500">
-                                <li>
+                                {{-- <li>
                                     <a href="{{ url('dashboard-profile') }}">Profile Operator</a>
-                                </li>
+                                </li> --}}
                                 {{-- <li>
                                     <a href="{{ url('dashboard-leader') }}">Dashboard leader</a>
                                 </li> --}}

@@ -74,7 +74,7 @@ class LogMachine extends Model
                     DB::raw("
                 CASE
                     WHEN tool.tool_id IS NOT NULL AND tool.tool_id != ''
-                        THEN CONCAT(header.machine_id, '/', tool.tool_id)
+                        THEN CONCAT(header.machine_id, '~', tool.tool_id)
                     ELSE header.machine_id
                 END as machine_id
             "),
@@ -134,7 +134,7 @@ class LogMachine extends Model
     WHERE T3.LaborEntryMethod = 'T'
       AND T1.JobReleased = 1
       AND T1.DueDate = FORMAT(GETDATE(), 'yyyy-MM-dd')
-      AND T5.ResourceGrpID = ?
+      AND T5.ResourceGrpID LIKE ?
     ";
         return $sql;
     }
@@ -159,16 +159,16 @@ class LogMachine extends Model
             ->selectRaw("
                 ROUND(
                     (
-                        CASE 
-                            WHEN EndTime < StartTime 
+                        CASE
+                            WHEN EndTime < StartTime
                                 THEN (EndTime + 24 - StartTime)
                             ELSE (EndTime - StartTime)
                         END
                     )
                     -
                     (
-                        CASE 
-                            WHEN LunchEnd < LunchStart 
+                        CASE
+                            WHEN LunchEnd < LunchStart
                                 THEN (LunchEnd + 24 - LunchStart)
                             ELSE (LunchEnd - LunchStart)
                         END
