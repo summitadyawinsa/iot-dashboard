@@ -163,20 +163,22 @@ class ConfigController extends Controller
                 if (empty($machine['employee_id']) || $machine['employee_id'] == null || $machine['employee_id'] == '') {
                     continue;
                 }
-                $check_part = Http::withoutVerifying()->get(
-                    'https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector',
-                    [
-                        'machine_name' => $machine['machine_id'],
-                        'part_number' => $part_no
-                    ]
-                );
-                $response = $check_part->json();
-                if (!$check_part->successful() || ($response['status'] ?? '') !== 'success') {
-                    DB::rollBack();
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Part number tidak terdaftar atau selector tidak ditemukan'
-                    ], 422);
+                if ($machine['machine_id'] == 'SSW-TG4R-2' || $machine['machine_id'] == 'SSW-TG4R-4' || $machine['machine_id'] == 'SSW-B-3' || $machine['machine_id'] == 'SSW-B-4' || $machine['machine_id'] == 'SSW-B-5' || $machine['machine_id'] == 'SSW-B-7') {
+                    $check_part = Http::withoutVerifying()->get(
+                        'https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector',
+                        [
+                            'machine_name' => $machine['machine_id'],
+                            'part_number' => $part_no
+                        ]
+                    );
+                    $response = $check_part->json();
+                    if (!$check_part->successful() || ($response['status'] ?? '') !== 'success') {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Part number tidak terdaftar atau selector tidak ditemukan'
+                        ], 422);
+                    }
                 }
                 $emp = explode('~', $machine['employee_id']);
                 $revisionModel = $this->config->revisionModel($job_num);
@@ -292,16 +294,16 @@ class ConfigController extends Controller
     }
     public function spesial_start(Request $request)
     {
+        // dd($request->all());
         date_default_timezone_set('Asia/Jakarta');
         $date = date('Y-m-d');
         $time = date('Y-m-d H:i:s');
-        $machine_id = $request->machineID;
-        // dd($machine_id);
-        // $production_date = $request->production_date;
+        $machine_id = $request->machine_id;
+        $employee = $request->employee;
         $shift = $request->shift;
-        $tool_ids = $request->toolID;
-        $job_nums = $request->jobNum;
-        $standard_sphs = $request->stdSPH;
+        $tool_ids = $request->tool_id;
+        $job_nums = $request->job_number;
+        $standard_sphs = $request->standard_sph;
         $shiftMap = [
             1 => 8,
             6 => 8.25,
@@ -311,15 +313,17 @@ class ConfigController extends Controller
             13 => 7,
         ];
         $work_time = $shiftMap[$shift] ?? 8;
-        $empId = $request->employeeID;
-        $employeeCode = $employeeName = null;
-        if ($empId && strpos($empId, '-') !== false) {
-            list($employeeCode, $employeeName) = explode('-', $empId, 2);
-            $employeeCode = trim($employeeCode);
-            $employeeName = trim($employeeName);
-        } else {
-            $employeeCode = trim($empId);
-        }
+        $emp = explode('~', $employee);
+        $employeeCode = $emp[0];
+        $employeeName = $emp[1];
+        // $employeeCode = $employeeName = null;
+        // if ($empId && strpos($empId, '-') !== false) {
+        //     list($employeeCode, $employeeName) = explode('-', $empId, 2);
+        //     $employeeCode = trim($employeeCode);
+        //     $employeeName = trim($employeeName);
+        // } else {
+        //     $employeeCode = trim($empId);
+        // }
         $epicor_shift = DB::connection('sqlsrv4')
             ->table('Erp.JCShift')
             ->where('Shift', $shift)

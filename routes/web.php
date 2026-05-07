@@ -974,16 +974,16 @@ Route::get('dashboard-leader', function () {
     return view('dashboard.leader.index', ['user_id' => Auth::user()->id]);
 })->middleware('auth');
 Route::get('dashboard-profile/{machineID}', function ($machineID) {
-    // return view('dashboard.profile.profile', [
-    //     'machineID' => $machineID
-    // ]);
-    if (str_contains($machineID, 'RSW-5H45')) {
-        return view('dashboard.profile.profile_rsw', [
-            'machineID' => $machineID
-        ]);
-    } else {
-        return view('dashboard.profile.profile', [
-            'machineID' => $machineID
-        ]);
-    }
+    return view('dashboard.profile.profile', [
+        'machineID' => $machineID
+    ]);
+    // if (str_contains($machineID, 'RSW-5H45')) {
+    //     return view('dashboard.profile.profile_rsw', [
+    //         'machineID' => $machineID
+    //     ]);
+    // } else {
+    //     return view('dashboard.profile.profile', [
+    //         'machineID' => $machineID
+    //     ]);
+    // }
 });

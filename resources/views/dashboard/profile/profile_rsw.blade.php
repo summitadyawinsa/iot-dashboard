@@ -427,9 +427,17 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white" id="configTitle">
                     Configuration
                 </h1>
-                <button id="special_back_btn"
+                {{-- <button id="special_back_btn"
                     class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
                     Back
+                </button> --}}
+                <button id="special_back_btn"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                    </svg>
                 </button>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow" id="config_machine_form">
@@ -475,7 +483,7 @@
            focus:outline-none focus:ring-2 focus:ring-blue-500
            dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
                             id="special_machine">
-                            <option disabled selected>Pilih Mobil</option>
+                            <option disabled selected>Pilih Mesin</option>
                             <option value="RSW-5H45-10">RSW-5H45-10</option>
                             <option value="RSW-5H45-09">RSW-5H45-09</option>
                         </select>
@@ -1296,6 +1304,39 @@
 
             }
         })
+
+        function special_employee() {
+            $('#special_employee').select2({
+                placeholder: 'Pilih Job Employee',
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                dropdownParent: $('#analytics'),
+                ajax: {
+                    url: "{{ url('api/config/get_employee') }}",
+                    type: 'POST',
+                    delay: 300,
+                    dataType: 'json',
+                    data: function(params) {
+                        return {
+                            _token: "{{ csrf_token() }}",
+                            search: params.term,
+                            page: params.page || 1,
+                            category: 'ASSY'
+                        };
+                    },
+                    processResults: function(response, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: response.results,
+                            pagination: {
+                                more: response.pagination.more
+                            }
+                        };
+                    }
+                }
+            });
+        }
         $("#special_machine").on('change', function() {
             $.ajax({
                 url: "{{ url('api/config/work-time') }}",
@@ -1305,9 +1346,10 @@
                     category: 'ASSY'
                 },
                 success: function(res) {
+                    special_employee()
                     const listTool = res.data || [];
                     const machineID = $("#special_machine").val();
-                    const labelText = 'Standard SPH';
+                    const labelText = 'Standard JPH';
                     const container = document.getElementById('listJig');
                     container.innerHTML = '';
 
@@ -1359,38 +1401,38 @@
             });
         });
 
-        // function job_list() {
-        //     const shift = $("#special_shift").val()
-        //     const category = 'ASSY'
-        //     const date = $("#special_production_date").val()
-        //     const machine_id = $("#special_machine").val()
+        function job_list() {
+            const shift = $("#special_shift").val()
+            const category = 'ASSY'
+            const date = $("#special_production_date").val()
+            const machine_id = $("#special_machine").val()
 
-        //     $.ajax({
-        //         url: "{{ url('api/config/job_list') }}",
-        //         type: 'post',
-        //         data: {
-        //             shift: shift,
-        //             category: category,
-        //             date: date,
-        //             machine_id: machine_id
-        //         },
-        //         success: function(res) {
-        //             $("select[name='spesial_job_number[]']").each(function() {
-        //                 let options = `<option selected disabled>-- Pilih Job --</option>`;
+            $.ajax({
+                url: "{{ url('api/config/job_list') }}",
+                type: 'post',
+                data: {
+                    shift: shift,
+                    category: category,
+                    date: date,
+                    machine_id: machine_id
+                },
+                success: function(res) {
+                    $("select[name='spesial_job_number[]']").each(function() {
+                        let options = `<option selected value="">-- Pilih Job --</option>`;
 
-        //                 res.forEach(item => {
-        //                     options += `
-    //                 <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
-    //                     ${item.jo_num}
-    //                 </option>
-    //             `;
-        //                 });
+                        res.forEach(item => {
+                            options += `
+                    <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
+                        ${item.jo_num}
+                    </option>
+                `;
+                        });
 
-        //                 $(this).html(options);
-        //             });
-        //         }
-        //     })
-        // }
+                        $(this).html(options);
+                    });
+                }
+            })
+        }
         $("#back_btn,#special_back_btn,#finish_back_btn").on('click', function() {
             window.location.reload()
             // $("#config_view").addClass('hidden')
@@ -2526,15 +2568,36 @@
                 }
             })
         })
+
+        function collect_special_machine_data() {
+            let specialMachines = [];
+
+            $("#listJig .border-2").each(function(index) {
+                const tool_id = $(this).find('input[name="spesial_tool_id[]"]').val();
+                const standard_sph = $(this).find('input[name="spesial_standard_sph[]"]').val();
+                const job_number = $(this).find('select[name="spesial_job_number[]"]').val();
+                const machine_id = $("#special_machine").val();
+                specialMachines.push({
+                    machine_id: machine_id,
+                    tool_id: tool_id,
+                    standard_sph: parseFloat(standard_sph) || 0,
+                    job_number: job_number
+                });
+            });
+
+            console.log('Collected special machines:', specialMachines);
+            return specialMachines;
+        }
         $("#spesial_submit_btn").on('click', function() {
             const production_date = $("#special_production_date").val();
-            const scanVal = $("#scan_input").val()
-            const job_num = scanVal.split('~')[0]
+            // const scanVal = $("#scan_input").val()
+            // const job_num = scanVal.split('~')[0]
             const shift = $("#special_shift").val();
-            const machine = collect_machine_data();
+            const employee = $("#special_employee").val()
+            const machine = collect_special_machine_data();
             if (
                 !job_num ||
-                !shift
+                !shift || !employee
             ) {
                 Swal.fire({
                     icon: "error",
@@ -2545,7 +2608,7 @@
             }
 
             $.ajax({
-                url: "{{ url('api/config/setup') }}",
+                url: "{{ url('api/config/spesial_start') }}",
                 type: 'POST',
                 contentType: 'application/json',
                 processData: false,
@@ -2553,7 +2616,8 @@
                     production_date,
                     job_num,
                     shift,
-                    machine
+                    machine,
+                    employee
                 }),
                 success: function(response) {
                     Swal.fire({

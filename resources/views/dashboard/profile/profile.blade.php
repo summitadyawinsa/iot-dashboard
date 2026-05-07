@@ -58,19 +58,13 @@
                                 d="M3.75 3.75h6v1.5h-4.5v4.5h-1.5v-6Zm16.5 0v6h-1.5v-4.5h-4.5v-1.5h6ZM3.75 20.25v-6h1.5v4.5h4.5v1.5h-6Zm16.5-6v6h-6v-1.5h4.5v-4.5h1.5Z" />
                         </svg>
                     </button>
-                    <select
-                        class="w-full px-3 py-2 rounded-md border
-                        bg-white text-gray-800 border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-blue-500
-                        dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
-                        id="select_config">
-                        <option selected disabled>Configuration</option>
-                        <option value="standard">Standard</option>
-                    </select>
-                    {{-- <button id="config_btn"
-                        class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
-                        Configuration
-                    </button> --}}
+                    <button id="config_btn" class="btn btn-success btn-sm btn-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -78,7 +72,7 @@
                     <div class="flex justify-between">
                         <div class="flex items-center gap-4">
                             <div class="relative">
-                                <img src="https://ui-avatars.com/api/?name=Aziz+FR"
+                                <img src="https://ui-avatars.com/api/?name=Summit+Adyawinsa+Indonesia&length=3"
                                     class="w-20 h-20 rounded-full border object-cover" id="img_pp">
                                 <button type="button" id="btn_open_img"
                                     class="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-1.5 shadow-md transition hidden"
@@ -310,25 +304,7 @@
                     </h3>
 
                     <ol class="relative" id="activityTimeline">
-                        <!-- <li class="relative flex gap-4 pb-10 mb-3">
-                            <span class="absolute left-5 top-10 h-full w-px bg-gray-300 dark:bg-gray-600"></span>
-                            <div
-                                class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900">
-                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor"
-                                    stroke-width="2" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-800 dark:text-white">
-                                    Login System
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    10 minutes ago
-                                </p>
-                            </div>
-                        </li> -->
+
                     </ol>
                 </div>
             </div>
@@ -451,9 +427,17 @@
                 <h1 class="text-2xl font-bold text-gray-800 dark:text-white" id="configTitle">
                     Configuration
                 </h1>
-                <button id="special_back_btn"
+                {{-- <button id="special_back_btn"
                     class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
                     Back
+                </button> --}}
+                <button id="special_back_btn"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                    </svg>
                 </button>
             </div>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow" id="config_machine_form">
@@ -472,13 +456,14 @@
                     </div>
                     <div>
                         <label for="jo-select">Shift</label>
-                        <input id="special_shift" type="text"
+                        <select
                             class="w-full px-3 py-2 rounded-md border
            bg-white text-gray-800 border-gray-300
            focus:outline-none focus:ring-2 focus:ring-blue-500
 
            dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
-                            style="color-scheme: dark;" readonly />
+                            id="special_shift">
+                        </select>
                     </div>
                     <div>
                         <label for="production_date">Production Date (Job)</label>
@@ -489,6 +474,29 @@
 
            dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
                             style="color-scheme: dark;" readonly />
+                    </div>
+                    <div>
+                        <label for="jo-select">Machine ID</label>
+                        <select
+                            class="w-full px-3 py-2 rounded-md border
+           bg-white text-gray-800 border-gray-300
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
+                            id="special_machine">
+                            <option disabled selected>Pilih Mesin</option>
+                            <option value="RSW-5H45-10">RSW-5H45-10</option>
+                            <option value="RSW-5H45-09">RSW-5H45-09</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="jo-select">Employee</label>
+                        <select
+                            class="w-full px-3 py-2 rounded-md border
+           bg-white text-gray-800 border-gray-300
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
+                            id="special_employee">
+                        </select>
                     </div>
                 </div>
                 <div class="grid md:grid-cols-2 sm:grid-cols-1 lg:grid-cols-3 gap-4 p-5 dark:text-white-light items-center"
@@ -768,10 +776,6 @@
             let url = window.location.pathname;
             let parts = url.split('/');
             let machineID = parts[parts.length - 1];
-            let select = $("#select_config");
-            if (machineID == 'RSW-5H45-10' || machineID == 'RSW-5H45-09') {
-                select.append(`<option value="special">Spesial</option>`)
-            }
         })
         let gsphChart
 
@@ -1035,9 +1039,20 @@
             let html = '';
 
             activities.forEach(item => {
-
                 const startDate = item.start_date;
-                const endDate = item.end_date ? item.end_date : 'On Progress';
+                const start = new Date(startDate);
+                const startTime = start.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                let endTime = 'On Progress';
+                if (item.end_date) {
+                    const end = new Date(item.end_date);
+                    endTime = end.toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
 
                 html += `
             <li class="relative flex gap-4 pb-10 mb-3">
@@ -1056,10 +1071,10 @@
                         ${item.activity}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-white">
-                        Start: ${startDate}
+                        Start: ${startTime}
                     </p>
                     <p class="text-xs text-gray-500 dark:text-white">
-                        End: ${endDate}
+                        End: ${endTime}
                     </p>
                 </div>
             </li>
@@ -1223,15 +1238,10 @@
                 }
             })
         })
-        $("#select_config").on('change', function() {
-            if (this.value == 'standard') {
-                $("#config_view").removeClass('hidden')
-                $("#condition_check_form").removeClass('hidden')
-                $("#dashboard_profile_view").addClass('hidden')
-                const today = new Date().toISOString().split('T')[0];
-                $("#production_date").val(today)
-                shift()
-            } else {
+        $("#config_btn").on('click', function() {
+            const machineID = window.location.pathname.split('/').pop();
+            if (machineID == 'RSW-5H45-10~1' || machineID == 'RSW-5H45-10~2' || machineID == 'RSW-5H45-10~3' ||
+                machineID == 'RSW-5H45-10~4' || machineID == 'RSW-5H45-09~1' || machineID == 'RSW-5H45-09~2') {
                 $("#special_config_view").removeClass('hidden')
                 $("#dashboard_profile_view").addClass('hidden')
                 const today = new Date().toISOString().split('T')[0];
@@ -1254,15 +1264,79 @@
                         $.each(response, function(index, item) {
                             select.append(
                                 `<option value="${item.Shift}">
-                                ${item.Description}
-                            </option>`
+                            ${item.Description}
+                        </option>`
                             );
                         });
                     }
                 });
+            } else {
+                $("#config_view").removeClass('hidden')
+                $("#condition_check_form").removeClass('hidden')
+                $("#dashboard_profile_view").addClass('hidden')
+                const today = new Date().toISOString().split('T')[0];
+                $("#production_date").val(today)
+                shift()
+                // $.ajax({
+                //     url: "{{ url('api/config/shift_get_all') }}",
+                //     type: 'post',
+                //     data: {
+                //         category: 'assy'
+                //     },
+                //     success: function(response) {
+                //         const select = $("#special_shift");
+                //         select.empty();
+                //         select.append('<option value="">Pilih shift</option>');
+
+                //         if (!response || response.length === 0) {
+                //             select.append('<option value="">Data tidak tersedia</option>');
+                //             return;
+                //         }
+                //         $.each(response, function(index, item) {
+                //             select.append(
+                //                 `<option value="${item.Shift}">
+            //                 ${item.Description}
+            //             </option>`
+                //             );
+                //         });
+                //     }
+                // });
 
             }
         })
+
+        function special_employee() {
+            $('#special_employee').select2({
+                placeholder: 'Pilih Job Employee',
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 0,
+                dropdownParent: $('#analytics'),
+                ajax: {
+                    url: "{{ url('api/config/get_employee') }}",
+                    type: 'POST',
+                    delay: 300,
+                    dataType: 'json',
+                    data: function(params) {
+                        return {
+                            _token: "{{ csrf_token() }}",
+                            search: params.term,
+                            page: params.page || 1,
+                            category: 'ASSY'
+                        };
+                    },
+                    processResults: function(response, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: response.results,
+                            pagination: {
+                                more: response.pagination.more
+                            }
+                        };
+                    }
+                }
+            });
+        }
         $("#special_machine").on('change', function() {
             $.ajax({
                 url: "{{ url('api/config/work-time') }}",
@@ -1272,9 +1346,10 @@
                     category: 'ASSY'
                 },
                 success: function(res) {
+                    special_employee()
                     const listTool = res.data || [];
                     const machineID = $("#special_machine").val();
-                    const labelText = 'Standard SPH';
+                    const labelText = 'Standard JPH';
                     const container = document.getElementById('listJig');
                     container.innerHTML = '';
 
@@ -1326,38 +1401,38 @@
             });
         });
 
-        // function job_list() {
-        //     const shift = $("#special_shift").val()
-        //     const category = 'ASSY'
-        //     const date = $("#special_production_date").val()
-        //     const machine_id = $("#special_machine").val()
+        function job_list() {
+            const shift = $("#special_shift").val()
+            const category = 'ASSY'
+            const date = $("#special_production_date").val()
+            const machine_id = $("#special_machine").val()
 
-        //     $.ajax({
-        //         url: "{{ url('api/config/job_list') }}",
-        //         type: 'post',
-        //         data: {
-        //             shift: shift,
-        //             category: category,
-        //             date: date,
-        //             machine_id: machine_id
-        //         },
-        //         success: function(res) {
-        //             $("select[name='spesial_job_number[]']").each(function() {
-        //                 let options = `<option selected disabled>-- Pilih Job --</option>`;
+            $.ajax({
+                url: "{{ url('api/config/job_list') }}",
+                type: 'post',
+                data: {
+                    shift: shift,
+                    category: category,
+                    date: date,
+                    machine_id: machine_id
+                },
+                success: function(res) {
+                    $("select[name='spesial_job_number[]']").each(function() {
+                        let options = `<option selected value="">-- Pilih Job --</option>`;
 
-        //                 res.forEach(item => {
-        //                     options += `
-    //                 <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
-    //                     ${item.jo_num}
-    //                 </option>
-    //             `;
-        //                 });
+                        res.forEach(item => {
+                            options += `
+                    <option value="${item.jo_num}" ${item.selected ? 'selected' : ''}>
+                        ${item.jo_num}
+                    </option>
+                `;
+                        });
 
-        //                 $(this).html(options);
-        //             });
-        //         }
-        //     })
-        // }
+                        $(this).html(options);
+                    });
+                }
+            })
+        }
         $("#back_btn,#special_back_btn,#finish_back_btn").on('click', function() {
             window.location.reload()
             // $("#config_view").addClass('hidden')
@@ -1615,6 +1690,7 @@
                 allowClear: true,
                 width: '100%',
                 minimumInputLength: 0,
+                dropdownParent: $('#analytics'),
                 ajax: {
                     url: "{{ url('api/config/get_employee') }}",
                     type: 'POST',
@@ -2279,7 +2355,7 @@
                             });
 
                             gsphChart.updateSeries([{
-                                name: 'GSPH',
+                                name: 'JPH',
                                 data: values
                             }]);
                         }
@@ -2321,7 +2397,7 @@
                             });
 
                             gsphChart.updateSeries([{
-                                name: 'GSPH',
+                                name: 'JPH',
                                 data: values
                             }]);
                         }
@@ -2493,15 +2569,36 @@
                 }
             })
         })
+
+        function collect_special_machine_data() {
+            let specialMachines = [];
+
+            $("#listJig .border-2").each(function(index) {
+                const tool_id = $(this).find('input[name="spesial_tool_id[]"]').val();
+                const standard_sph = $(this).find('input[name="spesial_standard_sph[]"]').val();
+                const job_number = $(this).find('select[name="spesial_job_number[]"]').val();
+                const machine_id = $("#special_machine").val();
+                specialMachines.push({
+                    machine_id: machine_id,
+                    tool_id: tool_id,
+                    standard_sph: parseFloat(standard_sph) || 0,
+                    job_number: job_number
+                });
+            });
+
+            console.log('Collected special machines:', specialMachines);
+            return specialMachines;
+        }
         $("#spesial_submit_btn").on('click', function() {
             const production_date = $("#special_production_date").val();
-            const scanVal = $("#scan_input").val()
-            const job_num = scanVal.split('~')[0]
+            // const scanVal = $("#scan_input").val()
+            // const job_num = scanVal.split('~')[0]
             const shift = $("#special_shift").val();
-            const machine = collect_machine_data();
+            const employee = $("#special_employee").val()
+            const machine = collect_special_machine_data();
             if (
                 !job_num ||
-                !shift
+                !shift || !employee
             ) {
                 Swal.fire({
                     icon: "error",
@@ -2512,7 +2609,7 @@
             }
 
             $.ajax({
-                url: "{{ url('api/config/setup') }}",
+                url: "{{ url('api/config/spesial_start') }}",
                 type: 'POST',
                 contentType: 'application/json',
                 processData: false,
@@ -2520,7 +2617,8 @@
                     production_date,
                     job_num,
                     shift,
-                    machine
+                    machine,
+                    employee
                 }),
                 success: function(response) {
                     Swal.fire({
