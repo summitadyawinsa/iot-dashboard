@@ -363,7 +363,7 @@ class ProfileController extends Controller
             })
             ->addColumn('action', function ($row) {
                 return '
-        <button 
+        <button
             class="btn btn-primary btn-sm"
             data-id="' . $row->machine_id . '"
         >
@@ -373,5 +373,41 @@ class ProfileController extends Controller
             })
             ->rawColumns(['action'])
             ->make(true);
+    }
+    public function dashboard_machine(Request $request)
+    {
+        $machine_id = $request->machineId;
+        $tool_id = null;
+        if (str_contains($machine_id, '~')) {
+            [$machine_id, $tool_id] = explode('~', $machine_id, 2);
+            $machine_id = trim($machine_id);
+            $tool_id = trim($tool_id);
+        }
+        $machine = $this->profile->dashboard_machine($machine_id, $tool_id);
+        if (!$machine) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'machine tidak ditemukan'
+            ], 404);
+        }
+        $gsph = $this->profile->dashboard_gsph_by_machine($machine_id, $machine->job_num, $tool_id);
+        $oee = $this->profile->dashboard_oee_by_machine($machine_id, $machine->job_num, $tool_id);
+        $oee_quality = (($oee->total_qty > 0 && $oee->total_ng > 0) ? 100 - ceil($oee->total_ng / $oee->total_qty * 100) : 100);
+        $oee_availability = ($oee->available_time > 0 ? ceil($oee->operation_time / ($oee->available_time) * 100) : 0);
+        $oee_performance = (($oee->operation_time_standard > 0 && $oee->operation_time > 0) ? ceil($oee->operation_time_standard / $oee->operation_time * 100) : 0);
+        $oee_average = ($oee_availability + $oee_performance + $oee_quality) / 3;
+        $activity = $this->profile->dashboard_activity_by_machine($machine_id, $machine->job_num, $tool_id);
+        $next_schedule = $this->profile->dashboard_next_schedule($machine_id);
+        return response()->json([
+            'status' => 'success',
+            'machine' => $machine,
+            'gsph' => $gsph,
+            'oee_average' => $oee_average,
+            'oee_availability' => $oee_availability,
+            'oee_performance' => $oee_performance,
+            'oee_quality' => $oee_quality,
+            'activity' => $activity,
+            'next_schedule' => $next_schedule
+        ]);
     }
 }

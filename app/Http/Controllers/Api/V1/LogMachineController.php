@@ -938,7 +938,7 @@ class LogMachineController extends Controller
             ->selectRaw("DATEPART(HOUR, cut_off_time) as hour_int, SUM(gsph) as gsph")
             ->where('machine_id', $id)
             ->where('job_num', $machineID->job_num)
-            ->where('shift', $machineID->shift)
+            // ->where('shift', $machineID->shift)
             ->where('cut_off', $date_sql)
             ->whereTime('cut_off_time', '>=', $start)
             ->whereTime('cut_off_time', '<=', $end)
@@ -956,20 +956,6 @@ class LogMachineController extends Controller
         } else {
             $qtyOK = $counter - $machineUpdate->qty_ng;
         }
-        if ($id === 'SSW-TG4R-4') {
-            $machineCheck = LogMachine::find($id);
-            if ($machineCheck && $machineCheck->qty_plan > 0) {
-                if ($counter == $machineCheck->qty_plan) {
-                    Http::withoutVerifying()->post(
-                        url('config/finish_machine'),
-                        [
-                            'machine' => $id,
-                            'job_num' => $machineCheck->job_num
-                        ]
-                    );
-                }
-            }
-        }
         $message = [
             'operation_time' => $machineUpdate->started_at . ' ' . now() . ' ' . $operation_time,
             'qty_actual' => $machineUpdate->qty_actual,
@@ -980,8 +966,8 @@ class LogMachineController extends Controller
             'act_cycletime' => 3600 / $machineUpdate->current_gsph,
             'ooe_quality' => $oee_quality,
             'oee_performance' => $oee_performance,
-            'oee-availability' => $oee_availability,
             'oee_availability' => $oee_availability,
+            'oee_average' => ($oee_availability + $oee_performance + $oee_quality) / 3,
             'oprMenit' => $oprTimeMenit,
             'dtDuration' => $totalDowntimeMinutes,
             'oprTimeDT' => $operTimeDT,
@@ -2328,7 +2314,8 @@ class LogMachineController extends Controller
         $perPage = 10;
         $employees = Cache::remember('employees_list', 600, function () {
             //API Epicor getEmployee
-            $empApi = Http::withoutVerifying()->post('https://192.168.1.251:8000/EPIAPI/Labor/GetEmployee');
+            $url = config('services.epicor_app.url');
+            $empApi = Http::withoutVerifying()->post($url . '/Labor/GetEmployee');
             return $empApi->json();
         });
         if ($search) {
@@ -2360,7 +2347,8 @@ class LogMachineController extends Controller
         $perPage = 10;
         $employees = Cache::remember('employees_list', 600, function () {
             //API Epicor getEmployee
-            $empApi = Http::withoutVerifying()->post('https://192.168.1.251:8000/EPIAPI/Labor/GetEmployee');
+            $url = config('services.epicor_app.url');
+            $empApi = Http::withoutVerifying()->post($url . '/Labor/GetEmployee');
             return $empApi->json();
         });
         if ($search) {
@@ -2392,11 +2380,14 @@ class LogMachineController extends Controller
         $date = date('Y-m-d');
         $jobNum = $request->input('job_num');
         $shift = $request->input('shift');
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()
-            ->post('https://192.168.1.251:8000/EPIAPI/JobEntry/GetDetailJob', [
+            ->post($url . '/JobEntry/GetDetailJob', [
                 'ipJobNum' => $jobNum
             ]);
-        $responseData = $response->json();
+        $responseResult = $response->body();
+        $responseData = json_decode($responseResult, true);
+        // dd($responseData['data']);
         if (!isset($responseData['data'])) {
             return response()->json([
                 'message' => 'Data tidak ditemukan dalam response dari API JobEntry.',
@@ -2838,6 +2829,7 @@ class LogMachineController extends Controller
         $machineData = $this->LogMachine->getRunningMachine($line_id);
         $uniqueJobs = $machineData->pluck('job_num')->unique()->filter(fn($jobNum) => $jobNum !== '1' && !empty($jobNum));
         $epicorResponses = [];
+        $url = config('services.epicor_app.url');
         //API Epicor JobEntry Detail JO
         $responses = Http::pool(function ($pool) use ($uniqueJobs) {
             return collect($uniqueJobs)
@@ -3268,7 +3260,9 @@ class LogMachineController extends Controller
         } catch (\Exception $e) {
             $production_date = date('Y-m-d');
         }
-        $activity_name = DB::table('downtime_list')->where('id', $downtime_id)->first()->name;
+        $downtime_list = DB::table('downtime_list')
+            ->where('id', $downtime_id)
+            ->first();
         $dataDT = [
             'machine_id' => $machine_id,
             'job_num' => $job_num,
@@ -3284,7 +3278,7 @@ class LogMachineController extends Controller
         $dbDowntime = $this->LogMachine->insertDT($dataDT);
         $dataAct = [
             'machine_id' => $machine_id,
-            'activity' => $activity_name,
+            'activity' => $downtime_list->name,
             'job_num' => $job_num,
             'shift' => $shift,
             'downtime_seq_id' => $dbDowntime,
@@ -3343,6 +3337,42 @@ class LogMachineController extends Controller
         ];
         $client->send(json_encode($data));
         $client->close();
+        $machine_data = $this->config->machine_data($machine_id);
+        $machine = NULL;
+        if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+            $line = 'ASSY';
+            if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+                $machine = 'RSW';
+            }
+            if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+                $machine = 'SSW-B';
+            }
+        } else {
+            $line = 'STP';
+            if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+                $machine = 'A6';
+            }
+        }
+        $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type);
+        foreach ($employee_data as $data) {
+            Http::acceptJson()
+                ->post(config('services.ems_wa.url'), [
+                    'phone' => $data->Telp,
+                    'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
+
+        Dear Bapak/Ibu,
+
+        Terdapat informasi downtime mesin yang memerlukan perhatian.
+
+        Machine ID : {$machine_id}
+Downtime : {$downtime_list->name}
+Start Time : " . now()->format('Y-m-d H:i:s') . "
+
+        Mohon segera dilakukan pengecekan dan tindak lanjut.
+
+        Terima kasih."
+                ]);
+        }
         return response()->json([
             'downtimeChartLabels' => $downtimeChartLabels,
             'downtimeChartValues' => $downtimeChartValues,
@@ -4538,10 +4568,11 @@ class LogMachineController extends Controller
     }
     public function createNewHeaderV2(Request $request)
     {
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/CreateNew', [
+        ])->post($url . '/Labor/CreateNew', [
                     'employeeNum' => $request->employee,
                     'startDate' => $request->productionDate,
                     'nik' => $request->nik,
@@ -4551,10 +4582,11 @@ class LogMachineController extends Controller
     }
     public function changeShiftV2(Request $request)
     {
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/ChangeShift', [
+        ])->post($url . '/Labor/ChangeShift', [
                     'laborHedSeq' => $request->laborHedSeq,
                     'shift' => $request->shift,
                     'nik' => $request->nik,
@@ -4564,10 +4596,11 @@ class LogMachineController extends Controller
     }
     public function updateHeaderV2(Request $request)
     {
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/UpdateHeader', [
+        ])->post($url . '/Labor/UpdateHeader', [
                     'workDate' => $request->workDate,
                     'laborHedSeq' => $request->laborHedSeq,
                     'shift' => $request->shift,
@@ -4589,10 +4622,11 @@ class LogMachineController extends Controller
     }
     public function getOpSeqV2(Request $request)
     {
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/GetOprSeq', [
+        ])->post($url . '/Labor/GetOprSeq', [
                     'jobNum' => $request->jobNum,
                     'nik' => $request->nik,
                     'password' => $request->password
@@ -4614,10 +4648,11 @@ class LogMachineController extends Controller
             'indirectCode' => "",
             'indirectDescription' => ""
         ];
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/GeNewtLaborDtl', $data);
+        ])->post($url . '/Labor/GeNewtLaborDtl', $data);
         return response()->json($response->json());
     }
     public function changeLaborTimeV2(Request $request)
@@ -4632,10 +4667,11 @@ class LogMachineController extends Controller
             'nik' => $request->nik,
             'password' => $request->password
         ];
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/ChangeLaborTime', $data);
+        ])->post($url . '/Labor/ChangeLaborTime', $data);
         return response()->json($response->json());
     }
     public function updateDtlV2(Request $request)
@@ -4673,18 +4709,20 @@ class LogMachineController extends Controller
         ];
         // Log::info($data);
         // dd($data);
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/UpdateDtl', $data);
+        ])->post($url . '/Labor/UpdateDtl', $data);
         return response()->json($response->json());
     }
     public function submitTimeEntryV2(Request $request)
     {
+        $url = config('services.epicor_app.url');
         $response = Http::withoutVerifying()->withHeaders([
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
-        ])->post('https://192.168.1.251:8000/EPIAPI/Labor/Submit', [
+        ])->post($url . '/Labor/Submit', [
                     'laborHedSeq' => $request->laborHedSeq,
                     'laborDtlSeq' => $request->laborDtlSeq,
                     'nik' => $request->nik,

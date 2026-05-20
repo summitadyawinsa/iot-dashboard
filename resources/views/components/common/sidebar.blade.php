@@ -23,7 +23,7 @@
             </div>
             <ul class="perfect-scrollbar relative font-semibold space-y-0.5 h-[calc(100vh-80px)] overflow-y-auto overflow-x-hidden  p-4 py-0"
                 x-data="{ activeDropdown: null }">
-                <h2
+                {{-- <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
 
                     <svg class="w-4 h-5 flex-none hidden" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
@@ -31,8 +31,8 @@
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     <span>Dashboard</span>
-                </h2>
-                <li class="nav-item">
+                </h2> --}}
+                {{-- <li class="nav-item">
                     <ul>
                         <li class="menu nav-item">
                             <button type="button" class="nav-link group"
@@ -65,16 +65,16 @@
                                 {{-- <li>
                                     <a href="{{ url('dashboard-profile') }}">Profile Operator</a>
                                 </li> --}}
-                                {{-- <li>
+                {{-- <li>
                                     <a href="{{ url('dashboard-leader') }}">Dashboard leader</a>
                                 </li> --}}
-                                <li>
+                {{-- <li>
                                     <a href="{{ url('user-management') }}">User management</a>
                                 </li>
                             </ul>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <h2
                     class="py-3 px-7 flex items-center uppercase font-extrabold bg-white-light/30 dark:bg-dark dark:bg-opacity-[0.08] -mx-4 mb-1">
 
@@ -113,8 +113,7 @@
                                     </svg>
                                 </div>
                             </button>
-                            <ul x-cloak x-show="activeDropdown === 'line-a1'" x-collapse
-                                class="sub-menu text-gray-500">
+                            <ul x-cloak x-show="activeDropdown === 'line-a1'" x-collapse class="sub-menu text-gray-500">
                                 <li>
                                     <a href="/stamping/page/A1">Page</a>
                                 </li>
@@ -312,9 +311,9 @@
                                 <li>
                                     <a href="/assy/page/RBT-5H45">Page</a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="/assy/summary-by-line/RBT-5H45">Summary</a>
-                                </li>
+                                </li> --}}
                                 <li>
                                     <a href="/assy/machine/RBT-5H45">Machine</a>
                                 </li>
@@ -399,12 +398,12 @@
                                 <li>
                                     <a href="/assy/page/RBT-5J45">Page</a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="/assy/summary-by-line/RBT-5J45">Summary</a>
-                                </li>
-                                <li>
+                                </li> --}}
+                                {{-- <li>
                                     <a href="/assy/machine/RBT-5J45">Machine</a>
-                                </li>
+                                </li> --}}
                                 {{-- <li>
                                     <a href="/assy/trial-time-entry/RBT-5J45">Trial Time Entry</a>
                                 </li> --}}
@@ -481,27 +480,27 @@
                                 <li>
                                     <a href="/assy/confirm/SSW">Confirm JO</a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="/assy/summary-by-line/SSW">Summary</a>
-                                </li>
-                                <li>
+                                </li> --}}
+                                {{-- <li>
                                     <a href="/assy/machine/SSW">Machine</a>
                                 </li>
                                 <li>
                                     <a href="/assy/trial-time-entry/SSW">Time Entry</a>
-                                </li>
+                                </li> --}}
                                 {{-- <li>
                                     <a href="/dashboard/summary/assy/RBT-5J45">5J45 Summary</a>
                                 </li> --}}
                                 {{-- <li>
                                     <a href="/dashboard/summary/dresser/assy/RBT-5J45">Dresser Summary</a>
                                 </li> --}}
-                                <li>
+                                {{-- <li>
                                     <a href="/assy/dashboard-by-machine/SSW-A-5">Mc. SSW-A - 05</a>
                                 </li>
                                 <li>
                                     <a href="/assy/dashboard-by-machine/SSW-A-14">Mc. SSW-A - 14</a>
-                                </li>
+                                </li> --}}
                                 <li>
                                     <a href="/assy/dashboard-by-machine/SSW-B-1">SSW-B-1</a>
                                 </li>
@@ -521,6 +520,12 @@
                                     <a href="/assy/dashboard-by-machine/SSW-B-7">SSW-B-7</a>
                                 </li>
                                 <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-TG4R-4">SSW-TG4R-4</a>
+                                </li>
+                                <li>
+                                    <a href="/assy/dashboard-by-machine/SSW-TG4R-2">SSW-TG4R-2</a>
+                                </li>
+                                {{-- <li>
                                     <a href="/assy/dashboard-by-machine/SSW-FS-1-2">SSW-FS-1-2</a>
                                 </li>
                                 <li>
@@ -534,7 +539,7 @@
                                 </li>
                                 <li>
                                     <a href="/assy/dashboard-by-machine/SSW-PLANTB-2">SSW-PLANTB-2</a>
-                                </li>
+                                </li> --}}
                             </ul>
                         </li>
                     </ul>
@@ -585,9 +590,9 @@
                                 <li>
                                     <a href="{{ url('configuration/special-setup') }}">Special Setup</a>
                                 </li>
-                                <li>
+                                {{-- <li>
                                     <a href="{{ url('configuration/scan-setup') }}">Scan Setup</a>
-                                </li>
+                                </li> --}}
                                 <li>
                                     <a href="{{ url('standard_operational_procedure') }}">SOP</a>
                                 </li>

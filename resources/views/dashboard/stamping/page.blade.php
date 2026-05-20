@@ -1,61 +1,61 @@
-<x-layout.default> 
-    <script defer src="/assets/js/apexcharts.js"></script>
+{{-- <x-layout.default> --}}
+{{-- <script defer src="/assets/js/apexcharts.js"></script>
     <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
-    <script> 
-        Pusher.logToConsole = false; 
-        var pusher = new Pusher('99d7cb1b939ca3a6bb80', { cluster: 'ap1' }); 
+    <script>
+        Pusher.logToConsole = false;
+        var pusher = new Pusher('99d7cb1b939ca3a6bb80', { cluster: 'ap1' });
         var channel = pusher.subscribe('my-channel');
-        channel.bind('my-event', function(data) { 
+        channel.bind('my-event', function(data) {
             refeshUi(data);
         });
     </script>
-    
-    <div x-data="analytics()"> 
+
+    <div x-data="analytics()">
         <span id="inpt_machine" hidden></span>
-        <div class="pt-5 -mt-5" > 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"> 
-                <div class="panel overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6"> 
-                        <div class="text-center text-white-light z-[7] gap-4 mb-3">  
-                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+        <div class="pt-5 -mt-5" >
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div class="panel overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
+                        <div class="text-center text-white-light z-[7] gap-4 mb-3">
+                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                     Job Number
-                                </p> 
+                                </p>
                                 <span id="inpt_job_num"></span>
                             </div>
-                        </div> 
+                        </div>
 
-                    <div class="text-center text-white-light z-[7]">  
-                        <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+                    <div class="text-center text-white-light z-[7]">
+                        <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                             <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                 Part No.
-                            </p> 
+                            </p>
                             <span  id="inpt_jo_part_no"></span>
                         </div>
-                    </div>  
+                    </div>
                 </div>
 
                 <div class="panel h-full overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4  mb-3">
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                     Planning
                                 </p>
                                 <span  id="inpt_planning_stroke">0</span>
                             </div>
                         </div>
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                     Actual
                                 </p>
                                 <span  id="inpt_actual_stroke">0</span>
                             </div>
-                        </div> 
-                    </div> 
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">  
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <div class="flex items-center justify-between">
                                     <div class="w-full rounded-full h-5 p-1 bg-dark-light overflow-hidden shadow-3xl dark:shadow-none dark:bg-dark-light/10 xl:mb-7 xl:mt-7 sm:mb-4 sm:mt-5">
                                         <div id="bar_progress" class="bg-gradient-to-r from-[#e7515a] to-[#00ab55] w-full h-full rounded-full relative before:absolute before:inset-y-0 ltr:before:right-0.5 rtl:before:left-0.5 before:bg-white before:w-2 before:h-2 before:rounded-full before:m-auto"
@@ -63,40 +63,40 @@
                                     </div>
                                     <span class="ltr:ml-5 rtl:mr-5 xl:text-3xl sm:text-sm dark:text-white-light" id="inpt_set_progress"></span>
                                 </div>
-                            </div> 
-                        </div>   
-                    </div>  
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="panel h-full overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6"> 
+                <div class="panel h-full overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                     GSPH
                                 </p>
                                 <span  id="inpt_current_gsph">0</span>
                             </div>
-                        </div> 
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2"> 
+                        </div>
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-4xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-2">
                                 <p class="align-center text-white-light p-1 xl:text-lg sm:text-sm">
                                     Cycle Time (AVG)
                                 </p>
                                 <span  id="inpt_average_ct">0</span>
                             </div>
-                        </div> 
-                    </div>  
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center text-xl rounded p-2">  
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center text-xl rounded p-2">
                                 <button id="btn_update_ct_chart" x-on:click="() => cycleTimeRecall(inpt_ct_log_detail.value)" hidden></button>
-                                <input type="text" id="inpt_ct_log_detail" value="" hidden> 
-                                <div x-ref="cycleTimeChart" class="overflow-hidden"></div>  
-                            </div> 
-                        </div> 
-                    </div> 
-                </div> 
+                                <input type="text" id="inpt_ct_log_detail" value="" hidden>
+                                <div x-ref="cycleTimeChart" class="overflow-hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="grid lg:grid-cols-6 gap-6 mb-6">
@@ -115,8 +115,8 @@
                             <button id="btn_update_dt_chart" x-on:click="() => downtimeChartRecall(inpt_val_chart_downtime.value)" hidden>Recall and Update</button>
                             <input type="text" id="inpt_val_chart_downtime" value="" hidden>
                         </div>
-                    </div> 
-                        <div x-ref="downtimeChart" class="bg-white dark:bg-black"></div> 
+                    </div>
+                        <div x-ref="downtimeChart" class="bg-white dark:bg-black"></div>
                 </div>
 
                 <div class="panel h-full sm:col-span-6 xl:col-span-2">
@@ -134,10 +134,10 @@
                             <button id="btn_update_chart" x-on:click="() => gsphChartRecall(inpt_val_stroke_chart.value)" hidden>Recall and Update</button>
                             <input type="text" id="inpt_val_stroke_chart" value="" hidden>
                         </div>
-                    </div>  
+                    </div>
                         <div x-ref="gsphChart" class="overflow-hidden"></div>
-                </div> 
- 
+                </div>
+
                 <div class="panel h-full sm:col-span-6 xl:col-span-2">
                     <div class="flex p-5 border-b  border-[#e0e6ed] dark:border-[#1b2e4b]">
                         <div
@@ -151,17 +151,17 @@
                             <p class="text-xl dark:text-white-light">Job Accumulate</p>
                             <h5 class="text-[#506690] text-xs">Accumulate By Hour</h5>
                         </div>
-                    </div>  
-                     
+                    </div>
+
                     <div class="relative overflow-hidden">
                         <button id="btn_update_chart_accumulate" x-on:click="() => accumulateRecall(inpt_val_chart_accumulate.value)" hidden>Recall and Update</button>
                         <input type="text" id="inpt_val_chart_accumulate" value="" hidden>
                         <div x-ref="accumulateChart" class="bg-white dark:bg-black rounded-lg"></div>
-                    </div>   
+                    </div>
                 </div>
             </div>
 
-            <div class="grid sm:grid-cols-2 xl:grid-cols-6 gap-6 mb-3"> 
+            <div class="grid sm:grid-cols-2 xl:grid-cols-6 gap-6 mb-3">
                 <div class="panel h-full xl:col-span-2">
                     <div class="flex p-5 border-b  border-[#e0e6ed] dark:border-[#1b2e4b]">
                         <div
@@ -175,11 +175,11 @@
                             <p class="text-xl dark:text-white-light">Next Schedule</p>
                             <h5 class="text-[#506690] text-xs">.</h5>
                         </div>
-                    </div>  
+                    </div>
 
                     <div class="flex flex-col space-y-5 p-5">
                         <div class="grid grid-cols-1 sm:grid-cols-1 gap-4 mb-3" id="inpt_sch_production"></div>
-                    </div> 
+                    </div>
 
                 </div>
 
@@ -199,12 +199,12 @@
                     </div>
                     <div class="perfect-scrollbar relative h-[200px] pr-3 -mr-3 p-5">
                         <div class="space-y-7" id="inpt_activity"></div>
-                    </div> 
+                    </div>
                 </div>
 
-                <div class="panel h-full sm:col-span-3 xl:col-span-1"> 
+                <div class="panel h-full sm:col-span-3 xl:col-span-1">
                     <div class="flex items-center justify-center p-6">
-                        <canvas class="p-2" data-type="radial-gauge" id="oeeCanvas" 
+                        <canvas class="p-2" data-type="radial-gauge" id="oeeCanvas"
                                 data-height="250"
                                 data-units="OEE"
                                 data-title="false"
@@ -215,7 +215,7 @@
                                 data-minor-ticks="0"
                                 data-stroke-ticks="false"
                                 data-highlights='[
-                                    { "from": 0, "to": 60, "color": "rgb(255,0,0)" }, 
+                                    { "from": 0, "to": 60, "color": "rgb(255,0,0)" },
                                     { "from": 61, "to": 70, "color": "rgb(255,255,0)" },
                                     { "from": 71, "to": 90, "color": "rgb(0,128,0)" },
                                     { "from": 91, "to": 100, "color": "rgb(0,100,0)" }
@@ -238,36 +238,36 @@
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 pt-5 gap-4  border-t  border-[#e0e6ed] dark:border-[#1b2e4b]">
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1"> 
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1">
                                 <p class="align-center text-white-light  xl:text-lg sm:text-sm">
                                     P
                                 </p>
                                 <span id="inpt_oee_performance">0</span>
                             </div>
-                        </div> 
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1"> 
+                        </div>
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1">
                                 <p class="align-center text-white-light  xl:text-lg sm:text-sm">
                                     A
                                 </p>
                                 <span  id="inpt_oee_availability">0</span>
                             </div>
-                        </div> 
-                        <div class="text-center text-white-light z-[7]">  
-                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1"> 
+                        </div>
+                        <div class="text-center text-white-light z-[7]">
+                            <div class="align-center xl:text-xl sm:text-xl shadow-[0_0_2px_0_#bfc9d4] rounded p-1">
                                 <p class="align-center text-white-light xl:text-lg sm:text-sm">
                                     Q
                                 </p>
                                 <span id="inpt_oee_quality">0</span>
                             </div>
-                        </div> 
-                    </div>  
+                        </div>
+                    </div>
 
                 </div>
 
                 <div class="panel h-full sm:col-span-3 xl:col-span-1">
-                   
+
                     <div class="flex items-center justify-center p-6">
                         <canvas class="p-2" data-type="radial-gauge" id="gsphCanvas"
                             data-height="250"
@@ -280,7 +280,7 @@
                             data-minor-ticks="2"
                             data-stroke-ticks="false"
                             data-highlights='[
-                                { "from": 0, "to": 60, "color": "rgb(255,0,0)" }, 
+                                { "from": 0, "to": 60, "color": "rgb(255,0,0)" },
                                     { "from": 61, "to": 70, "color": "rgb(255,255,0)" },
                                     { "from": 71, "to": 90, "color": "rgb(0,128,0)" },
                                     { "from": 91, "to": 100, "color": "rgb(0,100,0)" }
@@ -294,7 +294,7 @@
                             data-color-needle-start="rgba(240, 128, 128, 1)"
                             data-color-needle-end="rgba(255, 160, 122, .9)"
                             data-value-box="true"
-                            data-value-dec="0" 
+                            data-value-dec="0"
                             data-animation-rule="bounce"
                             data-animation-duration="3000"
                             data-font-value="Led"
@@ -317,225 +317,225 @@
                     </div>
 
                 </div>
-            </div> 
-            
-        </div> 
-    </div>  
-    
-    <input type="number" id="inpt_standard_sph" hidden readonly>
-    <script>  
-        document.addEventListener("DOMContentLoaded", function() {  
-            function setDefaultData(machineId) {  
-                    var currentHost = window.location.host;   
-                    const apiUrl =  `https://` + currentHost + `/api/machine/${machineId}`; 
-                    axios.get(apiUrl)
-                        .then(response => {  
-                            var data = response.data.message; 
-                            
+            </div>
 
-                            var qty_actual = data.qty_actual; 
-                            var job_num = data.job_num; 
-                            var part_no = data.part_no; 
-                            var sch_production = data.sch_production; 
-                            var qty_plan = data.qty_plan;  
-                            var shift = data.shift; 
-                            var current_gsph = data.current_gsph;  
-                            var current_gsph_persen = data.current_gsph_persen;  
-                            var bar_progress = data.bar_progress;  
-                            var average_ct = data.average_ct; 
-                            var activity = data.activity;  
-                            var data_chart_gsph = data.data_chart_gsph;  
-                            var data_chart_downtime = data.data_chart_downtime;  
-                            var ct_log_detail = data.ct_log_detail;   
-                            var machine_code = data.machine_code;   
-                            var oee_quality = data.oee_quality;   
-                            var oee_performance = data.oee_performance;   
-                            var oee_availability = data.oee_availability;   
-                            var oee_value = data.oee_value;    
-                            var data_chart_accumulate = data.data_chart_accumulate;  
-                            var standard_sph = data.standard_sph;  
-                             
-                            document.getElementById('inpt_sch_production').innerHTML = `${sch_production}` ; 
+        </div>
+    </div>
+
+    <input type="number" id="inpt_standard_sph" hidden readonly>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function setDefaultData(machineId) {
+                    var currentHost = window.location.host;
+                    const apiUrl =  `https://` + currentHost + `/api/machine/${machineId}`;
+                    axios.get(apiUrl)
+                        .then(response => {
+                            var data = response.data.message;
+
+
+                            var qty_actual = data.qty_actual;
+                            var job_num = data.job_num;
+                            var part_no = data.part_no;
+                            var sch_production = data.sch_production;
+                            var qty_plan = data.qty_plan;
+                            var shift = data.shift;
+                            var current_gsph = data.current_gsph;
+                            var current_gsph_persen = data.current_gsph_persen;
+                            var bar_progress = data.bar_progress;
+                            var average_ct = data.average_ct;
+                            var activity = data.activity;
+                            var data_chart_gsph = data.data_chart_gsph;
+                            var data_chart_downtime = data.data_chart_downtime;
+                            var ct_log_detail = data.ct_log_detail;
+                            var machine_code = data.machine_code;
+                            var oee_quality = data.oee_quality;
+                            var oee_performance = data.oee_performance;
+                            var oee_availability = data.oee_availability;
+                            var oee_value = data.oee_value;
+                            var data_chart_accumulate = data.data_chart_accumulate;
+                            var standard_sph = data.standard_sph;
+
+                            document.getElementById('inpt_sch_production').innerHTML = `${sch_production}` ;
                             document.getElementById('inpt_oee_quality').textContent = `${oee_quality}`;
                             document.getElementById('inpt_oee_performance').textContent = `${oee_performance}`;
                             document.getElementById('inpt_oee_availability').textContent = `${oee_availability}`;
                             document.getElementById('inpt_machine_code').textContent = ' | LINE : ' + `${machine_code}`;
                             document.getElementById('inpt_machine').textContent = `${machine_code}`;
                             document.getElementById('inpt_actual_stroke').textContent = `${qty_actual}`;
-                            document.getElementById('inpt_job_num').textContent = `${job_num}` ; 
-                            document.getElementById('inpt_jo_part_no').textContent = `${part_no}` ; 
-                            document.getElementById('inpt_planning_stroke').textContent = `${qty_plan}` ;    
-                            document.getElementById('inpt_shift').textContent = `Shift : ${shift}` +  " | " ;  
-                            document.getElementById('inpt_current_gsph').textContent = `${current_gsph}` ;   
-                            document.getElementById('inpt_average_ct').textContent = `${average_ct}` ;  
-                            document.getElementById('inpt_set_progress').textContent = `${bar_progress}%` ;  
-                            document.getElementById('inpt_activity').innerHTML = `${activity}` ;   
-                            document.getElementById('bar_progress').style.width = bar_progress + '%';   
-                            document.getElementById('inpt_val_stroke_chart').value = data_chart_gsph  ;   
-                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ;   
-                            document.getElementById('inpt_ct_log_detail').value = ct_log_detail  ;    
-                            document.getElementById('inpt_standard_sph').value = standard_sph  ;    
-                            document.getElementById('inpt_val_chart_accumulate').value = data_chart_accumulate  ;  
-                            document.getElementById('btn_update_chart_accumulate').click() ;   
-                            document.getElementById('btn_update_dt_chart').click() ;  
-                            document.getElementById('btn_update_ct_chart').click() ;  
-                            document.getElementById('btn_update_chart').click() ;    
+                            document.getElementById('inpt_job_num').textContent = `${job_num}` ;
+                            document.getElementById('inpt_jo_part_no').textContent = `${part_no}` ;
+                            document.getElementById('inpt_planning_stroke').textContent = `${qty_plan}` ;
+                            document.getElementById('inpt_shift').textContent = `Shift : ${shift}` +  " | " ;
+                            document.getElementById('inpt_current_gsph').textContent = `${current_gsph}` ;
+                            document.getElementById('inpt_average_ct').textContent = `${average_ct}` ;
+                            document.getElementById('inpt_set_progress').textContent = `${bar_progress}%` ;
+                            document.getElementById('inpt_activity').innerHTML = `${activity}` ;
+                            document.getElementById('bar_progress').style.width = bar_progress + '%';
+                            document.getElementById('inpt_val_stroke_chart').value = data_chart_gsph  ;
+                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ;
+                            document.getElementById('inpt_ct_log_detail').value = ct_log_detail  ;
+                            document.getElementById('inpt_standard_sph').value = standard_sph  ;
+                            document.getElementById('inpt_val_chart_accumulate').value = data_chart_accumulate  ;
+                            document.getElementById('btn_update_chart_accumulate').click() ;
+                            document.getElementById('btn_update_dt_chart').click() ;
+                            document.getElementById('btn_update_ct_chart').click() ;
+                            document.getElementById('btn_update_chart').click() ;
                             var gsphCanvas = document.getElementById('gsphCanvas');
                             gsphCanvas.setAttribute('data-value', current_gsph_persen);
                             var oeeCanvas = document.getElementById('oeeCanvas');
-                            oeeCanvas.setAttribute('data-value', oee_value);  
-                           
+                            oeeCanvas.setAttribute('data-value', oee_value);
+
                         })
-                        .catch(error => { 
+                        .catch(error => {
                             console.error('Error fetching data:', error);
                         });
-                        
+
                     }
-                    
-                    const targetMachineId = '{{ $id }}' ;  
+
+                    const targetMachineId = '{{ $id }}' ;
                     setDefaultData(targetMachineId);
                 });
-  
-                function addNewDetailActivity(newActivity) { 
-                    var container = document.getElementById("inpt_activity"); 
+
+                function addNewDetailActivity(newActivity) {
+                    var container = document.getElementById("inpt_activity");
                     var newDetailActivity = document.createElement("div");
                     newDetailActivity.className = "flex";
-                    newDetailActivity.id = "detail_activity_" + Date.now();   
+                    newDetailActivity.id = "detail_activity_" + Date.now();
                     newDetailActivity.innerHTML = newActivity ;
-                    var firstChild = container.firstChild; 
+                    var firstChild = container.firstChild;
                     container.insertBefore(newDetailActivity, firstChild);
-                } 
-                
+                }
+
 
                 function refeshUi(id) {
-                    const targetMachineId = '{{ $id }}' ;   
+                    const targetMachineId = '{{ $id }}' ;
                     var responseData = id ;
                     // console.log(responseData.message);
-                    var machine_id = responseData.message.machine_id;  
-                    var topic = responseData.message.topic;   
+                    var machine_id = responseData.message.machine_id;
+                    var topic = responseData.message.topic;
                     // console.log(topic+ " : " +machine_id);
-                    if (machine_id == targetMachineId) { 
-                        if (topic == 'set_finish') {  
+                    if (machine_id == targetMachineId) {
+                        if (topic == 'set_finish') {
                             location.reload();
                         } else
-                        if (topic == 'set_job_number') {  
+                        if (topic == 'set_job_number') {
                             location.reload();
-                        } else  
-                        if (topic == 'set_downtime') {  
-                            var data_chart_downtime = responseData.message.data_chart_downtime;   
-                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ; 
-                            document.getElementById('btn_update_dt_chart').click() ;   
+                        } else
+                        if (topic == 'set_downtime') {
+                            var data_chart_downtime = responseData.message.data_chart_downtime;
+                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ;
+                            document.getElementById('btn_update_dt_chart').click() ;
                             if ( responseData.message.status_action > 1) {
-                                var activityText = responseData.message.activity; 
-                                addNewDetailActivity(activityText);   
-                            } 
-                        } else 
+                                var activityText = responseData.message.activity;
+                                addNewDetailActivity(activityText);
+                            }
+                        } else
                         if (topic == 'log_activity') {
-                            var activityText = responseData.message.activity; 
-                            addNewDetailActivity(activityText);  
-                        } else { 
+                            var activityText = responseData.message.activity;
+                            addNewDetailActivity(activityText);
+                        } else {
 
-                            var job_num = responseData.message.job_num; 
-                            var qty_plan = responseData.message.qty_plan; 
-                            var part_no = responseData.message.part_no; 
-                            var qty_actual = responseData.message.qty_actual; 
-                            var current_gsph = responseData.message.current_gsph; 
-                            var current_gsph_persen = responseData.message.current_gsph_persen; 
-                            var bar_progress = responseData.message.bar_progress;  
-                            var average_ct = responseData.message.average_ct;  
+                            var job_num = responseData.message.job_num;
+                            var qty_plan = responseData.message.qty_plan;
+                            var part_no = responseData.message.part_no;
+                            var qty_actual = responseData.message.qty_actual;
+                            var current_gsph = responseData.message.current_gsph;
+                            var current_gsph_persen = responseData.message.current_gsph_persen;
+                            var bar_progress = responseData.message.bar_progress;
+                            var average_ct = responseData.message.average_ct;
                             var data_chart_gsph = responseData.message.data_chart_gsph;
-                            var ct_log_detail = responseData.message.ct_log_detail;  
-                            var data_chart_downtime = responseData.message.data_chart_downtime;  
-                            var oee_quality = responseData.message.oee_quality;   
-                            var oee_performance = responseData.message.oee_performance;   
-                            var oee_availability = responseData.message.oee_availability;   
-                            var oee_value = responseData.message.oee_value;   
-                            var data_chart_accumulate = responseData.message.data_chart_accumulate ;   
+                            var ct_log_detail = responseData.message.ct_log_detail;
+                            var data_chart_downtime = responseData.message.data_chart_downtime;
+                            var oee_quality = responseData.message.oee_quality;
+                            var oee_performance = responseData.message.oee_performance;
+                            var oee_availability = responseData.message.oee_availability;
+                            var oee_value = responseData.message.oee_value;
+                            var data_chart_accumulate = responseData.message.data_chart_accumulate ;
 
                             document.getElementById('inpt_oee_quality').textContent = `${oee_quality}`;
                             document.getElementById('inpt_oee_performance').textContent = `${oee_performance}`;
                             document.getElementById('inpt_oee_availability').textContent = `${oee_availability}`;
-                            document.getElementById('inpt_job_num').textContent = `${job_num}`; 
-                            document.getElementById('inpt_planning_stroke').textContent = `${qty_plan}`; 
-                            document.getElementById('inpt_jo_part_no').textContent = `${part_no}`;    
-                            document.getElementById('inpt_actual_stroke').textContent = `${qty_actual}`; 
-                            document.getElementById('inpt_current_gsph').textContent = `${current_gsph}`; 
-                            document.getElementById('inpt_set_progress').textContent = `${bar_progress}%` ;  
-                            document.getElementById('bar_progress').style.width = bar_progress + '%'; 
-                            document.getElementById('inpt_average_ct').textContent = `${average_ct}` ;  
-                            document.getElementById('inpt_val_stroke_chart').value = data_chart_gsph  ;   
-                            document.getElementById('inpt_ct_log_detail').value = ct_log_detail  ;   
-                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ;   
-                            document.getElementById('inpt_val_chart_accumulate').value = data_chart_accumulate ;   
-                            document.getElementById('btn_update_chart_accumulate').click() ;  
+                            document.getElementById('inpt_job_num').textContent = `${job_num}`;
+                            document.getElementById('inpt_planning_stroke').textContent = `${qty_plan}`;
+                            document.getElementById('inpt_jo_part_no').textContent = `${part_no}`;
+                            document.getElementById('inpt_actual_stroke').textContent = `${qty_actual}`;
+                            document.getElementById('inpt_current_gsph').textContent = `${current_gsph}`;
+                            document.getElementById('inpt_set_progress').textContent = `${bar_progress}%` ;
+                            document.getElementById('bar_progress').style.width = bar_progress + '%';
+                            document.getElementById('inpt_average_ct').textContent = `${average_ct}` ;
+                            document.getElementById('inpt_val_stroke_chart').value = data_chart_gsph  ;
+                            document.getElementById('inpt_ct_log_detail').value = ct_log_detail  ;
+                            document.getElementById('inpt_val_chart_downtime').value = data_chart_downtime  ;
+                            document.getElementById('inpt_val_chart_accumulate').value = data_chart_accumulate ;
+                            document.getElementById('btn_update_chart_accumulate').click() ;
                             document.getElementById('btn_update_ct_chart').click() ;
                             document.getElementById('btn_update_chart').click() ;
-                            document.getElementById('btn_update_dt_chart').click() ; 
+                            document.getElementById('btn_update_dt_chart').click() ;
 
                             var gsphCanvas = document.getElementById('gsphCanvas');
-                            gsphCanvas.setAttribute('data-value', current_gsph_persen); 
+                            gsphCanvas.setAttribute('data-value', current_gsph_persen);
                             var oeeCanvas = document.getElementById('oeeCanvas');
-                            oeeCanvas.setAttribute('data-value', oee_value);  
+                            oeeCanvas.setAttribute('data-value', oee_value);
 
                         }
                     } else {
                         // console.log('0');
                     }
                 }
-    </script> 
+    </script>
 
 <script>
     document.addEventListener("alpine:init", () => {
-        Alpine.data("analytics", () => ({ 
+        Alpine.data("analytics", () => ({
             data: {
                 analytics: "Initial Data"
-            },   
-
-            downtimeChartRecall(parameter) { 
-                const c_get = parameter ;   
-                c = c_get.split(',').map(Number); 
-                const dummyData =  c ; 
-                    this.downtimeChart.updateSeries([{
-                    data: dummyData
-                }]); 
-            }, 
-
-            gsphChartRecall(parameter) { 
-                const c_get = parameter ;   
-                c = c_get.split(',').map(Number); 
-                const dummyData =  c ; 
-                    this.gsphChart.updateSeries([{
-                    data: dummyData
-                }]); 
-            }, 
-
-            cycleTimeRecall(parameter) { 
-                const c_get = parameter ;    
-                c = c_get.split(',').map(Number); 
-                const dummyData =  c ; 
-                    this.cycleTimeChart.updateSeries([{
-                    data: dummyData
-                }]); 
             },
 
-            accumulateRecall(parameter) { 
-                const c_get = parameter ;   
+            downtimeChartRecall(parameter) {
+                const c_get = parameter ;
+                c = c_get.split(',').map(Number);
+                const dummyData =  c ;
+                    this.downtimeChart.updateSeries([{
+                    data: dummyData
+                }]);
+            },
+
+            gsphChartRecall(parameter) {
+                const c_get = parameter ;
+                c = c_get.split(',').map(Number);
+                const dummyData =  c ;
+                    this.gsphChart.updateSeries([{
+                    data: dummyData
+                }]);
+            },
+
+            cycleTimeRecall(parameter) {
+                const c_get = parameter ;
+                c = c_get.split(',').map(Number);
+                const dummyData =  c ;
+                    this.cycleTimeChart.updateSeries([{
+                    data: dummyData
+                }]);
+            },
+
+            accumulateRecall(parameter) {
+                const c_get = parameter ;
                 const standard_sph =  document.getElementById('inpt_standard_sph').value ;
-                c = c_get.split(',').map(Number); 
-                const dummyData =  c ; 
+                c = c_get.split(',').map(Number);
+                const dummyData =  c ;
                     this.accumulateChart.updateSeries([
                         {
                             name: 'Plan',
-                            data: [0, (standard_sph * 1), (standard_sph * 2), (standard_sph * 3), (standard_sph * 4), (standard_sph * 5), (standard_sph * 6), (standard_sph * 7), (standard_sph * 8), (standard_sph * 9), (standard_sph * 10)], 
+                            data: [0, (standard_sph * 1), (standard_sph * 2), (standard_sph * 3), (standard_sph * 4), (standard_sph * 5), (standard_sph * 6), (standard_sph * 7), (standard_sph * 8), (standard_sph * 9), (standard_sph * 10)],
                         },
                         {
                             name: 'Actual',
                             data: dummyData,
                         }
-                    ]); 
+                    ]);
             },
- 
-            renderCharts() { 
+
+            renderCharts() {
                 this.gsphChart = new ApexCharts(this.$refs.gsphChart, this.gsphChartOptions);
                 this.gsphChart.render();
 
@@ -546,14 +546,14 @@
                 this.downtimeChart.render();
 
                 this.accumulateChart = new ApexCharts(this.$refs.accumulateChart, this.accumulateChartOptions);
-                this.accumulateChart.render(); 
+                this.accumulateChart.render();
             },
 
             get accumulateChartOptions() {
                     return {
                         series: [{
                                 name: 'Plan',
-                                data: [0, 19, 38, 57, 76, 95, 114, 133, 152, 171, 190], 
+                                data: [0, 19, 38, 57, 76, 95, 114, 133, 152, 171, 190],
                             },
                             {
                                 name: 'Actual',
@@ -579,50 +579,50 @@
                                 borderColor: ['transparent', '#00ab55'] // Set default colors for dataLabels
                             }
                         },
-                        stroke: { 
-                            width: [2, 2],  
+                        stroke: {
+                            width: [2, 2],
                             curve: ['straight', 'straight'],
                             dashArray: [5, 0]
-                        },  
-                        colors: ['#2196f3', '#00ab55'], 
+                        },
+                        colors: ['#2196f3', '#00ab55'],
                         labels: ['', '07:30', '08:30', '09:30', '10:30', '11:30', '12:30', '13:30', '14:30', '15:30', '16:30'],
                         xaxis: {
                             axisBorder: {
                                 show: true,
-                                color: '#3b3f5c' 
+                                color: '#3b3f5c'
                             },
                             axisTicks: {
                                 show: false
                             },
                             crosshairs: {
                                 show: true
-                            }, 
+                            },
                         },
                         yaxis: {
                             axisBorder: {
                                 show: true,
-                                color: '#3b3f5c' 
+                                color: '#3b3f5c'
                             },
-                            tickAmount: 3, 
+                            tickAmount: 3,
                             opposite: false,
                         },
                         grid: {
                             borderColor: '#3b3f5c',
-                            strokeDashArray: 5,  
+                            strokeDashArray: 5,
                             xaxis: {
                                 lines: {
-                                    show: false,  
+                                    show: false,
                                 }
                             },
                             yaxis: {
                                 lines: {
-                                    show: true, 
+                                    show: true,
                                 }
-                            }, 
+                            },
                         },
                         legend: {
                             show: false,
-                            position: 'top', 
+                            position: 'top',
                             offsetY: 20,
                             fontSize: '16px',
                             markers: {
@@ -679,7 +679,7 @@
                         stroke: {
                             width: 2,
                             colors: ['transparent']
-                        },  
+                        },
                         colors: ['#4361ee', '#2196fe', '#00Ab55', '#e7515a', '#3b3f5c'],
                         dropShadow: {
                             enabled: true,
@@ -715,7 +715,7 @@
                             categories: ['LDK', 'DB', 'MB', 'QC', 'Etc'],
                             axisBorder: {
                                 show: true,
-                                color: '#3b3f5c' 
+                                color: '#3b3f5c'
                             },
                             labels: {
                                 style: {
@@ -760,7 +760,7 @@
 
             get cycleTimeOptions() {
                     return {
-                        series: [{ 
+                        series: [{
                             data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                         }],
                         chart: {
@@ -778,8 +778,8 @@
                             }
                         },
                         dataLabels: {
-                            enabled: false,  
-                        }, 
+                            enabled: false,
+                        },
                         stroke: {
                             curve: 'smooth',
                             width: 2
@@ -792,7 +792,7 @@
                                 left: 5,
                                 right: 5
                             }
-                        }, 
+                        },
                         tooltip: {
                             x: {
                                 show: false,
@@ -807,7 +807,7 @@
                         },
                     }
                 },
- 
+
             get gsphChartOptions() {
                 return {
                     series: [{
@@ -821,7 +821,7 @@
                             toolbar: {
                                 show: false
                             },
-                            
+
                         },
                         dataLabels: {
                             enabled: true
@@ -872,13 +872,13 @@
                         },
                         yaxis: {
                             tickAmount: 3,
-                            opposite: false, 
+                            opposite: false,
                             labels: {
                                 show: true,
                                 offsetX: 0,
                             }
                         },
-                        
+
                         fill: {
                             type: 'gradient',
                             gradient: {
@@ -890,17 +890,113 @@
                                 opacityTo: 0.8,
                                 stops: [0, 100]
                             },
-                        }, 
-                        
+                        },
+
                 };
             },
- 
-            init() { 
+
+            init() {
                 this.data.analytics = "Initial Data";
                 this.renderCharts();
             }
         }));
     });
-</script> 
+</script>  --}}
 
+{{-- </x-layout.default> --}}
+<x-layout.default>
+    <link rel='stylesheet' type='text/css' href='{{ Vite::asset('resources/css/nice-select2.css') }}'>
+    <link rel="stylesheet" href="{{ Vite::asset('resources/css/flatpickr.min.css') }}">
+    <script src="/assets/js/flatpickr.js"></script>
+    <link rel="stylesheet" href="{{ Vite::asset('resources/css/nouislider.min.css') }}">
+    <script src="/assets/js/nouislider.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/select.css">
+    <style>
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .table tbody tr {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Kolom chart transparan */
+        .table td:last-child {
+            background-color: #0e1726 !important;
+            border: 2px solid white !important
+        }
+
+        /* Atur tinggi chart agar pas */
+        .chart-wrapper {
+            width: 60px;
+            height: 60px;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            background-color: transparent !important;
+        }
+    </style>
+    <div x-data="form">
+        <ul class="flex space-x-2 rtl:space-x-reverse">
+            <li>
+                <a href="javascript:;" class="text-primary hover:underline">Dashboard</a>
+            </li>
+            <li class="before:content-['/'] before:mr-1 rtl:before:ml-1">
+                <span id="namePage"></span>
+            </li>
+        </ul>
+
+        <div class="pt-5 space-y-8">
+            <div class="panel">
+                <div class="flex items-center justify-center mb-5">
+                    <h5 class="font-bold lg:text-4xl md:text-2xl dark:text-white-light">Dashboard Realtime Monitoring
+                        System
+                    </h5>
+                </div>
+                <div class="mb-5" x-data="{ active: 1 }">
+                    <div class="space-y-2 font-semibold text-2xl">
+                        <div class="border border-[#d3d3d3] dark:border-[#1b2e4b] rounded dark:text-white-light">
+                            <div x-cloak x-show="active === 1" x-collapse>
+                                <div class="dark:text-white-light overflow-x-auto">
+                                    <div class="" id="mainTableCard">
+                                        <div class="text-center mb-6">
+                                            <p class="text-lg text-gray-600 dark:text-gray-300">
+                                                Sistem ini digunakan untuk memonitor aktivitas produksi secara realtime,
+                                                mulai dari status mesin, progress produksi, hingga performa operasional.
+                                            </p>
+
+                                            <p class="text-lg text-gray-600 dark:text-gray-300 mt-2">
+                                                This system is used to monitor production activities in real time,
+                                                including machine status, production progress, and operational
+                                                performance.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-layout.default>

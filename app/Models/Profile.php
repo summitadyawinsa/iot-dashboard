@@ -606,4 +606,147 @@ class Profile extends Model
                 'operation_time'
             ]);
     }
+    public function dashboard_machine($machine_id, $tool_id)
+    {
+        if ($tool_id == null) {
+            $data = DB::table('log_header_machine')
+                ->where('machine_id', $machine_id)
+                ->where('is_active', 1)
+                ->where('condition_id', 1)
+                ->first();
+        } else {
+            $data = DB::table('log_machine_tool')
+                ->where('machine_id', $machine_id)
+                ->where('tool_id', $tool_id)
+                ->where('is_active', 1)
+                ->where('condition_id', 1)
+                ->first();
+        }
+        return $data;
+    }
+    public function dashboard_gsph_by_machine($machine_id, $job_num, $tool_id)
+    {
+        $query = DB::table('gsph_record')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num);
+        if ($tool_id != null) {
+            $query->where('tool_id', $tool_id);
+        }
+        $data = $query
+            ->select('cut_off_time', 'qty_actual')
+            ->orderBy('cut_off_time', 'asc')
+            ->skip(1)
+            ->get();
+
+        return $data;
+    }
+    public function dashboard_oee_by_machine($machine_id, $job_num, $tool_id)
+    {
+        $query = DB::table('oee_log_machine')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num);
+        if ($tool_id != null) {
+            $query->where('tool_id', $tool_id);
+        }
+        return $query->first();
+    }
+    public function dashboard_activity_by_machine($machine_id, $job_num, $tool_id)
+    {
+        $query = DB::table('log_activity')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num);
+        if ($tool_id != null) {
+            $query->where('tool_id', $tool_id);
+        }
+        return $query->orderBy('start_date', 'asc')->limit(3)->get();
+    }
+    public function dashboard_next_schedule($machine_id)
+    {
+        $sql = "
+        SELECT DISTINCT TOP 2
+    T1.DueDate,
+    T1.IUM,
+    T1.ProdQty,
+    T1.ReqDueDate,
+    T1.StartDate,
+    T1.AnalysisCode,
+
+    T2.AssemblySeq,
+    T2.BomSequence,
+    T2.Company,
+    T2.[Description],
+    T2.DrawNum,
+    T2.IUM AS JobAsmbl_IUM,
+    T2.JobNum,
+    T2.OverRunQty,
+    T2.PartNum,
+    T2.PullQty,
+    T2.RequiredQty,
+    T2.RevisionNum,
+
+    T3.CommentText,
+    T3.Instructions,
+    T3.DaysOut,
+    T3.DueDate AS JobOper_DueDate,
+    T3.EstProdHours,
+    T3.EstSetHours,
+    T3.Machines,
+    T3.OpCode,
+    T3.OpDesc,
+    T3.OprSeq,
+    T3.PrimaryProdOpDtl,
+    T3.PrimarySetupOpDtl,
+    T3.ProdStandard,
+    T3.RunQty,
+    T3.StartDate AS JobOper_StartDate,
+    T3.StdFormat,
+
+    T4.CapabilityID,
+    T4.ConcurrentCapacity,
+    T4.DailyProdRate,
+    T4.OpDtlSeq,
+    T4.ProdCrewSize,
+    T4.ResourceGrpID,
+    T4.ResourceID,
+    T4.SetUpCrewSize,
+    T4.SetupOrProd,
+
+    T5.ResourceGrpID AS ResourceTimeUsed_ResourceGrpID,
+    T5.ResourceID AS ResourceTimeUsed_ResourceID,
+    T5.WhatIf,
+
+    T1.JobCode,
+    T1.ProdCode
+
+FROM [App].Erp.JobHead T1
+
+LEFT OUTER JOIN [App].Erp.JobAsmbl T2
+    ON T1.Company = T2.Company
+    AND T1.JobNum = T2.JobNum
+
+LEFT OUTER JOIN [App].Erp.JobOper T3
+    ON T2.Company = T3.Company
+    AND T2.JobNum = T3.JobNum
+    AND T2.AssemblySeq = T3.AssemblySeq
+
+LEFT OUTER JOIN [App].Erp.JobOpDtl T4
+    ON T3.Company = T4.Company
+    AND T3.JobNum = T4.JobNum
+    AND T3.AssemblySeq = T4.AssemblySeq
+    AND T3.OprSeq = T4.OprSeq
+
+LEFT OUTER JOIN [App].Erp.ResourceTimeUsed T5
+    ON T4.Company = T5.Company
+    AND T4.JobNum = T5.JobNum
+    AND T4.AssemblySeq = T5.AssemblySeq
+    AND T4.OprSeq = T5.OprSeq
+    AND T4.OpDtlSeq = T5.OpDtlSeq
+
+WHERE T3.LaborEntryMethod = 'T'
+    AND T1.JobReleased = 1
+    AND CAST(T1.DueDate AS DATE) = CAST(GETDATE() AS DATE)
+	AND T5.ResourceID = ?
+        ";
+        return DB::connection('sqlsrv4')->select($sql, [$machine_id]);
+    }
 }

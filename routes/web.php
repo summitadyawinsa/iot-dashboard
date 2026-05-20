@@ -905,9 +905,9 @@ Route::prefix('configuration')->group(function () {
     Route::get('special-setup', function () {
         return view('v2.setup.special-setup');
     });
-    Route::get('scan-setup', function () {
-        return view('v2.setup.scan');
-    });
+    // Route::get('scan-setup', function () {
+    //     return view('v2.setup.scan');
+    // });
 });
 //Export To Excel
 Route::post('machine/export-history-log', [LogMachineController::class, 'exportHistoryTable']);

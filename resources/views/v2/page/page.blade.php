@@ -137,8 +137,9 @@
                                         </select>
                                     </div>
                                     <div class="" id="mainTableCard">
-                                        <table class="min-w-full table" id="main-table">
-                                            <thead class="text-black dark:text-white uppercase text-center bg-sky-600">
+                                        <table class="min-w-full" id="main-table">
+                                            <thead
+                                                class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white uppercase text-center">
                                                 <tr>
                                                     <th class="text-center">Machine</th>
                                                     <th id="model-column" style="display: none">Model</th>
@@ -160,9 +161,9 @@
                                         </table>
                                     </div>
                                     <div class="hidden" id='joPendingCard'>
-                                        <table class="min-w-full table" id="jo_pending_table">
+                                        <table class="min-w-full" id="jo_pending_table">
                                             <thead
-                                                class="text-black dark:text-white uppercase text-center border border-sky-600 bg-sky-600">
+                                                class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white uppercase text-center">
                                                 <tr>
                                                     <th>Machine</th>
                                                     <th>Job Num</th>
@@ -172,15 +173,15 @@
                                                 </tr>
                                             </thead>
 
-                                            <tbody class="text-white">
+                                            <tbody class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white">
 
                                             </tbody>
                                         </table>
                                     </div>
                                     <div class="hidden" id="joHistoryCard">
-                                        <table class="min-w-full table" id="jo_history_table">
+                                        <table class="min-w-full" id="jo_history_table">
                                             <thead
-                                                class="text-black dark:text-white uppercase text-center border border-sky-600 bg-sky-600">
+                                                class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-white uppercase text-center">
                                                 <tr>
                                                     <th>Machine</th>
                                                     <th>Job Number</th>
@@ -713,9 +714,10 @@
                         const progress = qtyPlan > 0 ? Math.round((qtyActual / qtyPlan) * 100) : 0;
                         const backgroundStyle = `linear-gradient(to right, #1e40af ${progress}%, #3b82f6 ${progress}%)`;
                         const titleText = `Progress: ${progress.toFixed(1)}%`;
-                        rowData.progress = progress;
+                        // rowData.progress = progress;
                         rowData.backgroundStyle = backgroundStyle;
                         rowData.titleText = titleText;
+                        rowData.planvsact = progress + '%';
                         table.row(rowIdx).data(rowData).invalidate().draw(false);
                         const rowNode = table.row(rowIdx).node();
                         $(rowNode)

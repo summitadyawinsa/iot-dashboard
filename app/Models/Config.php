@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class Config extends Model
 {
@@ -363,5 +364,41 @@ class Config extends Model
     {
         return DB::table('history_header_machine')
             ->insert($data);
+    }
+    public function employee_data($line, $machine, $downtimeType = null)
+    {
+        return DB::table('Employee')
+            ->where(function ($query) use ($line, $machine, $downtimeType) {
+                $query->where(function ($q) use ($line, $machine) {
+
+                    $q->where(function ($x) use ($line) {
+
+                        $x->where('Line', 'ALL')
+                            ->orWhere('Line', $line);
+                    });
+
+                    $q->where(function ($x) use ($machine) {
+
+                        $x->where('Machine', 'ALL')
+                            ->orWhere('Machine', $machine);
+                    });
+                    $q->whereNull('Type');
+                });
+
+                if ($downtimeType) {
+                    $query->orWhere(function ($q) use ($line, $downtimeType) {
+
+                        $q->where('Type', $downtimeType);
+
+                        $q->where(function ($x) use ($line) {
+
+                            $x->where('Line', 'ALL')
+                                ->orWhere('Line', $line);
+                        });
+                    });
+                }
+            })
+            ->distinct()
+            ->get();
     }
 }

@@ -155,7 +155,7 @@ class ConfigController extends Controller
             $qty_plan = $row->qty_plan;
             $part_no = $row->item_no;
             $qty_actual = 0;
-            // Http::withoutVerifying()->get('https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector?machine_name=SSW-B-7&part_number=73211C000P');
+            // Http::withoutVerifying()->get(config('services.api_factory.url').'setup-ssw/selector?machine_name=SSW-B-7&part_number=73211C000P');
         }
         DB::beginTransaction();
         try {
@@ -165,7 +165,7 @@ class ConfigController extends Controller
                 }
                 if ($machine['machine_id'] == 'SSW-TG4R-2' || $machine['machine_id'] == 'SSW-TG4R-4' || $machine['machine_id'] == 'SSW-B-3' || $machine['machine_id'] == 'SSW-B-4' || $machine['machine_id'] == 'SSW-B-5' || $machine['machine_id'] == 'SSW-B-7') {
                     $check_part = Http::withoutVerifying()->get(
-                        'https://factoryhub.summitadyawinsa.co.id/api/v1/setup-ssw/selector',
+                        config('services.api_factory.url') . 'setup-ssw/selector',
                         [
                             'machine_name' => $machine['machine_id'],
                             'part_number' => $part_no
@@ -250,7 +250,7 @@ class ConfigController extends Controller
                     $this->config->insertOee($machine['machine_id'], $job_num, $shift, $production_date, $avail_time, $operation_time, $downtime, $qty_actual, $qty_ng);
                 }
                 Http::withoutVerifying()->post(
-                    'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+                    config('services.api_factory.url') . 'machine-status/update',
                     [
                         "machine_id" => $machine['machine_id'],
                         "condition_id" => 1,
@@ -423,7 +423,7 @@ class ConfigController extends Controller
             }
             $this->config->insertGsphRecordTool($machine_id, $date, $time, $tool_id, $job_num, $shift);
             Http::withoutVerifying()->post(
-                'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+                config('services.api_factory.url') . 'machine-status/update',
                 [
                     "machine_id" => $machine_id,
                     "condition_id" => 1,
@@ -587,15 +587,69 @@ class ConfigController extends Controller
                 'shift' => $machine_data->shift,
                 'production_date' => $machine_data->production_date
             ]);
+            $machine = NULL;
+            if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+                $line = 'ASSY';
+                if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+                    $machine = 'RSW';
+                }
+                if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+                    $machine = 'SSW-B';
+                }
+            } else {
+                $line = 'STP';
+                if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+                    $machine = 'A6';
+                }
+            }
+            $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type);
+            foreach ($employee_data as $data) {
+                Http::acceptJson()
+                    ->post(config('services.ems_wa.url'), [
+                        'phone' => $data->Telp,
+                        'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
+
+        Dear Bapak/Ibu,
+
+        Terdapat informasi downtime mesin yang memerlukan perhatian.
+
+        Machine ID : {$machine}
+Downtime : {$downtime_list->name}
+Start Time : " . now()->format('Y-m-d H:i:s') . "
+
+        Mohon segera dilakukan pengecekan dan tindak lanjut.
+
+        Terima kasih."
+                    ]);
+            }
+            //             Http::acceptJson()
+//                 ->post(config('services.ems_wa.url'), [
+//                     'phone' => "6285218493050",
+//                     'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
+
+            // Dear Bapak/Ibu,
+
+            // Terdapat informasi downtime mesin yang memerlukan perhatian.
+
+            // Machine ID : {$machine}
+// Downtime : {$downtime_list->name}
+// Start Time : " . now()->format('Y-m-d H:i:s') . "
+
+            // Mohon segera dilakukan pengecekan dan tindak lanjut.
+
+            // Terima kasih."
+//                 ]);
             if ($downtime_list->type == 'MTN') {
-                $update = Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/dies-status/update', [
+                $update = Http::withoutVerifying()->post(config('services.api_factory.url') . 'dies-status/update', [
                     "machine_id" => $machine,
                     "PartNum" => $machine_data->part_no,
                     "condition_id" => 2,
                 ]);
+                // dd($update);
                 $response_update = $update->json();
+                // dd($response_update);
                 if ($response_update['success'] == true) {
-                    $create = Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/tickets/create', [
+                    $create = Http::withoutVerifying()->post(config('services.api_factory.url') . 'tickets/create', [
                         "machine_id" => $machine,
                         "title" => $downtime_list->name,
                         // "downtime_category" => $downtime_list->type,
@@ -642,7 +696,7 @@ class ConfigController extends Controller
             $machine_data = $this->config->machine_data($machine);
             $this->config->downtime_update($machine, $job_num, $machine_data->production_date);
             $this->config->activity_update($machine, $job_num, $machine_data->production_date);
-            Http::withoutVerifying()->post('https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update', [
+            Http::withoutVerifying()->post(config('services.api_factory.url') . 'machine-status/update', [
                 "PartNum" => $machine_data->part_no,
                 "condition_id" => 1,
             ]);
@@ -740,7 +794,7 @@ class ConfigController extends Controller
             //     $this->config->update_setup($machine, $data);
             // }
             // Http::withoutVerifying()->post(
-            //     'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+            //     config('services.api_factory.url').'machine-status/update',
             //     [
             //         "machine_id" => $machine,
             //         "condition_id" => 0,
@@ -774,7 +828,7 @@ class ConfigController extends Controller
                     $this->config->update_setup($machine, $data);
                 }
                 Http::withoutVerifying()->post(
-                    'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+                    config('services.api_factory.url') . 'machine-status/update',
                     [
                         "machine_id" => $machine,
                         "condition_id" => 0,
@@ -798,7 +852,7 @@ class ConfigController extends Controller
         try {
             $employee = explode('~', $request->employee);
             $employee_id = $employee[0];
-            $url = config('services.epicor_app.url') . 'CreateNew';
+            $url = config('services.epicor_app.url') . '/Labor/CreateNew';
             $response = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
@@ -820,7 +874,7 @@ class ConfigController extends Controller
     public function change_shift(Request $request)
     {
         try {
-            $url = config('services.epicor_app.url') . 'ChangeShift';
+            $url = config('services.epicor_app.url') . '/Labor/ChangeShift';
             $laborHedSeq = $request->laborHedSeq;
             $shift = DB::connection('sqlsrv4')
                 ->table('Erp.JCShift')
@@ -857,7 +911,7 @@ class ConfigController extends Controller
                 ->where('Description', $request->shift)
                 ->select('Shift')
                 ->first();
-            $url = config('services.epicor_app.url') . 'UpdateHeader';
+            $url = config('services.epicor_app.url') . '/Labor/UpdateHeader';
             $response = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
@@ -922,30 +976,43 @@ class ConfigController extends Controller
                 ->select('Shift')
                 ->first();
             $url = config('services.epicor_app.url');
-            $GetOprSeq = Http::withoutVerifying()->withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ])->post($url . 'GetOprSeq', [
-                        'jobNum' => $request->jobNum,
-                        'nik' => $request->nik,
-                        'password' => $request->password
-                    ]);
-            $GetOprRes = json_decode($GetOprSeq->body(), true);
-            if (!$GetOprRes || !isset($GetOprRes['oprSeq'])) {
-                return response()->json([
-                    'status' => false,
-                    'step' => 'get_opseq',
-                    'message' => 'OprSeq tidak ditemukan'
-                ]);
+            // $GetOprSeq = Http::withoutVerifying()->withHeaders([
+            //     'Content-Type' => 'application/json',
+            //     'Accept' => 'application/json'
+            // ])->post($url . 'GetOprSeq', [
+            //             'jobNum' => $request->jobNum,
+            //             'nik' => $request->nik,
+            //             'password' => $request->password
+            //         ]);
+            // $GetOprRes = json_decode($GetOprSeq->body(), true);
+            // if (!$GetOprRes || !isset($GetOprRes['oprSeq'])) {
+            //     return response()->json([
+            //         'status' => false,
+            //         'step' => 'get_opseq',
+            //         'message' => 'OprSeq tidak ditemukan'
+            //     ]);
+            // }
+            $LaborDtl = DB::connection('sqlsrv4')
+                ->table('Erp.LaborDtl')
+                ->where('ResourceID', $request->resourceID)
+                ->where('JobNum', $request->input('jobNum'))
+                ->select('OprSeq')
+                ->first();
+            $oprSeq = 10;
+            if ($LaborDtl) {
+                if ($LaborDtl->OprSeq == 10) {
+                    $oprSeq = 20;
+                }
             }
+
             $getNewLaborDtl = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post($url . 'GeNewtLaborDtl', [
+            ])->post($url . '/Labor/GeNewtLaborDtl', [
                         'laborTypePseudo' => 'P',
                         'laborHedSeq' => $request->input('laborHedSeq'),
                         'jobNum' => $request->input('jobNum'),
-                        'opSeq' => (string) $GetOprRes['oprSeq'],
+                        'opSeq' => (string) $oprSeq,
                         'date' => $request->input('date'),
                         'nik' => $request->input('nik'),
                         'password' => $request->input('password'),
@@ -966,7 +1033,7 @@ class ConfigController extends Controller
             $changeLabor = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post($url . 'ChangeLaborTime', [
+            ])->post($url . '/Labor/ChangeLaborTime', [
                         'laborHedSeq' => $request->laborHedSeq,
                         'laborDtlSeq' => $data_get_new['laborDtlSeq'],
                         'shift' => $JCShift->Shift,
@@ -989,7 +1056,7 @@ class ConfigController extends Controller
             $updateDtl = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post($url . 'UpdateDtl', [
+            ])->post($url . '/Labor/UpdateDtl', [
                         'laborHedSeq' => (int) $request->laborHedSeq,
                         'laborDtlSeq' => (int) $data_get_new['laborDtlSeq'],
                         'date' => (string) $request->date,
@@ -1023,7 +1090,7 @@ class ConfigController extends Controller
             $submit = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
-            ])->post($url . 'Submit', [
+            ])->post($url . '/Labor/Submit', [
                         'laborHedSeq' => $request->laborHedSeq,
                         'laborDtlSeq' => $data_get_new['laborDtlSeq'],
                         'nik' => $request->nik,
@@ -1089,7 +1156,7 @@ class ConfigController extends Controller
 
                 ];
                 Http::withoutVerifying()->post(
-                    'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+                    config('services.api_factory.url') . 'machine-status/update',
                     [
                         "machine_id" => $request->resourceID,
                         "condition_id" => 0,
@@ -1126,7 +1193,7 @@ class ConfigController extends Controller
     public function technician_arrived(Request $request)
     {
         $machine_id = $request->machine;
-        $data = Http::withoutVerifying()->post("https://factoryhub.summitadyawinsa.co.id/factory-hub/public/api/v1/machine/{$machine_id}/stop-alarm");
+        $data = Http::withoutVerifying()->post(config('services.api_factory.url') . "machine/{$machine_id}/stop-alarm");
         return response()->json([
             'status' => $data->status(),
             'message' => $data->body()
@@ -1297,7 +1364,7 @@ class ConfigController extends Controller
                 $this->config->insertOee($data->machine_id, $data->job_num, $shift, $data->production_date, $avail_time, $operation_time, $downtime, $qty_actual, $qty_ng);
             }
             Http::withoutVerifying()->post(
-                'https://factoryhub.summitadyawinsa.co.id/factory-hub/api/v1/machine-status/update',
+                config('services.api_factory.url') . 'machine-status/update',
                 [
                     "machine_id" => $data->machine_id,
                     "condition_id" => 1,

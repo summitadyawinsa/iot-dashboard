@@ -14,6 +14,7 @@ use App\Http\Controllers\HealthConditionController;
 use App\Http\Controllers\JobNumController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
+use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -398,6 +399,9 @@ Route::prefix('profile')->group(function () {
     Route::post('main-dt', [ProfileController::class, 'main_dt']);
     Route::post('jo_show', [ProfileController::class, 'jo_show']);
     Route::post('change_jo', [ProfileController::class, 'change_jo']);
+    //Dashboard machine
+    Route::post('dashboard_machine', [ProfileController::class, 'dashboard_machine']);
+
 });
 Route::prefix('user-management')->group(function () {
     Route::post('list', [UserManagementController::class, 'list']);
@@ -407,7 +411,8 @@ Route::prefix('user-management')->group(function () {
     Route::post('delete-user', [UserManagementController::class, 'delete_user']);
 });
 Route::prefix('config')->group(function () {
-    Route::post('setup', [ConfigController::class, 'setup']);
+    // Route::post('setup', [ConfigController::class, 'setup']);
+    Route::post('setup', [ConfigController::class, 'setup_before_confirm']);
     Route::post('spesial_start', [ConfigController::class, 'spesial_start']);
     Route::post('finish_machine', [ConfigController::class, 'finish_machine']);
     Route::post('shift_get_all', [ConfigController::class, 'shift_get_all']);

@@ -790,41 +790,67 @@
                     _token: "{{ csrf_token() }}"
                 },
                 success: function(response) {
-
                     let gsphData = [];
                     let timeCategory = [];
 
+                    let previousGsph = 0;
+
                     response.data.forEach(function(item) {
-                        gsphData.push(parseFloat(item.gsph));
+
+                        const currentGsph = parseFloat(item.gsph) || 0;
+                        let diffGsph = currentGsph - previousGsph;
+                        if (diffGsph < 0) {
+                            diffGsph = currentGsph;
+                        }
+
+                        gsphData.push(diffGsph);
+
                         timeCategory.push(item.cut_off_time);
+
+                        previousGsph = currentGsph;
                     });
+                    if (gsphChart) {
+                        gsphChart.destroy();
+                    }
 
                     const gsph_chart = {
+
                         chart: {
                             type: 'area',
                             height: 300
                         },
+
                         title: {
-                            text: 'JPH',
+                            text: 'JPH/GSPH',
                             align: 'center'
                         },
+
                         series: [{
-                            name: 'JPH',
+                            name: 'JPH/GSPH',
                             data: gsphData
                         }],
+
                         stroke: {
                             curve: 'smooth'
                         },
+
                         xaxis: {
                             categories: timeCategory
                         }
                     };
 
-                    gsphChart = new ApexCharts(document.querySelector("#gsphChart"), gsph_chart);
+                    gsphChart = new ApexCharts(
+                        document.querySelector("#gsphChart"),
+                        gsph_chart
+                    );
+
                     gsphChart.render();
                 },
+
                 error: function(xhr) {
+
                     console.log(xhr.responseText);
+
                 }
             });
         }
@@ -1705,7 +1731,6 @@
                     },
                     processResults: function(response, params) {
                         params.page = params.page || 1;
-
                         return {
                             results: response.results,
                             pagination: {
@@ -2291,7 +2316,7 @@
 
             },
             title: {
-                text: 'Monthly Inflation in Argentina, 2002',
+                text: '',
                 floating: true,
                 offsetY: 330,
                 align: 'center',
@@ -2345,9 +2370,32 @@
                         if (oeeChart) {
                             oeeChart.updateSeries([Number(oeeFinal.toFixed(1))]);
                         }
-                        const labels = Object.keys(response.gsphLabel).map(h => h.padStart(2, '0') + ":00");
-                        const values = Object.values(response.gsphLabel).map(Number);
+                        const labels = Object.keys(response.gsphLabel)
+                            .map(h => h.padStart(2, '0') + ":00");
+
+                        const rawValues = Object.values(response.gsphLabel)
+                            .map(Number);
+
+                        const values = [];
+
+                        let previousQty = 0;
+
+                        rawValues.forEach(currentQty => {
+
+                            let diffQty = currentQty - previousQty;
+
+                            // hindari minus
+                            if (diffQty < 0) {
+                                diffQty = currentQty;
+                            }
+
+                            values.push(diffQty);
+
+                            previousQty = currentQty;
+                        });
+
                         if (gsphChart) {
+
                             gsphChart.updateOptions({
                                 xaxis: {
                                     categories: labels
@@ -2355,7 +2403,7 @@
                             });
 
                             gsphChart.updateSeries([{
-                                name: 'JPH',
+                                name: 'JPH/GSPH',
                                 data: values
                             }]);
                         }
@@ -2397,7 +2445,7 @@
                             });
 
                             gsphChart.updateSeries([{
-                                name: 'JPH',
+                                name: 'JPH/GSPH',
                                 data: values
                             }]);
                         }

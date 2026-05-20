@@ -40,5 +40,11 @@ return [
     'epicor_app' => [
         'url' => env('EPICOR_APP'),
     ],
+    'ems_wa' => [
+        'url' => env('EMS_WA_URL'),
+    ],
+    'api_factory'=>[
+        'url'=>env('API_FACTORY')
+    ]
 
 ];
