@@ -432,6 +432,7 @@ Route::prefix('config')->group(function () {
     Route::post('labor_submit_entry', [ConfigController::class, 'labor_submit_entry']);
     Route::post('scan_qr', [ConfigController::class, 'scan_qr']);
     Route::post('list_machine_by_scan', [ConfigController::class, 'list_machine_by_scan']);
+    Route::post('downtime_message', [ConfigController::class, 'downtime_message']);
 });
 Route::prefix('production-report')->group(function () {
     Route::get('/', [ProfileController::class, 'production_table']);

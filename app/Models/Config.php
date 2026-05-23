@@ -100,6 +100,25 @@ class Config extends Model
             ->where('machine_id', $machine_id)
             ->first();
     }
+    public function machine_data_tool($machine_id, $tool_id)
+    {
+        return DB::table('log_machine_tool')
+            ->where('machine_id', $machine_id)
+            ->where('tool_id', $tool_id)
+            ->first();
+    }
+    public function downtime_log($machine_id, $job_num, $tool_id = null)
+    {
+        return DB::table('log_downtime')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->when($tool_id, function ($query, $tool_id) {
+                return $query->where('tool_id', $tool_id);
+            })
+            ->whereDate('production_date', date('Y-m-d'))
+            ->where('is_active', 1)
+            ->first();
+    }
     public function get_employee($search, $offset, $limit)
     {
         $query = DB::connection('sqlsrv4')
@@ -365,9 +384,10 @@ class Config extends Model
         return DB::table('history_header_machine')
             ->insert($data);
     }
-    public function employee_data($line, $machine, $downtimeType = null)
+    public function employee_data($line, $machine, $downtimeType = null, $position)
     {
         return DB::table('Employee')
+            ->where('Position', $position)
             ->where(function ($query) use ($line, $machine, $downtimeType) {
                 $query->where(function ($q) use ($line, $machine) {
 

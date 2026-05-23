@@ -987,10 +987,12 @@
                     $("#line_text").text(data.category_line_id ?? data.category_line)
                     // $("#total_qty_plan").text(data.qty_plan ?? '-')
                     // $("#total_qty_actual").text(data.qty_actual ?? '-');
-                    $("#machine_info_text").text(data.machine_id)
                     if (data.tool_id) {
+                        $("#machine_info_text").text(data.machine_id + '~' + data.tool_id)
                         $("#tool_id").val(data.tool_id)
                         funct_pilih_jo(data.production_date)
+                    } else {
+                        $("#machine_info_text").text(data.machine_id)
                     }
                     $("#part_info_text").text(data.part_no)
                     $("#jo_info_text").text(data.job_num)
@@ -1118,10 +1120,34 @@
             return new Date(y, m - 1, d, h, i, s)
         }
 
+        // function downtimeMessage(position) {
+        //     $.ajax({
+        //         url: "{{ url('api/config/downtime_message') }}",
+        //         type: 'POST',
+        //         data: {
+        //             machine: $("#machine_info_text").text(),
+        //             job_num: $("#jo_info_text").text(),
+        //             position: position
+        //         },
+        //         success: function(response) {
+        //             if (response.status == 200) {
+        //                 Swal.fire({
+        //                     icon: "warning",
+        //                     title: "Downtime Alert",
+        //                     text: response.message
+        //                 });
+        //             }
+        //         },
+        //         error: function(xhr) {
+        //             console.log(xhr.responseText);
+        //         }
+        //     })
+        // }
         const startDowntimeCounter = (startDt) => {
             if (dtInterval) clearInterval(dtInterval)
 
             const startTime = parseJakartaTime(startDt)
+            let has5MinAlert = false // Flag untuk mencegah alert berulang
 
             const update = () => {
                 const now = new Date()
@@ -1134,6 +1160,30 @@
                 const seconds = String(diff % 60).padStart(2, '0')
 
                 $("#lama_dt").text(`${hours}:${minutes}:${seconds}`)
+                // if (diff === 150 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(1)
+                // }
+                // if (diff === 300 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(2)
+                // }
+                // if (diff === 300 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(2)
+                // }
+                // if (diff > 600 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(3)
+                // }
+                //  if (diff > 900 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(4)
+                // }
+                //  if (diff > 1800 && !has5MinAlert) {
+                //     has5MinAlert = true
+                //     downtimeMessage(5)
+                // }
             }
 
             update()

@@ -3337,42 +3337,40 @@ class LogMachineController extends Controller
         ];
         $client->send(json_encode($data));
         $client->close();
-        $machine_data = $this->config->machine_data($machine_id);
-        $machine = NULL;
-        if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
-            $line = 'ASSY';
-            if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
-                $machine = 'RSW';
-            }
-            if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
-                $machine = 'SSW-B';
-            }
-        } else {
-            $line = 'STP';
-            if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
-                $machine = 'A6';
-            }
-        }
-        $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type);
-        foreach ($employee_data as $data) {
-            Http::acceptJson()
-                ->post(config('services.ems_wa.url'), [
-                    'phone' => $data->Telp,
-                    'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
+//         $machine_data = $this->config->machine_data($machine_id);
+//         $machine = NULL;
+//         if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+//             $line = 'ASSY';
+//             if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+//                 $machine = 'RSW';
+//             }
+//             if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+//                 $machine = 'SSW-B';
+//             }
+//         } else {
+//             $line = 'STP';
+//             if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+//                 $machine = 'A6';
+//             }
+//         }
+//         $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type, 1);
+//         foreach ($employee_data as $data) {
+//             Http::acceptJson()
+//                 ->post(config('services.ems_wa.url'), [
+//                     'phone' => $data->Telp,
+//                     'message' => "*[ESCALATION DOWNTIME]*
 
-        Dear Bapak/Ibu,
+// Dear Bapak/Ibu,
+// Downtime sedang berlangsung dan memerlukan perhatian segera.
+// Machine  : {$machine_id}
+// Downtime : {$downtime_list->name}
+// Start    : " . now()->format('Y-m-d H:i:s') . "
 
-        Terdapat informasi downtime mesin yang memerlukan perhatian.
+// Mohon segera dilakukan pengecekan dan tindak lanjut untuk meminimalisir impact terhadap produksi.
 
-        Machine ID : {$machine_id}
-Downtime : {$downtime_list->name}
-Start Time : " . now()->format('Y-m-d H:i:s') . "
-
-        Mohon segera dilakukan pengecekan dan tindak lanjut.
-
-        Terima kasih."
-                ]);
-        }
+// Terima kasih."
+//                 ]);
+//         }
         return response()->json([
             'downtimeChartLabels' => $downtimeChartLabels,
             'downtimeChartValues' => $downtimeChartValues,

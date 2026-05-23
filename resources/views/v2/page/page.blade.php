@@ -417,7 +417,13 @@
                 $('#qtyOK').show()
                 columns.splice(5, 0, {
                     data: 'qty_ok',
-                    name: 'qty_ok'
+                    name: 'qty_ok',
+                    render: function(data) {
+                        return Number(data || 0).toLocaleString('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        });
+                    }
                 });
             }
             let table = $('#main-table').DataTable({
@@ -718,7 +724,11 @@
                         rowData.backgroundStyle = backgroundStyle;
                         rowData.titleText = titleText;
                         rowData.planvsact = progress + '%';
-                        table.row(rowIdx).data(rowData).invalidate().draw(false);
+                        // table.row(rowIdx).data(rowData).invalidate().draw(false);
+                        table.row(rowIdx).data({
+                            ...rowData,
+                            qty_ok: parseInt(response.qty_ok) || 0
+                        }).invalidate().draw(false);
                         const rowNode = table.row(rowIdx).node();
                         $(rowNode)
                             .css('background', backgroundStyle)

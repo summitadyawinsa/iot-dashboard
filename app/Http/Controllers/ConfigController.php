@@ -6,6 +6,7 @@ use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use WebSocket\Client;
 use Yajra\DataTables\DataTables;
 
@@ -587,94 +588,84 @@ class ConfigController extends Controller
                 'shift' => $machine_data->shift,
                 'production_date' => $machine_data->production_date
             ]);
-            $machine = NULL;
-            if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
-                $line = 'ASSY';
-                if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
-                    $machine = 'RSW';
-                }
-                if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
-                    $machine = 'SSW-B';
-                }
-            } else {
-                $line = 'STP';
-                if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
-                    $machine = 'A6';
-                }
-            }
-            $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type);
-            foreach ($employee_data as $data) {
-                Http::acceptJson()
-                    ->post(config('services.ems_wa.url'), [
-                        'phone' => $data->Telp,
-                        'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
-
-        Dear Bapak/Ibu,
-
-        Terdapat informasi downtime mesin yang memerlukan perhatian.
-
-        Machine ID : {$machine}
-Downtime : {$downtime_list->name}
-Start Time : " . now()->format('Y-m-d H:i:s') . "
-
-        Mohon segera dilakukan pengecekan dan tindak lanjut.
-
-        Terima kasih."
-                    ]);
-            }
-            //             Http::acceptJson()
-//                 ->post(config('services.ems_wa.url'), [
-//                     'phone' => "6285218493050",
-//                     'message' => "*[NOTIFIKASI DOWNTIME MESIN]*
+            //             $machine = NULL;
+//             if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+//                 $line = 'ASSY';
+//                 if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+//                     $machine = 'RSW';
+//                 }
+//                 if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+//                     $machine = 'SSW-B';
+//                 }
+//             } else {
+//                 $line = 'STP';
+//                 if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+//                     $machine = 'A6';
+//                 }
+//             }
+//             $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type,1);
+//             // dd($employee_data);
+//             foreach ($employee_data as $data) {
+//                 Http::acceptJson()
+//                     ->post(config('services.ems_wa.url'), [
+//                         'phone' => $data->Telp,
+//                         'message' => "*[ESCALATION DOWNTIME]*
 
             // Dear Bapak/Ibu,
-
-            // Terdapat informasi downtime mesin yang memerlukan perhatian.
-
-            // Machine ID : {$machine}
+// Downtime sedang berlangsung dan memerlukan perhatian segera.
+// Machine  : {$machine_data->machine_id}
 // Downtime : {$downtime_list->name}
-// Start Time : " . now()->format('Y-m-d H:i:s') . "
+// Start    : " . now()->format('Y-m-d H:i:s') . "
 
-            // Mohon segera dilakukan pengecekan dan tindak lanjut.
+            // Mohon segera dilakukan pengecekan dan tindak lanjut untuk meminimalisir impact terhadap produksi.
 
             // Terima kasih."
-//                 ]);
+//                     ]);
+//             }
             if ($downtime_list->type == 'MTN') {
                 $update = Http::withoutVerifying()->post(config('services.api_factory.url') . 'dies-status/update', [
                     "machine_id" => $machine,
                     "PartNum" => $machine_data->part_no,
                     "condition_id" => 2,
                 ]);
-                // dd($update);
                 $response_update = $update->json();
-                // dd($response_update);
-                if ($response_update['success'] == true) {
-                    $create = Http::withoutVerifying()->post(config('services.api_factory.url') . 'tickets/create', [
+
+                if (!isset($response_update['success']) || !$response_update['success']) {
+
+                    return response()->json([
+                        'status' => 401,
+                        'message' => 'Gagal update',
+                        'response' => $response_update
+                    ]);
+                }
+
+                $create = Http::withoutVerifying()->post(
+                    config('services.api_factory.url') . 'tickets/create',
+                    [
                         "machine_id" => $machine,
                         "title" => $downtime_list->name,
-                        // "downtime_category" => $downtime_list->type,
                         "downtime_category" => 'Machine',
                         "impact_breakdown" => "Yes",
                         "downtime_type" => "Unplanned"
-                    ]);
-                    $response_create = $create->json();
-                    if ($response_create['success'] == true) {
-                        return response()->json([
-                            'status' => 200,
-                            'message' => 'Data berhasil di kirim'
-                        ]);
-                    } else {
-                        return response()->json([
-                            'status' => 401,
-                            'message' => 'Gagal Kirim data'
-                        ]);
-                    }
-                } else {
+                    ]
+                );
+
+                $response_create = $create->json();
+
+                if (isset($response_create['success']) && $response_create['success']) {
+
                     return response()->json([
-                        'status' => 401,
-                        'message' => 'Gagal update'
+                        'status' => 200,
+                        'message' => 'Data berhasil di kirim',
+                        'response' => $response_create
                     ]);
                 }
+
+                return response()->json([
+                    'status' => 401,
+                    'message' => 'Gagal Kirim data',
+                    'response' => $response_create
+                ]);
             } else {
                 return response()->json([
                     'status' => 200,
@@ -779,22 +770,10 @@ Start Time : " . now()->format('Y-m-d H:i:s') . "
                 'employee_id' => null,
 
             ];
-            // if ($cur_machine->qty_plan == $cur_machine->qty_actual) {
-            //     $data['status_acc'] = true;
-            // } else {
-            //     $data['status_acc'] = false;
-            // }
-            // if ($machine == 'RSW-5H45-10' || $machine == 'RSW-5H45-09') {
-            //     $data['tool_id'] = $cur_machine->tool_id;
-            //     $history['tool_id'] = $cur_machine->tool_id;
-            //     $this->config->insert_history_machine($history);
-            //     $this->config->update_setup_tool($machine, $data, $cur_machine->tool_id);
-            // } else {
-            //     $this->config->insert_history_machine($history);
-            //     $this->config->update_setup($machine, $data);
-            // }
+            // $this->config->insert_history_machine($history);
+            // $this->config->update_setup($machine, $data);
             // Http::withoutVerifying()->post(
-            //     config('services.api_factory.url').'machine-status/update',
+            //     config('services.api_factory.url') . 'machine-status/update',
             //     [
             //         "machine_id" => $machine,
             //         "condition_id" => 0,
@@ -1012,7 +991,7 @@ Start Time : " . now()->format('Y-m-d H:i:s') . "
                         'laborTypePseudo' => 'P',
                         'laborHedSeq' => $request->input('laborHedSeq'),
                         'jobNum' => $request->input('jobNum'),
-                        'opSeq' => (string) $oprSeq,
+                        'opSeq' => (int) $oprSeq,
                         'date' => $request->input('date'),
                         'nik' => $request->input('nik'),
                         'password' => $request->input('password'),
@@ -1023,6 +1002,10 @@ Start Time : " . now()->format('Y-m-d H:i:s') . "
                     ]);
             $resp_get_new = json_decode($getNewLaborDtl->body(), true);
             if ($resp_get_new['code'] !== 200) {
+                Log::error('Error GetNewtLaborDtl', [
+                    'response' => $resp_get_new,
+                    'request' => $request->all()
+                ]);
                 return response()->json([
                     'status' => false,
                     'step' => 'GeNewtLaborDtl',
@@ -1245,10 +1228,6 @@ Start Time : " . now()->format('Y-m-d H:i:s') . "
             'data' => $data
         ]);
     }
-    public function list_machine_by_scan(Request $request)
-    {
-
-    }
     public function confirm_table(Request $request)
     {
         $page = $request->page;
@@ -1416,5 +1395,76 @@ Start Time : " . now()->format('Y-m-d H:i:s') . "
                 'message' => $th->getMessage()
             ]);
         }
+    }
+    public function downtime_message(Request $request)
+    {
+        $machine_id = $request->machine;
+        $job_num = $request->job_num;
+        $position = $request->position;
+        if (str_contains($machine_id, '~')) {
+            $machine_id = explode('~', $machine_id)[0];
+            $data_machine = $this->config->machine_data_tool($machine_id, $machine_id[1]);
+            $downtime_log = $this->config->downtime_log($machine_id, $job_num, $machine_id[1]);
+        } else {
+            $data_machine = $this->config->machine_data($machine_id);
+            $downtime_log = $this->config->downtime_log($machine_id, $job_num, null);
+        }
+        if (!$data_machine) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data mesin tidak ditemukan'
+            ]);
+        }
+        if (!$downtime_log) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data downtime tidak ditemukan'
+            ]);
+        }
+        if (str_contains(strtoupper($data_machine->category_line_id), 'ASSY')) {
+            $line = 'ASSY';
+            if (str_contains(strtoupper($data_machine->machine_id), 'RSW')) {
+                $machine = 'RSW';
+            }
+            if (str_contains(strtoupper($data_machine->machine_id), 'SSW-B')) {
+                $machine = 'SSW-B';
+            }
+        } else {
+            $line = 'STP';
+            if (str_contains(strtoupper($data_machine->machine_id), 'A6')) {
+                $machine = 'A6';
+            }
+        }
+        $downtime_list = $this->config->downtime_list_id($downtime_log->downtime_id);
+        $employee = $this->config->employee_data($line, $machine, $downtime_list->type, 6);
+        foreach ($employee as $emp) {
+            Http::acceptJson()
+                ->post(config('services.ems_wa.url'), [
+                    'phone' => $emp->Telp,
+                    'message' => "*[NOTIFIKASI DOWNTIME]*
+
+                    Dear Bapak/Ibu,
+
+                    Terdapat informasi downtime yang memerlukan perhatian.
+
+                    Machine ID : {$machine_id}
+                    Downtime : {$downtime_list->name}
+                    Start Time : " . now()->format('Y-m-d H:i:s') . "
+                    Duration : 5 Menit+
+
+                    Mohon segera dilakukan pengecekan dan tindak lanjut.
+
+                    Terima kasih."
+                ]);
+        }
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'machine' => $data_machine,
+                'downtime_log' => $downtime_log,
+                'downtime_list' => $downtime_list,
+                'employee' => $employee
+            ]
+        ]);
     }
 }
