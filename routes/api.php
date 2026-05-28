@@ -395,10 +395,15 @@ Route::prefix('profile')->group(function () {
     Route::post('progress_bar', [ProfileController::class, 'progress_bar']);
     Route::post('upload-photo', [ProfileController::class, 'uploadPhoto']);
     Route::post('view_more', [ProfileController::class, 'view_more']);
+    Route::post('history_oee', [ProfileController::class, 'history_oee']);
     Route::post('main_gsph', [ProfileController::class, 'main_gsph']);
+    Route::post('history_main_gsph', [ProfileController::class, 'history_main_gsph']);
     Route::post('main-dt', [ProfileController::class, 'main_dt']);
+    Route::post('history_main_dt', [ProfileController::class, 'history_main_dt']);
     Route::post('jo_show', [ProfileController::class, 'jo_show']);
     Route::post('change_jo', [ProfileController::class, 'change_jo']);
+    Route::post('history', [ProfileController::class, 'history']);
+    Route::post('activity_history', [ProfileController::class, 'activity_history']);
     //Dashboard machine
     Route::post('dashboard_machine', [ProfileController::class, 'dashboard_machine']);
 

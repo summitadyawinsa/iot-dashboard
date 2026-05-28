@@ -40,8 +40,9 @@ class CheckDowntimeAlert extends Command
         $downtime_data = DB::table('log_downtime as a')
             ->leftJoin('log_header_machine as b', 'a.machine_id', '=', 'b.machine_id')
             ->leftJoin('downtime_list as c', 'a.downtime_id', '=', 'c.id')
+            ->leftJoin('log_activity as d','d.downtime_seq_id','=','a.seq_id')
             ->where('a.is_active', true)
-            ->select('a.*', 'b.category_line_id', 'c.name as downtime_name', 'c.type as downtime_type')
+            ->select('a.*', 'b.category_line_id', 'c.name as downtime_name', 'c.type as downtime_type','d.note as remark')
             ->get();
 
         foreach ($downtime_data as $data) {
@@ -84,18 +85,18 @@ class CheckDowntimeAlert extends Command
             |--------------------------------------------------------------------------
             */
 
-            if ($diff_in_minutes >= 5 && !$data->notif_5m) {
+            if ($diff_in_minutes >= 20 && !$data->notif_5m) {
 
                 $employees = $this->config->employee_data(
                     $line,
                     $machine,
                     $data->downtime_type,
-                    6
+                    2
                 );
 
                 foreach ($employees as $emp) {
 
-                    $this->sendWhatsapp($emp, $data, 5);
+                    $this->sendWhatsapp($emp, $data, 20);
                 }
 
                 DB::table('log_downtime')
@@ -104,18 +105,18 @@ class CheckDowntimeAlert extends Command
                         'notif_5m' => 1
                     ]);
             }
-            if ($diff_in_minutes >= 7 && !$data->notif_7m) {
+            if ($diff_in_minutes >= 30 && !$data->notif_7m) {
 
                 $employees = $this->config->employee_data(
                     $line,
                     $machine,
                     $data->downtime_type,
-                    6
+                    2
                 );
 
                 foreach ($employees as $emp) {
 
-                    $this->sendRemindWhatsapp($emp, $data, 7);
+                    $this->sendRemindWhatsapp($emp, $data, 30);
                 }
 
                 DB::table('log_downtime')
@@ -132,118 +133,118 @@ class CheckDowntimeAlert extends Command
             |--------------------------------------------------------------------------
             */
 
-            // if ($diff_in_minutes >= 10 && !$data->notif_10m) {
+            if ($diff_in_minutes >= 40 && !$data->notif_10m) {
 
-            //     $employees = $this->config->employee_data(
-            //         $line,
-            //         $machine,
-            //         $data->downtime_type,
-            //         3
-            //     );
+                $employees = $this->config->employee_data(
+                    $line,
+                    $machine,
+                    $data->downtime_type,
+                    3
+                );
 
-            //     foreach ($employees as $emp) {
+                foreach ($employees as $emp) {
 
-            //         $this->sendWhatsapp($emp, $data, 10);
-            //     }
+                    $this->sendWhatsapp($emp, $data, 40);
+                }
 
-            //     DB::table('log_downtime')
-            //         ->where('seq_id', $data->seq_id)
-            //         ->update([
-            //             'notif_10m' => 1
-            //         ]);
-            // }
-            // if ($diff_in_minutes >= 13 && !$data->notif_13m) {
+                DB::table('log_downtime')
+                    ->where('seq_id', $data->seq_id)
+                    ->update([
+                        'notif_10m' => 1
+                    ]);
+            }
+            if ($diff_in_minutes >= 50 && !$data->notif_13m) {
 
-            //     $employees = $this->config->employee_data(
-            //         $line,
-            //         $machine,
-            //         $data->downtime_type,
-            //         3
-            //     );
+                $employees = $this->config->employee_data(
+                    $line,
+                    $machine,
+                    $data->downtime_type,
+                    3
+                );
 
-            //     foreach ($employees as $emp) {
+                foreach ($employees as $emp) {
 
-            //         $this->sendRemindWhatsapp($emp, $data, 13);
-            //     }
+                    $this->sendRemindWhatsapp($emp, $data, 13);
+                }
 
-            //     DB::table('log_downtime')
-            //         ->where('seq_id', $data->seq_id)
-            //         ->update([
-            //             'notif_13m' => 1
-            //         ]);
-            // }
+                DB::table('log_downtime')
+                    ->where('seq_id', $data->seq_id)
+                    ->update([
+                        'notif_13m' => 1
+                    ]);
+            }
             /*
             |--------------------------------------------------------------------------
             | 15 MENIT
             |--------------------------------------------------------------------------
             */
 
-            // if ($diff_in_minutes >= 15 && !$data->notif_15m) {
+            if ($diff_in_minutes >= 60 && !$data->notif_15m) {
 
-            //     $employees = $this->config->employee_data(
-            //         $line,
-            //         $machine,
-            //         $data->downtime_type,
-            //         4
-            //     );
+                $employees = $this->config->employee_data(
+                    $line,
+                    $machine,
+                    $data->downtime_type,
+                    4
+                );
 
-            //     foreach ($employees as $emp) {
+                foreach ($employees as $emp) {
 
-            //         $this->sendWhatsapp($emp, $data, 15);
-            //     }
+                    $this->sendWhatsapp($emp, $data, 60);
+                }
 
-            //     DB::table('log_downtime')
-            //         ->where('seq_id', $data->seq_id)
-            //         ->update([
-            //             'notif_15m' => 1
-            //         ]);
-            // }
-            // if ($diff_in_minutes >= 20 && !$data->notif_20m) {
+                DB::table('log_downtime')
+                    ->where('seq_id', $data->seq_id)
+                    ->update([
+                        'notif_15m' => 1
+                    ]);
+            }
+            if ($diff_in_minutes >= 70 && !$data->notif_20m) {
 
-            //     $employees = $this->config->employee_data(
-            //         $line,
-            //         $machine,
-            //         $data->downtime_type,
-            //         4
-            //     );
+                $employees = $this->config->employee_data(
+                    $line,
+                    $machine,
+                    $data->downtime_type,
+                    4
+                );
 
-            //     foreach ($employees as $emp) {
+                foreach ($employees as $emp) {
 
-            //         $this->sendRemindWhatsapp($emp, $data, 20);
-            //     }
+                    $this->sendRemindWhatsapp($emp, $data, 70);
+                }
 
-            //     DB::table('log_downtime')
-            //         ->where('seq_id', $data->seq_id)
-            //         ->update([
-            //             'notif_20m' => 1
-            //         ]);
-            // }
+                DB::table('log_downtime')
+                    ->where('seq_id', $data->seq_id)
+                    ->update([
+                        'notif_20m' => 1
+                    ]);
+            }
             /*
             |--------------------------------------------------------------------------
             | 30 MENIT
             |--------------------------------------------------------------------------
             */
 
-            // if ($diff_in_minutes >= 30 && !$data->notif_30m) {
+            if ($diff_in_minutes >= 80 && !$data->notif_30m) {
 
-            //     $employees = $this->config->employee_data(
-            //         $line,
-            //         $machine,
-            //         $data->downtime_type,
-            //         5
-            //     );
+                $employees = $this->config->employee_data(
+                    $line,
+                    $machine,
+                    $data->downtime_type,
+                    5
+                );
 
-            //     foreach ($employees as $emp) {
+                foreach ($employees as $emp) {
 
-            //         $this->sendWhatsapp($emp, $data, 30);
-            //     }
+                    $this->sendWhatsapp($emp, $data, 80);
+                }
 
-            //     DB::table('log_downtime')
-            //         ->where('seq_id', $data->seq_id)
-            //         ->update([
-            //             'notif_30m' => 1
-            //         ]);
-            // }
+                DB::table('log_downtime')
+                    ->where('seq_id', $data->seq_id)
+                    ->update([
+                        'notif_30m' => 1
+                    ]);
+            }
         }
     }
     private function sendWhatsapp($emp, $data, $minutes)
@@ -254,7 +255,8 @@ class CheckDowntimeAlert extends Command
 Dear Bapak/Ibu,
 Downtime telah berlangsung lebih dari {$minutes} menit dan memerlukan perhatian segera.
 Machine  : {$data->machine_id}
-Downtime : {$data->downtime_name}
+Downtime : {$data->downtime_name},
+Keterangan : {$data->remark}
 Start    : " . \Carbon\Carbon::parse($data->started_at)->format('Y-m-d H:i:s') . "
 Duration : {$minutes} Menit+
 
@@ -282,6 +284,7 @@ Dear Bapak/Ibu,
 Downtime telah berlangsung lebih dari {$minutes} menit dan memerlukan perhatian segera.
 Machine  : {$data->machine_id}
 Downtime : {$data->downtime_name}
+Keterangan : {$data->remark}
 Start    : " . \Carbon\Carbon::parse($data->started_at)->format('Y-m-d H:i:s') . "
 Duration : {$minutes} Menit+
 

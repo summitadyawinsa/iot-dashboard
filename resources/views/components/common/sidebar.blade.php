@@ -398,6 +398,9 @@
                                 <li>
                                     <a href="/assy/page/RBT-5J45">Page</a>
                                 </li>
+                                <li>
+                                    <a href="/assy/confirm/RBT-5J45">Confirm JO</a>
+                                </li>
                                 {{-- <li>
                                     <a href="/assy/summary-by-line/RBT-5J45">Summary</a>
                                 </li> --}}

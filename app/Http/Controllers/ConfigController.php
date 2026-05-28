@@ -61,6 +61,23 @@ class ConfigController extends Controller
                 if (empty($machine['employee_id']) || $machine['employee_id'] == null || $machine['employee_id'] == '') {
                     continue;
                 }
+                if ($machine['machine_id'] == 'SSW-TG4R-2' || $machine['machine_id'] == 'SSW-TG4R-1' || $machine['machine_id'] == 'SSW-TG4R-3' || $machine['machine_id'] == 'SSW-TG4R-4' || $machine['machine_id'] == 'SSW-B-1' || $machine['machine_id'] == 'SSW-B-2' || $machine['machine_id'] == 'SSW-A-5' || $machine['machine_id'] == 'SSW-A-14' || $machine['machine_id'] == 'SSW-B-3' || $machine['machine_id'] == 'SSW-B-4' || $machine['machine_id'] == 'SSW-B-5' || $machine['machine_id'] == 'SSW-B-7' || $machine['machine_id'] == 'SSW-B-6' || $machine['machine_id'] == 'SSW-B-8' || $machine['machine_id'] == 'SSW-MA-3') {
+                    $check_part = Http::withoutVerifying()->get(
+                        config('services.api_factory.url') . 'setup-ssw/selector',
+                        [
+                            'machine_name' => $machine['machine_id'],
+                            'part_number' => $part_no
+                        ]
+                    );
+                    $response = $check_part->json();
+                    if (!$check_part->successful() || ($response['status'] ?? '') !== 'success') {
+                        DB::rollBack();
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Part number tidak terdaftar atau selector tidak ditemukan'
+                        ], 422);
+                    }
+                }
                 $emp = explode('~', $machine['employee_id']);
                 $revisionModel = $this->config->revisionModel($job_num);
                 if ($revisionModel && isset($revisionModel->RevisionNum)) {
@@ -84,7 +101,8 @@ class ConfigController extends Controller
                     'qty_plan' => $qty_plan,
                     'part_no' => $part_no,
                     'model' => $revisionNum ?? null,
-                    'shift' => $shift
+                    'shift' => $shift,
+                    'opr_seq' => $machine['opr_seq'] ?? 10
                 ];
                 $this->config->update_confirm($machine['machine_id'], $data_update);
             }
@@ -560,6 +578,7 @@ class ConfigController extends Controller
     {
         $id = $request->downtime['id'];
         $machine = $request->machine;
+        $remark = $request->remark;
         try {
             $downtime_list = $this->config->downtime_list_id($id);
             $machine_data = $this->config->machine_data($machine);
@@ -586,42 +605,45 @@ class ConfigController extends Controller
                 'start_date' => now('Asia/Jakarta'),
                 'downtime_seq_id' => $insert,
                 'shift' => $machine_data->shift,
-                'production_date' => $machine_data->production_date
+                'production_date' => $machine_data->production_date,
+                'note' => $remark
             ]);
-            //             $machine = NULL;
-//             if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
-//                 $line = 'ASSY';
-//                 if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
-//                     $machine = 'RSW';
-//                 }
-//                 if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
-//                     $machine = 'SSW-B';
-//                 }
-//             } else {
-//                 $line = 'STP';
-//                 if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
-//                     $machine = 'A6';
-//                 }
-//             }
-//             $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type,1);
-//             // dd($employee_data);
-//             foreach ($employee_data as $data) {
-//                 Http::acceptJson()
-//                     ->post(config('services.ems_wa.url'), [
-//                         'phone' => $data->Telp,
-//                         'message' => "*[ESCALATION DOWNTIME]*
+            $machine = NULL;
+            if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+                $line = 'ASSY';
+                if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+                    $machine = 'RSW';
+                }
+                if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+                    $machine = 'SSW-B';
+                }
+            } else {
+                $line = 'STP';
+                if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+                    $machine = 'A6';
+                }
+            }
+            $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type, 1);
+            // dd($employee_data);
+            foreach ($employee_data as $data) {
+                Http::acceptJson()
+                    ->post(config('services.ems_wa.url'), [
+                        'phone' => $data->Telp,
+                        'message' => "*[ESCALATION DOWNTIME]*
 
-            // Dear Bapak/Ibu,
-// Downtime sedang berlangsung dan memerlukan perhatian segera.
-// Machine  : {$machine_data->machine_id}
-// Downtime : {$downtime_list->name}
-// Start    : " . now()->format('Y-m-d H:i:s') . "
+            Dear Bapak/Ibu,
+Downtime sedang berlangsung dan memerlukan perhatian segera.
+Machine  : {$machine_data->machine_id}
+Downtime : {$downtime_list->name}
+Keterangan : {$remark}
+Start    : " . now()->format('Y-m-d H:i:s') . "
+Duration : -20 menit
 
-            // Mohon segera dilakukan pengecekan dan tindak lanjut untuk meminimalisir impact terhadap produksi.
+            Mohon segera dilakukan pengecekan dan tindak lanjut untuk meminimalisir impact terhadap produksi.
 
-            // Terima kasih."
-//                     ]);
-//             }
+            Terima kasih."
+                    ]);
+            }
             if ($downtime_list->type == 'MTN') {
                 $update = Http::withoutVerifying()->post(config('services.api_factory.url') . 'dies-status/update', [
                     "machine_id" => $machine,
@@ -685,8 +707,68 @@ class ConfigController extends Controller
         $job_num = $request->job_num;
         try {
             $machine_data = $this->config->machine_data($machine);
-            $this->config->downtime_update($machine, $job_num, $machine_data->production_date);
-            $this->config->activity_update($machine, $job_num, $machine_data->production_date);
+            if (!$machine_data) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Data machine tidak ditemukan'
+                ]);
+            }
+            if (str_contains(strtoupper($machine_data->category_line_id), 'ASSY')) {
+                $line = 'ASSY';
+                if (str_contains(strtoupper($machine_data->machine_id), 'RSW')) {
+                    $machine = 'RSW';
+                }
+                if (str_contains(strtoupper($machine_data->machine_id), 'SSW-B')) {
+                    $machine = 'SSW-B';
+                }
+            } else {
+                $line = 'STP';
+                if (str_contains(strtoupper($machine_data->machine_id), 'A6')) {
+                    $machine = 'A6';
+                }
+            }
+            // dd($machine, $job_num, $machine_data->production_date);
+            $downtime_log = $this->config->downtime_log_get($machine_data->machine_id, $job_num, $machine_data->production_date);
+            if (!$downtime_log) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Data downtime tidak ditemukan'
+                ]);
+            }
+            $downtime_list = $this->config->downtime_list_id($downtime_log->downtime_id);
+            $position = 1;
+            if ($downtime_log->notif_5m == 1) {
+                $position = 2;
+            }
+            if ($downtime_log->notif_10m == 1) {
+                $position = 3;
+            }
+            if ($downtime_log->notif_15m == 1) {
+                $position = 4;
+            }
+            if ($downtime_log->notif_30m == 1) {
+                $position = 5;
+            }
+            $employee_data = $this->config->employee_data_stop($line, $machine, $downtime_list->type, $position);
+            // $employee_data = $this->config->employee_data($line, $machine, $downtime_list->type, 6);
+            foreach ($employee_data as $data) {
+                Http::acceptJson()
+                    ->post(config('services.ems_wa.url'), [
+                        'phone' => $data->Telp,
+                        'message' => "*[INFORMASI DOWNTIME SELESAI]*
+Dear Bapak/Ibu,
+Downtime pada {$machine_data->machine_id} telah selesai.
+Machine  : {$machine_data->machine_id}
+Downtime : {$downtime_list->name}
+Keterangan : {$downtime_log->remark}
+Start    : {$downtime_log->started_at}
+End      : " . now()->format('Y-m-d H:i:s') . "
+
+                        Terima kasih."
+                    ]);
+            }
+            $this->config->downtime_update($machine_data->machine_id, $job_num, $machine_data->production_date);
+            $this->config->activity_update($machine_data->machine_id, $job_num, $machine_data->production_date);
             Http::withoutVerifying()->post(config('services.api_factory.url') . 'machine-status/update', [
                 "PartNum" => $machine_data->part_no,
                 "condition_id" => 1,
@@ -785,6 +867,7 @@ class ConfigController extends Controller
             //     'message' => 'Mesin berhasil di finish'
             // ], 201);
             if ($cur_machine->machine_id == $machine && $cur_machine->qty_plan == $cur_machine->qty_actual) {
+                // if ($cur_machine->machine_id == 'RSW-5J45-04') {
                 // $data['status_acc'] = true;
                 return response()->json([
                     'status' => true,
@@ -971,19 +1054,33 @@ class ConfigController extends Controller
             //         'message' => 'OprSeq tidak ditemukan'
             //     ]);
             // }
-            $LaborDtl = DB::connection('sqlsrv4')
-                ->table('Erp.LaborDtl')
-                ->where('ResourceID', $request->resourceID)
-                ->where('JobNum', $request->input('jobNum'))
-                ->select('OprSeq')
-                ->first();
-            $oprSeq = 10;
-            if ($LaborDtl) {
-                if ($LaborDtl->OprSeq == 10) {
-                    $oprSeq = 20;
-                }
-            }
-
+            // $LaborDtl = DB::connection('sqlsrv4')
+            //     ->table('Erp.LaborDtl')
+            //     ->where('ResourceID', $request->resourceID)
+            //     ->where('JobNum', $request->input('jobNum'))
+            //     ->select('OprSeq')
+            //     ->first();
+            // $oprSeq = 10;
+            // if ($LaborDtl) {
+            //     if ($LaborDtl->OprSeq == 10) {
+            //         $oprSeq = 20;
+            //     }
+            // }
+            // Log::info('REQUEST GET NEW', [
+            //     'payload' => [
+            //         'laborTypePseudo' => 'P',
+            //         'laborHedSeq' => $request->input('laborHedSeq'),
+            //         'jobNum' => $request->input('jobNum'),
+            //         'opSeq' => '10',
+            //         'date' => $request->input('date'),
+            //         'nik' => $request->input('nik'),
+            //         'password' => $request->input('password'),
+            //         'resourceGrpID' => "",
+            //         'resourceID' => "",
+            //         'indirectCode' => "",
+            //         'indirectDescription' => ""
+            //     ]
+            // ]);
             $getNewLaborDtl = Http::withoutVerifying()->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
@@ -991,7 +1088,7 @@ class ConfigController extends Controller
                         'laborTypePseudo' => 'P',
                         'laborHedSeq' => $request->input('laborHedSeq'),
                         'jobNum' => $request->input('jobNum'),
-                        'opSeq' => (int) $oprSeq,
+                        'opSeq' => $request->input('opr_seq') ?? '10',
                         'date' => $request->input('date'),
                         'nik' => $request->input('nik'),
                         'password' => $request->input('password'),
@@ -1006,10 +1103,67 @@ class ConfigController extends Controller
                     'response' => $resp_get_new,
                     'request' => $request->all()
                 ]);
+                $cur_machine = $this->config->current_machine($request->input('jobNum'));
+                $history = [
+                    'machine_id' => $request->resourceID,
+                    'line_id' => $cur_machine->line_id,
+                    'line_detail_id' => $cur_machine->line_detail_id,
+                    'category_line_id' => $cur_machine->category_line_id,
+                    'machine_code' => $cur_machine->machine_code,
+                    'machine_name' => $cur_machine->machine_name,
+                    'tonage' => $cur_machine->tonage,
+                    'average_ct' => $cur_machine->average_ct,
+                    'standard_sph' => $cur_machine->standard_sph,
+                    'started_at' => $cur_machine->started_at,
+                    'operation_time' => $cur_machine->operation_time,
+                    'break_12' => $cur_machine->break_12,
+                    'break_18' => $cur_machine->break_18,
+                    'break_02' => $cur_machine->break_02,
+                    'production_date' => $cur_machine->production_date,
+                    'part_no' => $cur_machine->part_no,
+                    'job_num' => $cur_machine->job_num,
+                    'qty_plan' => $cur_machine->qty_plan,
+                    'qty_actual' => $cur_machine->qty_actual,
+                    'qty_ng' => $cur_machine->qty_ng,
+                    'shift' => $cur_machine->shift,
+                    'current_gsph' => $cur_machine->current_gsph,
+                    'finished_at' => now('Asia/Jakarta'),
+                    'condition_id' => 0,
+                    'customer' => $cur_machine->customer,
+                    'employee_id' => $cur_machine->employee_id,
+                    'employee_name' => $cur_machine->employee_name,
+                    'qty_ok' => max(0, ($cur_machine->qty_actual ?? 0) - ($cur_machine->qty_ng ?? 0))
+                ];
+                $data = [
+                    'machine_id' => $request->resourceID,
+                    'part_no' => null,
+                    'job_num' => null,
+                    'qty_plan' => 0,
+                    'qty_actual' => 0,
+                    'qty_ng' => 0,
+                    'shift' => null,
+                    'current_gsph' => null,
+                    'finished_at' => now('Asia/Jakarta'),
+                    'condition_id' => 0,
+                    'status_finish' => true,
+                    'customer' => null,
+                    'employee_id' => null,
+
+                ];
+                $this->config->insert_history_machine($history);
+                $this->config->update_setup($request->resourceID, $data);
+                Http::withoutVerifying()->post(
+                    config('services.api_factory.url') . 'machine-status/update',
+                    [
+                        "machine_id" => $request->resourceID,
+                        "condition_id" => 0,
+                        "job_num" => $request->input('jobNum')
+                    ]
+                );
                 return response()->json([
-                    'status' => false,
+                    'status' => true,
                     'step' => 'GeNewtLaborDtl',
-                    'message' => $resp_get_new['status']
+                    'message' => 'Mesin berhasil finish gagal time entry'
                 ]);
             }
             $data_get_new = $resp_get_new['data'];
@@ -1231,7 +1385,9 @@ class ConfigController extends Controller
     public function confirm_table(Request $request)
     {
         $page = $request->page;
-
+        if ($page == 'RBT-5J45') {
+            $page = 'RSW-5J45';
+        }
         $data = DB::table('log_machine_confirm')
             ->when($page, function ($query, $page) {
                 $query->where('machine_id', 'LIKE', "%{$page}%");
@@ -1310,7 +1466,8 @@ class ConfigController extends Controller
                 'average_ct' => 0,
                 'operation_time' => 0,
                 'current_gsph' => 0,
-                'qty_actual' => 0
+                'qty_actual' => 0,
+                'opr_seq' => $data->opr_seq ?? 10
             ]);
             $dataGsph = [
                 'machine_id' => $data->machine_id,

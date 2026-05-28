@@ -1,500 +1,583 @@
 <x-layout.default>
-    <script defer src="/assets/js/apexcharts.js"></script>
+    <link rel='stylesheet' type='text/css' href='{{ Vite::asset('resources/css/nice-select2.css') }}'>
+    <link rel="stylesheet" href="{{ Vite::asset('resources/css/flatpickr.min.css') }}">
+    <script src="/assets/js/flatpickr.js"></script>
+    <link rel="stylesheet" href="{{ Vite::asset('resources/css/nouislider.min.css') }}">
+    <script src="/assets/js/nouislider.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/select.css') }}">
+    <style>
+        #analytics:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background: #fff;
+        }
 
+        #analytics:fullscreen * {
+            pointer-events: auto;
+        }
+    </style>
     <div id="analytics">
-        <span id="inpt_machine" hidden></span>
-        <div class="pt-5 -mt-5">
-            <div class="grid lg:grid-cols-4 md:grid-cols-1 lg:gap-3 d:gap-2 mb-3">
-                <div
-                    class="panel col-span-1 overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
-                    <div class="text-center text-black bg-white gap-2 mb-2 rounded-lg border">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded-lg p-1">
-                            <p class="align-center text-black p-1 lg:text-2xl md:text-xl">
-                                Job Number
-                            </p>
-                            <span id="job_number" class="font-bold lg:text-2xl md:text-xl "></span>
-                        </div>
+        <div class="p-6 space-y-6 bg-gray-100 dark:bg-gray-900 min-h-screen transition" id="dashboard_profile_view">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">
+                    Dashboard Operator
+                </h1>
+                <div class="flex gap-2">
+                    <div class="hidden" id="div_pilih_jo">
+                        <select
+                            class="w-full px-3 py-2 rounded-md border
+           bg-white text-gray-800 border-gray-300
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:focus:ring-blue-400"
+                            id="pilih_jo">
+                            {{-- <option selected disabled>Pilih JO</option> --}}
+                        </select>
                     </div>
-
-                    <div class="text-center text-black bg-white z-[7] mb-3 rounded-lg border">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded-lg p-1">
-                            <p class="align-center text-black bg-white p-1 lg:text-2xl md:text-xl">
-                                Part No.
-                            </p>
-                            <span id="part_number" class="font-bold lg:text-2xl md:text-xl"></span>
-                        </div>
-                    </div>
-                    <div class="text-center text-black bg-white z-[7] mb-3 border rounded-lg">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded-lg p-1">
-                            <p class="align-center text-black bg-white p-1 lg:text-2xl md:text-xl">
-                                Customer.
-                            </p>
-                            <span id="customer" class="font-bold lg:text-2xl md:text-xl"></span>
-                        </div>
-                    </div>
-                    <div class="text-center text-black bg-white z-[7] mb-3 border rounded-lg">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded-lg p-1">
-                            <p class="align-center text-black bg-white p-1 lg:text-2xl md:text-xl">
-                                Time start.
-                            </p>
-                            <span id="time_start" class="font-bold lg:text-2xl md:text-xl"></span>
-                        </div>
-                    </div>
-                    <div class="text-center text-black bg-white z-[7] border rounded-lg">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded-lg p-1">
-                            <p class="align-center text-black bg-white p-1 lg:text-2xl md:text-xl">
-                                Time Finish.
-                            </p>
-                            <span id="time_finish" class="font-bold lg:text-2xl md:text-xl"></span>
-                        </div>
-                    </div>
+                    <button class="btn btn-primary btn-sm btn-icon" id="view_more">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                    </button>
+                    <button id="fullscreen_btn"
+                        class="p-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                        title="Toggle Fullscreen">
+                        <svg id="fullscreen_icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 3.75h6v1.5h-4.5v4.5h-1.5v-6Zm16.5 0v6h-1.5v-4.5h-4.5v-1.5h6ZM3.75 20.25v-6h1.5v4.5h4.5v1.5h-6Zm16.5-6v6h-6v-1.5h4.5v-4.5h1.5Z" />
+                        </svg>
+                    </button>
                 </div>
-
-                <div
-                    class="panel col-span-1 h-full overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
-                        <div class="text-center text-white-light border border-white z-[7] rounded">
-                            <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                                <div class="text-center">
-                                    <span
-                                        class="ltr:ml-5 rtl:mr-5 lg:text-3xl md:text-xl font-bold dark:text-white-light">Plan
-                                        Vs
-                                        Actual Achievement</span>
-                                </div>
-                            </div>
-                        </div>
-                        <canvas id="planVsActualChart" class="mx-auto mt-4"
-                            style="max-width: 300px; max-height: 300px;"></canvas>
-                    </div>
-                </div>
-                <div
-                    class="panel col-span-2 h-full flex flex-col overflow-hidden gap-4 before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96">
-
-                    <!-- Judul Atas -->
-                    <div class="text-center text-white-light border border-white z-[7] rounded">
-                        <div class="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                            <span class="lg:text-3xl md:text-xl font-bold" id="gsph_achievement_title"></span>
-                        </div>
-                    </div>
-
-                    <!-- Konten -->
-                    <div class="flex flex-1 justify-around items-stretch">
-
-                        <!-- STD GSPH -->
-                        <div class="flex flex-col justify-between items-center w-full px-2">
-                            <div class="text-white lg:text-3xl md:text-xl font-semibold" id="std_gsph_title"></div>
-                            <div class="flex-grow flex items-center justify-center">
-                                <div class="font-bold" style="color: #4ade80; font-size: 5vw;" id="std_gsph">
-                                </div>
-                            </div>
-                            <div class="text-white text-base text-center">
-                                <div class="lg:text-3xl md:text-xl font-semibold">Std.Cycletime</div> <span
-                                    id="std_cycletime" class="font-bold text-3xl"></span>
-                            </div>
-                        </div>
-
-                        <!-- ACT GSPH -->
-                        <div class="flex flex-col justify-between items-center w-full px-2">
-                            <div class="text-white lg:text-3xl md:text-xl font-semibold" id="act_gsph_title"></div>
-                            <div class="flex-grow flex items-center justify-center">
-                                <div class="font-bold text-white" style="font-size: 5vw;" id="act_gsph"></div>
-                            </div>
-                            <div class="text-white text-base text-center">
-                                <div class="lg:text-3xl md:text-xl font-semibold">Act.Cycletime</div> <span
-                                    id="act_cycletime" class="font-bold text-3xl"></span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
             </div>
-            <div class="grid lg:grid-cols-4 md:grid-cols-1 lg:gap-3 d:gap-2 mb-2">
-                <div
-                    class="panel col-span-1 overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
-                    <div class="text-center text-white-light border border-white gap-4 mb-3">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                            <p class="align-center text-white-light p-1 lg:text-3xl md:text-xl font-bold">
-                                OEE%
-                            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 space-y-4">
+                    <div class="flex justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <img src="https://ui-avatars.com/api/?name=Summit+Adyawinsa+Indonesia&length=3"
+                                    class="w-20 h-20 rounded-full border object-cover" id="img_pp">
+                                <button type="button" id="btn_open_img"
+                                    class="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-1.5 shadow-md transition hidden"
+                                    onclick="document.getElementById('photo_input').click()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 7h4l2-2h6l2 2h4v13H3V7z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                </button>
+                                <input type="file" id="photo_input" class="hidden" accept="image/*">
+                            </div>
+                            <div>
+                                <h2 class="text-md font-semibold text-gray-800 dark:text-white" id="name_text">
+                                    -
+                                </h2>
+                                <p class="text-gray-500 dark:text-gray-400" id="nik_name">
+                                    -
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Line</span>
+                            <span class="text-sm text-gray-800 dark:text-white" id="line_text">
+                            </span>
+                        </div>
+                        {{-- <div class="flex justify-between">
+                            <span class="text-gray-500">Opr Seq</span>
+                            <span class="text-sm text-gray-800 dark:text-white" id="opr_seq_text">
+                            </span>
+                        </div> --}}
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Status</span>
+                            <span class="px-2 py-1 text-xs rounded bg-green-100" id="status_text" style="color:red">
+                                Non Active
+                            </span>
+                        </div>
+                        <!-- <div class="flex justify-between">
+                            <span class="text-gray-500">Production Date</span>
+                            <span class="text-sm text-gray-800 dark:text-white" id="prod_date_text">
+
+                            </span>
+                        </div> -->
+                    </div>
+                    <div class="w-full">
+                        <div class="flex justify-between mb-1 text-sm">
+                            <span>Production Progress</span>
+                            <span id="progress_percent">0%</span>
+                        </div>
+
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                            <div id="progress_bar" class="bg-blue h-4 rounded-full transition-all duration-500"
+                                style="width: 0%;background-color: #3490dc;">
+                            </div>
                         </div>
                     </div>
-                    <canvas id="oee_chart" class="mx-auto mt-4 w-full max-w-[250px] max-h-[250px]"></canvas>
-                    <div class="flex justify-around">
-                        <div class="text-center font-bold text-white text-2xl">
-                            <div>A</div>
-                            <span id="availability"></span>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Total DT</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_dt"></p>
                         </div>
-                        <div class="text-center font-bold text-white text-2xl">
-                            <div>P</div>
-                            <span id="performance"></span>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Duration DT</p>
+                            <p class="text-sm font-bold dark:text-white" id="duration_dt"></p>
                         </div>
-                        <div class="text-center text-white text-2xl font-bold">
-                            <div>Q</div>
-                            <span id="quality"></span>
+                        <!-- <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Sum Qty Plan</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_qty_plan">-</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Sum Qty Act</p>
+                            <p class="text-sm font-bold dark:text-white" id="total_qty_actual">-</p>
+                        </div> -->
+                    </div>
+                    <div id="dtChart" style="width: 100%;"></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 md:col-span-2">
+                    <div class="flex justify-between mb-2">
+                        <h3 class="font-semibold text-gray-800 dark:text-white" id="prod_date_text">
+                            Machine Info
+                        </h3>
+
+                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Machine</p>
+                            <p class="text-sm font-bold dark:text-white" id="machine_info_text"></p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Part</p>
+                            <p class="text-sm font-bold dark:text-white" id="part_info_text">-</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Job Number</p>
+                            <p class="text-sm font-bold dark:text-white" id="jo_info_text">-</p>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-2">
-                        <div>
-                            <div>Qty</div>
-                            <span class="text-white text-xl" id="qty_span"></span>
+                    <div class="grid grid-cols-3 gap-4 mt-2">
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Qty Plan</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_plan_info_text">-</p>
                         </div>
-                        <div>
-                            <div>Opr Time</div>
-                            <span class="text-white text-xl" id="opr_time_span"></span>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Qty Actual</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_actual_info_text">-</p>
                         </div>
-                        <div>
-                            <div>DT Duration</div>
-                            <span class="text-white text-xl" id="downtime_span"></span>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Qty NG</p>
+                            <p class="text-sm font-bold dark:text-white" id="qty_ng_info_text">-</p>
                         </div>
                     </div>
-                    <div class="flex justify-between mt-2">
-                        <div>
-                            <div>OPR - DT</div>
-                            <span class="text-white text-xl" id="opr_dt_span"></span>
+                    <div id="gsphChart" style="width:100%;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 space-y-6 bg-gray-100 dark:bg-gray-900 min-h-screen transition hidden" id="oee_view">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-white">
+                    OEE & Activities
+                </h1>
+                <button id="back_btn_view"
+                    class="px-4 py-2 rounded-lg bg-gray-800 text-white dark:bg-yellow-400 dark:text-black">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6" width="24" height="24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-4">
+                        OEE Chart
+                    </h3>
+                    <div id="oeeChart" height="200"></div>
+                    <div class="grid grid-cols-3 gap-4 mt-3">
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">A</p>
+                            <p class="text-sm font-bold dark:text-white" id="availability">-</p>
                         </div>
-                        <div>
-                            <div>CT</div>
-                            <span class="text-white text-xl" id="ct_span"></span>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">P</p>
+                            <p class="text-sm font-bold dark:text-white" id="performance_val">-</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-blue-50 dark:bg-gray-700">
+                            <p class="text-sm dark:text-white">Q</p>
+                            <p class="text-sm font-bold dark:text-white" id="quality">-</p>
                         </div>
                     </div>
                 </div>
-                <div
-                    class="panel col-span-2 h-full flex flex-col justify-between gap-6 relative overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 md:col-span-2">
+                    <h3 class="font-semibold text-gray-800 dark:text-white mb-6">
+                        Recent Activity
+                    </h3>
 
-                    <!-- Bagian Atas -->
-                    <div class="flex flex-col items-center justify-center flex-1">
-                        <div class="text-center text-white-light border border-white z-[7] rounded w-full">
-                            <div class="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                                <span class="lg:text-3xl md:text-xl font-bold dark:text-white-light">Prod.
-                                    Downtime</span>
-                            </div>
-                        </div>
-                        <canvas id="downtime_chart" class="w-full h-72 mt-2"></canvas>
-                    </div>
+                    <ol class="relative" id="activityTimeline">
 
-                    <!-- Bagian Bawah -->
-                    <div class="flex flex-col items-center justify-center flex-1">
-                        <div class="text-center text-white-light border border-white z-[7] rounded w-full">
-                            <div class="shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                                <span class="lg:text-3xl md:text-xl font-bold dark:text-white-light"> <span
-                                        id="monitoringTitle"></span> Monitoring</span>
-                            </div>
-                        </div>
-                        <canvas id="gsph_monitoring" class="w-full h-72 mt-2"></canvas>
-                    </div>
-
-                </div>
-
-                <div
-                    class="panel col-span-1 h-full overflow-hidden before:absolute before:-right-44 before:top-0 before:bottom-0 before:m-auto before:rounded-full before:w-96 before:h-96 content-between gap-6">
-                    <div class="text-center text-white-light border border-white z-[7] rounded">
-                        <div class="align-center shadow-[0_0_2px_0_#bfc9d4] rounded p-1 bg-blue-600">
-                            <div class="text-center">
-                                <span
-                                    class="ltr:ml-5 rtl:mr-5 lg:text-3xl md:text-xl font-bold dark:text-white-light">Log
-                                    Activity</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="activity"></div>
+                    </ol>
                 </div>
             </div>
         </div>
     </div>
-
-    <input type="number" id="inpt_standard_sph" hidden readonly>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <input id="clock_in_date" type="text" hidden />
+    <input id="clock_in_time" type="text" hidden />
+    <input id="clock_out_time" type="text" hidden />
+    <input id="lunch_out_time" type="text" hidden />
+    <input id="lunch_in_time" type="text" hidden />
+    <input id="laborHedSeq" type="text" hidden />
+    <link rel="stylesheet" href="{{ Vite::asset('resources/css/highlight.min.css') }}">
+    <script src="/assets/js/highlight.min.js"></script>
+    <script src="/assets/js/nice-select2.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const pathParts = window.location.pathname.split('/');
-            const data = new URLSearchParams()
-            data.append('machine_id', pathParts[3])
-            data.append('job_num', pathParts[4])
-            data.append('production_date', pathParts[5])
-            data.append('shift', pathParts[6])
-            axios.post(`https://${window.location.host}/api/history-dashboard`, data, {
-                'headers': { 'Content-Type': 'application/x-www-form-urlencoded' }
+        let gsphChart
+        let dtChart;
+        $(document).ready(function() {
+            var els = document.querySelectorAll(".selectize");
+            els.forEach(function(select) {
+                NiceSelect.bind(select);
+            });
+            $(".form-select").select2({
+                width: '100%'
+            });
+            let url = window.location.pathname;
+            main_history(url)
+            chart_main(url)
+            init_dt_chart(url)
+        })
+
+        function main_history(url) {
+            $.ajax({
+                url: "{{ url('api/profile/history') }}",
+                method: 'POST',
+                data: {
+                    url: url
+                },
+                success: function(res) {
+                    const data = res.data
+                    const downtime = res.downtime
+                    if (res.status == true) {
+                        $("#name_text").text(data.employee_name)
+                        $("#nik_name").text(data.employee_id)
+                        $("#line_text").text(data.category_line_id)
+                        // $("#opr_seq_text").text(data.opr_seq)
+                        $("#prod_date_text").text(data.production_date)
+                        // $("#total_job").text(data.total_job)
+                        // $("#total_downtime").text(data.total_downtime)
+                        // $("#total_qty_plan").text(data.qty_plan)
+                        // $("#total_qty_actual").text(data.qty_actual)
+                        if (data.tool_id !== null) {
+                            $("#machine_info_text").text(data.machine_name + " ~ " + data.tool_id)
+                        } else {
+                            $("#machine_info_text").text(data.machine_name)
+                        }
+
+                        $("#part_info_text").text(data.part_no)
+                        $("#jo_info_text").text(data.job_num)
+                        $("#qty_plan_info_text").text(Number(data.qty_plan).toFixed(0))
+                        $("#qty_actual_info_text").text(Number(data.qty_actual).toFixed(0))
+                        $("#qty_ng_info_text").text(Number(data.qty_ng).toFixed(0))
+                        const progress = data.qty_plan > 0 ? (data.qty_actual / data.qty_plan) * 100 : 0;
+                        $("#progress_percent").text(Number(progress).toFixed(0) + "%")
+                        $("#progress_bar").css('width', 100 + '%')
+                        const totalDowntime = parseFloat(downtime?.total_downtime ?? 0);
+                        const totalDuration = parseFloat(downtime?.total_duration ?? 0);
+
+                        $("#total_dt").text(totalDowntime.toFixed(0));
+                        $("#duration_dt").text(totalDuration.toFixed(2) + " mnt");
+                    } else {
+                        console.log(res)
+                    }
+                },
+                error: function(err) {
+                    console.log(err)
+                }
             })
-                .then(response => {
-                    const data = response.data
-                    if (!data.machine) {
-                        document.getElementById('job_number').textContent = 'N/A';
-                        return;
-                    }
-                    const line = pathParts[1]
-                    if (line === 'assy') {
-                        document.getElementById('gsph_achievement_title').textContent = 'JPH Achievement';
-                        document.getElementById('std_gsph_title').textContent = 'Std.JPH';
-                        document.getElementById('act_gsph_title').textContent = 'Act.JPH';
-                        document.getElementById('monitoringTitle').textContent = 'JPH'
-                    } else {
-                        document.getElementById('gsph_achievement_title').textContent = 'GSPH Achievement';
-                        document.getElementById('std_gsph_title').textContent = 'Std.GSPH';
-                        document.getElementById('act_gsph_title').textContent = 'Act.GSPH';
-                        document.getElementById('monitoringTitle').textContent = 'GSPH'
-                    }
-                    document.getElementById('qty_span').textContent = data.machine.qty_actual
-                    const opr = data.opr_time
-                    document.getElementById('opr_time_span').textContent = opr.toFixed(2) + 'M'
-                    const totalDT = data.total_dt
-                    document.getElementById('downtime_span').textContent = totalDT.toFixed(2) + 'M'
-                    const opr_dt = data.opr_dt
-                    document.getElementById('opr_dt_span').textContent = opr_dt.toFixed(2)
-                    const ct_ = data.ct
-                    document.getElementById('ct_span').textContent = ct_.toFixed(1)
-                    const machine = data.machine;
-                    const robotName = machine.machine_code.split('-').pop()
-                    const showRobotName = 'RBT-' + robotName
-                    document.getElementById('job_number').textContent = machine.job_num || '-';
-                    document.getElementById('part_number').textContent = machine.part_no || '-';
-                    if (line === 'assy') {
-                        document.getElementById('customer').textContent = machine.customer + ' (' + showRobotName + ')' || '-';
-                    } else {
-                        document.getElementById('customer').textContent = machine.customer || '-';
-                    }
+        }
 
-                    const startedAt = machine.started_at ? machine.started_at.split(' ')[1] : '-';
-                    const time_finish = machine.finished_at
-                    const timeReplace = time_finish.replace('T', ' ');
-                    const date = new Date(timeReplace);
-                    finishedAt = date.toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
+        function chart_main(url) {
+            $.ajax({
+                url: "{{ url('api/profile/history_main_gsph') }}",
+                type: 'POST',
+                data: {
+                    machineID: url,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function(response) {
+                    let gsphData = [];
+                    let timeCategory = [];
+
+                    let previousGsph = 0;
+
+                    response.data.forEach(function(item) {
+                        const currentGsph = parseFloat(item.gsph) || 0;
+                        let diffGsph = currentGsph - previousGsph;
+                        if (diffGsph < 0) {
+                            diffGsph = currentGsph;
+                        }
+                        gsphData.push(diffGsph);
+                        timeCategory.push(item.cut_off_time);
+                        previousGsph = currentGsph;
                     });
-                    document.getElementById('time_start').textContent = startedAt;
-                    document.getElementById('time_finish').textContent = finishedAt;
-
-                    const plan = parseInt(machine.qty_plan || 0);
-                    const actual = parseInt(machine.qty_actual || 0);
-                    const remaining = Math.max(plan - actual, 0);
-                    const percentage = plan > 0 ? Math.round((actual / plan) * 100) : 0;
-
-                    const planCtx = document.getElementById('planVsActualChart').getContext('2d');
-                    if (!window.planVsActualChartInstance) {
-                        window.planVsActualChartInstance = new Chart(planCtx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Actual', 'Remaining'],
-                                datasets: [{
-                                    data: [actual, remaining],
-                                    backgroundColor: ['#4ade80', '#e5e7eb'],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                cutout: '75%',
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: { enabled: true }
-                                }
-                            },
-                            plugins: [{
-                                id: 'centerText',
-                                beforeDraw(chart) {
-                                    const { width, height, ctx } = chart;
-                                    const text = `${percentage}%`;
-                                    const fontSize = (height / 6).toFixed(2);
-                                    ctx.save();
-                                    ctx.font = `${fontSize}px Arial`;
-                                    ctx.fillStyle = '#fff';
-                                    ctx.textBaseline = 'middle';
-                                    const textX = (width - ctx.measureText(text).width) / 2;
-                                    const textY = height / 2;
-                                    ctx.fillText(text, textX, textY);
-                                    ctx.restore();
-                                }
-                            }]
-                        });
+                    if (gsphChart) {
+                        gsphChart.destroy();
                     }
+                    const gsph_chart = {
+                        chart: {
+                            type: 'area',
+                            height: 300
+                        },
+                        title: {
+                            text: 'JPH/GSPH',
+                            align: 'center'
+                        },
+                        series: [{
+                            name: 'JPH/GSPH',
+                            data: gsphData
+                        }],
+                        stroke: {
+                            curve: 'smooth'
+                        },
+                        xaxis: {
+                            categories: timeCategory
+                        }
+                    };
 
-                    // GSPH & Cycle Time
-                    document.getElementById('std_gsph').textContent = parseFloat(machine.standard_sph).toFixed(0) || 0;
-                    document.getElementById('act_gsph').textContent = parseFloat(machine.current_gsph).toFixed(0) || 0;
+                    gsphChart = new ApexCharts(
+                        document.querySelector("#gsphChart"),
+                        gsph_chart
+                    );
 
-                    const stdCycle = machine.standard_sph > 0 ? (3600 / machine.standard_sph).toFixed(0) : '0';
-                    const actCycle = machine.current_gsph > 0 ? (3600 / machine.current_gsph).toFixed(0) : '0';
+                    gsphChart.render();
+                },
 
-                    document.getElementById('std_cycletime').textContent = stdCycle;
-                    document.getElementById('act_cycletime').textContent = actCycle;
+                error: function(xhr) {
 
-                    // OEE Chart
-                    const availability = data.oee_availability || 0;
-                    const performance = data.oee_performance || 0;
-                    const quality = data.oee_quality || 0;
-                    const oeePercent = ((availability + performance + quality) / 3).toFixed(0);
+                    console.log(xhr.responseText);
 
-                    document.getElementById('availability').textContent = `${availability.toFixed(0)}%`;
-                    document.getElementById('performance').textContent = `${performance.toFixed(0)}%`;
-                    document.getElementById('quality').textContent = `${quality.toFixed(0)}%`;
+                }
+            });
+        }
 
-                    const oeeCtx = document.getElementById('oee_chart').getContext('2d');
-                    if (!window.oeeChartInstance) {
-                        window.oeeChartInstance = new Chart(oeeCtx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['OEE', 'Remaining'],
-                                datasets: [{
-                                    data: [oeePercent, 100 - oeePercent],
-                                    backgroundColor: ['#4ade80', '#e5e7eb'],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                cutout: '75%',
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: { enabled: true }
-                                }
-                            },
-                            plugins: [{
-                                id: 'centerTextOEE',
-                                beforeDraw(chart) {
-                                    const { width, height, ctx } = chart;
-                                    const text = `${oeePercent}%`;
-                                    const fontSize = (height / 6).toFixed(2);
-                                    ctx.save();
-                                    ctx.font = `${fontSize}px Arial`;
-                                    ctx.fillStyle = '#fff';
-                                    ctx.textBaseline = 'middle';
-                                    const textX = (width - ctx.measureText(text).width) / 2;
-                                    const textY = height / 2;
-                                    ctx.fillText(text, textX, textY);
-                                    ctx.restore();
-                                }
-                            }]
-                        });
-                    }
+        function init_dt_chart(url) {
+            $.ajax({
+                url: "{{ url('api/profile/history_main_dt') }}",
+                type: 'POST',
+                data: {
+                    machineID: url
+                },
+                success: function(response) {
+                    const dtMap = {};
+                    response.dt_log.forEach(item => {
+                        const name = item.name;
+                        // konversi jam → menit
+                        const minutes = Number(item.downtime) * 60;
+                        if (!dtMap[name]) {
+                            dtMap[name] = 0;
+                        }
+                        dtMap[name] += minutes;
+                    });
+                    // singkatan label
+                    const shortLabel = (text) => {
+                        return text
+                            .split(" ")
+                            .map(w => w[0])
+                            .join("")
+                            .toUpperCase();
+                    };
+                    const categories = [];
+                    const data = [];
+                    Object.keys(dtMap).forEach(name => {
+                        categories.push(shortLabel(name));
+                        data.push(Number(dtMap[name].toFixed(2)));
+                    });
 
-                    // Downtime Bar Chart
-                    const downtimeCtx = document.getElementById('downtime_chart').getContext('2d');
-                    if (!window.downtimeChartInstance) {
-                        window.downtimeChartInstance = new Chart(downtimeCtx, {
+                    const options = {
+
+                        chart: {
                             type: 'bar',
-                            data: {
-                                labels: data.downtimeChartLabels,
-                                datasets: [{
-                                    label: 'Downtime (minutes)',
-                                    data: data.downtimeChartValues,
-                                    backgroundColor: '#4ade80',
-                                    'maxBarThickness': 50
-                                }]
+                            height: 250
+                        },
+
+                        title: {
+                            text: 'Downtime List',
+                            align: 'center'
+                        },
+
+                        series: [{
+                            name: 'Downtime (Minutes)',
+                            data: data
+                        }],
+
+                        xaxis: {
+                            categories: categories
+                        },
+                        plotOptions: {
+                            bar: {
+                                borderRadius: 4,
+                                columnWidth: '35%'
+                            }
+                        },
+
+                        dataLabels: {
+                            enabled: true
+                        }
+
+                    };
+
+                    dtChart = new ApexCharts(document.querySelector("#dtChart"), options);
+                    dtChart.render();
+
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                }
+            });
+
+        }
+
+        $("#back_btn_view").on('click', function() {
+            $("#oee_view").addClass('hidden')
+            $("#dashboard_profile_view").removeClass('hidden')
+        })
+        let oeeChart
+        $("#view_more").on('click', function() {
+            $("#dashboard_profile_view").addClass('hidden')
+            $("#oee_view").removeClass('hidden')
+            activity_get()
+            oee_chart()
+        })
+
+        function oee_chart() {
+            $.ajax({
+                url: "{{ url('api/profile/history_oee') }}",
+                method: 'POST',
+                data: {
+                    url: window.location.pathname
+                },
+                success: function(res) {
+                    if (res.status == true) {
+                        $("#availability").text(res.oee_availability)
+                        $("#performance_val").text(res.oee_performance)
+                        $("#quality").text(res.oee_quality)
+                        var oeeOption = {
+                            chart: {
+                                height: 280,
+                                type: "radialBar"
                             },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: { display: false },
-                                    tooltip: { enabled: true }
-                                },
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white', font: { size: 12 } },
-                                        offset: false,
-                                        grid: { offset: false }
+
+                            series: [res.percentage_rata_rata],
+
+                            plotOptions: {
+                                radialBar: {
+                                    hollow: {
+                                        margin: 15,
+                                        size: "70%"
                                     },
-                                    y: {
-                                        ticks: { color: 'white', font: { size: 10 } }
+
+                                    dataLabels: {
+                                        showOn: "always",
+                                        name: {
+                                            offsetY: -10,
+                                            show: true,
+                                            color: "#888",
+                                            fontSize: "13px"
+                                        },
+                                        value: {
+                                            color: "#111",
+                                            fontSize: "30px",
+                                            show: true
+                                        }
                                     }
                                 }
-                            }
-                        });
-                    }
-                    const gsphMonitoringCtx = document.getElementById('gsph_monitoring').getContext('2d')
-                    if (!window.gsphMonitoringChartInstance) {
-                        const gsphLabelsArray = Object.keys(data.gsphLabels)
-                            .sort((a, b) => a - b)
-                            .map(h => h.padStart(2, '0') + ':00');
-
-                        const gsphValuesArray = gsphLabelsArray.map(label => {
-                            const hour = parseInt(label.split(':')[0], 10);
-                            return data.gsphLabels[hour] ?? 0;
-                        });
-                        window.gsphMonitoringChartInstance = new Chart(gsphMonitoringCtx, {
-                            type: 'bar',
-                            data: {
-                                labels: gsphLabelsArray,
-                                datasets: [{
-                                    label: 'GSPH Monitoring',
-                                    data: gsphValuesArray,
-                                    backgroundColor: '#4ade80',
-                                    'maxBarThickness': 50
-                                }]
                             },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    },
-                                    tooltip: { enabled: true }
-                                },
-                                scales: {
-                                    x: {
-                                        ticks: { color: 'white', font: { size: 12 } },
-                                        offset: false,
-                                        grid: { offset: false }
-                                    },
-                                    y: {
-                                        ticks: { color: 'white', font: { size: 10 } }
-                                    }
-                                }
-                            }
+
+                            stroke: {
+                                lineCap: "round",
+                            },
+                            labels: ["OEE"]
+                        };
+
+                        oeeChart = new ApexCharts(document.querySelector("#oeeChart"), oeeOption);
+                        oeeChart.render();
+                    } else {
+
+                    }
+                },
+                error: function(err) {
+                    console.log(err)
+                }
+            })
+        }
+
+        function activity_get() {
+            $.ajax({
+                url: "{{ url('api/profile/activity_history') }}",
+                method: 'POST',
+                data: {
+                    url: window.location.pathname
+                },
+                success: function(res) {
+                    if (res.status == true) {
+                        let data = res.data
+                        let html = ''
+                        data.forEach(function(item) {
+                            html += `
+                            <li class="mb-10 ml-4">
+                                <div class="absolute w-3 h-3 bg-blue-600 rounded-full -left-1.5 border border-white dark:border-gray-900"></div>
+                                <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">${item.time}</time>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${item.activity}</h3>
+                                <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">${item.description}</p>
+                            </li>
+                            `
                         })
+                        $("#activityTimeline").html(html)
+                    } else {
+                        console.log(res)
                     }
+                },
+                error: function(err) {
+                    console.log(err)
+                }
+            })
+        }
+    </script>
+    <script>
+        const fullscreenBtn = document.getElementById('fullscreen_btn');
+        const fullscreenIcon = document.getElementById('fullscreen_icon');
+        const content = document.getElementById('analytics');
 
-                    // Activity log
-                    const container = document.getElementById("activity");
-                    const logs = data.activity || [];
-                    let html = `<div class="space-y-6 mt-4">`;
-                    logs.forEach((item, index) => {
-                        html += `
-                        <div class="flex items-start space-x-3 pl-2" id="activity-${index}">
-                            <div class="text-red-500 lg:text-xl md:text-lg select-none">🔔</div>
-                            <div>
-                                <p class="text-white lg:text-xl md:text-lg font-bold">
-                                    <strong>${item.activity}</strong>
-                                </p>
-                                <p class="text-white font-bold lg:text-xl md:text-sm">from ${item.start_date?.substring(11) || '-'} to ${item.end_date?.substring(11) || '-'}</p>
-                                <button onclick="noteShow(${index})">Read more...</button>
-                            </div>
-                        </div>
-                        <div id="toast-${index}" class="flex items-center w-full max-w-xs p-1 text-gray-500 bg-white rounded-lg shadow-sm dark:text-gray-400 dark:bg-gray-800 hidden" role="alert">
-                        <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
-                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-                            </svg>
-                            <span class="sr-only">Warning icon</span>
-                        </div>
-                        <div class="ms-3 text-sm font-normal">${item.note}</div>
-                        <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" data-dismiss-target="#toast-warning" aria-label="Close" onclick="closeNote(${index})">
-                            <span class="sr-only">Close</span>
-                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                            </svg>
-                        </button>
-                    </div>`;
-                    });
-                    html += `</div>`;
-                    container.innerHTML = html;
-                })
-                .catch(err => {
-                    console.error('Terjadi error:', err);
-                });
+        fullscreenBtn.addEventListener('click', () => {
+
+            if (!document.fullscreenElement) {
+                content.requestFullscreen();
+
+                fullscreenIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 9H5.25V5.25m0 0L9 9m-3.75-3.75L9 9m6 6h3.75v3.75m0 0L15 15m3.75 3.75L15 15" />
+        `;
+            } else {
+                document.exitFullscreen();
+
+                fullscreenIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round"
+            d="M3.75 3.75h6v1.5h-4.5v4.5h-1.5v-6Zm16.5 0v6h-1.5v-4.5h-4.5v-1.5h6ZM3.75 20.25v-6h1.5v4.5h4.5v1.5h-6Zm16.5-6v6h-6v-1.5h4.5v-4.5h1.5Z" />
+        `;
+            }
 
         });
-        function noteShow(index) {
-            const toast = document.getElementById(`toast-${index}`);
-            toast.classList.remove('hidden');
-            const activityDiv = document.getElementById(`activity-${index}`);
-            activityDiv.classList.add('hidden');
-        }
-        function closeNote(index) {
-            const toast = document.getElementById(`toast-${index}`);
-            toast.classList.add('hidden');
-            const activityDiv = document.getElementById(`activity-${index}`);
-            activityDiv.classList.remove('hidden');
-        }
     </script>
 </x-layout.default>

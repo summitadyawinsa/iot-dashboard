@@ -877,6 +877,7 @@ Route::prefix('/assy')->group(function () {
         return view('v2.dashboard.history-dashboard');
     });
     Route::get('/dashboard/{machine_id}/{tool_id}/{job_num}/{production_date}/{shift}', function () {
+        // return view('v2.dashboard.history-dashboard');
         return view('v2.dashboard.history-dashboard-tool');
     });
     Route::get('/summary-by-line/{id}', function () {

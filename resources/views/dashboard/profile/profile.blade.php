@@ -122,15 +122,13 @@
                         <div class="flex justify-between">
                             <span class="text-gray-500">Line</span>
                             <span class="text-sm text-gray-800 dark:text-white" id="line_text">
-
                             </span>
                         </div>
-                        <!-- <div class="flex justify-between">
-                            <span class="text-gray-500">Machine</span>
-                            <button class="text-sm text-gray-800 dark:text-white" id="machine_text">
-
-                            </button>
-                        </div> -->
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Opr Seq</span>
+                            <span class="text-sm text-gray-800 dark:text-white" id="opr_seq_text">
+                            </span>
+                        </div>
                         <div class="flex justify-between">
                             <span class="text-gray-500">Status</span>
                             <span class="px-2 py-1 text-xs rounded bg-green-100" id="status_text"
@@ -985,6 +983,7 @@
                         $("#btn_machine_finish").hide();
                     }
                     $("#line_text").text(data.category_line_id ?? data.category_line)
+                    $("#opr_seq_text").text(data.opr_seq)
                     // $("#total_qty_plan").text(data.qty_plan ?? '-')
                     // $("#total_qty_actual").text(data.qty_actual ?? '-');
                     if (data.tool_id) {
@@ -1237,7 +1236,7 @@
                 <textarea id="downtime_remark"
                     class="swal2-textarea"
                     placeholder="Enter remark here..."
-                    rows="4"></textarea>
+                    rows="4" required></textarea>
             </div>
         `,
                 showCancelButton: true,
@@ -1246,6 +1245,11 @@
                 focusConfirm: false,
                 preConfirm: () => {
                     const remark = document.getElementById('downtime_remark').value;
+                    if (!remark) {
+                        Swal.showValidationMessage('Remark wajib diisi');
+                        return false;
+                    }
+                    return remark;
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -1254,14 +1258,14 @@
             });
         }
 
-        function saveDowntime(downtime, result) {
+        function saveDowntime(downtime, remark) {
             $.ajax({
                 url: "{{ url('api/config/save_downtime') }}",
                 type: 'POST',
                 data: {
                     _token: "{{ csrf_token() }}",
                     downtime: downtime,
-                    result: result,
+                    remark: remark,
                     machine: $("#machine_info_text").text()
                 },
                 success: function(response) {
@@ -2210,11 +2214,12 @@
                 data: {
                     laborHedSeq: $("#laborHedSeq").val(),
                     resourceID: $("#machine_info_text").text(),
+                    opr_seq: $("#opr_seq_text").text(),
                     date: $("#finish_work_date").val(),
                     jobNum: $("#finish_job_number").val(),
                     shift: $("#finish_shift").val(),
-                    clockinTime: $("#clock_in_time").val(),
-                    clockOutTime: $("#clock_out_time").val(),
+                    clockinTime: $("#finish_actual_clock_in_time").val(),
+                    clockOutTime: $("#finish_actual_clock_out_time").val(),
                     clockInDate: $("#clock_in_date").val(),
                     laborQty: labor_qty,
                     discrepQty: discrep_qty,

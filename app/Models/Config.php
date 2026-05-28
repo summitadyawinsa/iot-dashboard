@@ -194,6 +194,17 @@ class Config extends Model
         return DB::table('log_activity')
             ->insertGetId($data);
     }
+    public function downtime_log_get($machine, $job_num, $production_date)
+    {
+        return DB::table('log_downtime as a')
+            ->leftJoin('log_activity as b', 'b.downtime_seq_id', '=', 'a.seq_id')
+            ->where('a.machine_id', $machine)
+            ->where('a.job_num', $job_num)
+            ->where('a.production_date', $production_date)
+            ->where('a.is_active', 1)
+            ->select('a.downtime_id', 'a.notif_5m', 'a.notif_10m', 'a.notif_15m', 'a.notif_30m', 'a.started_at', 'b.note as remark')
+            ->first();
+    }
     public function downtime_update($machine, $job_num, $production_date)
     {
         $query = DB::table('log_downtime')
@@ -383,6 +394,43 @@ class Config extends Model
     {
         return DB::table('history_header_machine')
             ->insert($data);
+    }
+    public function employee_data_stop($line, $machine, $downtimeType = null, $position)
+    {
+        return DB::table('Employee')
+            ->where('Position', '<=', $position)
+            ->where(function ($query) use ($line, $machine, $downtimeType) {
+                $query->where(function ($q) use ($line, $machine) {
+
+                    $q->where(function ($x) use ($line) {
+
+                        $x->where('Line', 'ALL')
+                            ->orWhere('Line', $line);
+                    });
+
+                    $q->where(function ($x) use ($machine) {
+
+                        $x->where('Machine', 'ALL')
+                            ->orWhere('Machine', $machine);
+                    });
+                    $q->whereNull('Type');
+                });
+
+                if ($downtimeType) {
+                    $query->orWhere(function ($q) use ($line, $downtimeType) {
+
+                        $q->where('Type', $downtimeType);
+
+                        $q->where(function ($x) use ($line) {
+
+                            $x->where('Line', 'ALL')
+                                ->orWhere('Line', $line);
+                        });
+                    });
+                }
+            })
+            ->distinct()
+            ->get();
     }
     public function employee_data($line, $machine, $downtimeType = null, $position)
     {

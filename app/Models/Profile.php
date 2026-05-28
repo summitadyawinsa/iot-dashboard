@@ -67,6 +67,23 @@ class Profile extends Model
         }
         return $data;
     }
+    public function history_main_dt($machineID, $job_num, $production_date, $shift)
+    {
+        return DB::table('history_header_machine as b')
+            ->leftJoin('users as a', 'a.employee_id', '=', 'b.employee_id')
+            ->leftJoin('log_downtime as c', function ($join) {
+                $join->on('b.machine_id', '=', 'c.machine_id')
+                    ->on('b.production_date', '=', 'c.production_date')
+                    ->where('c.is_active', 1);
+            })
+            ->leftJoin('downtime_list as d', 'c.downtime_id', '=', 'd.id')
+            ->select('a.name', 'a.username', 'a.avatar', 'b.*', 'c.started_at as start_dt', 'd.name as nama_dt', 'd.type as dt_type')
+            ->where('b.machine_id', (string) $machineID)
+            ->where('b.job_num', $job_num)
+            ->where('b.production_date', $production_date)
+            ->where('b.shift', $shift)
+            ->first();
+    }
     public function option_tool($emp_id)
     {
         return DB::table('users as a')
@@ -573,6 +590,23 @@ class Profile extends Model
         }
         return $gsph;
     }
+    public function history_main_gsph_by_machine($machine_id, $jo_num, $production_date, $shift)
+    {
+        $data_machine = DB::table('history_header_machine')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $jo_num)
+            ->where('production_date', $production_date)
+            ->where('shift', $shift)
+            ->first();
+        $gsph = DB::table('gsph_record')
+            ->where('machine_id', $data_machine->machine_id)
+            ->where('cut_off', $production_date)
+            ->where('shift', $data_machine->shift)
+            ->where('job_num', $data_machine->job_num)
+            ->select('machine_id', 'gsph', DB::raw("FORMAT(cut_off_time,'HH:mm') as cut_off_time"))
+            ->get();
+        return $gsph;
+    }
     public function show_jo($machine, $date)
     {
         return DB::table('log_machine_tool')
@@ -748,5 +782,61 @@ WHERE T3.LaborEntryMethod = 'T'
 	AND T5.ResourceID = ?
         ";
         return DB::connection('sqlsrv4')->select($sql, [$machine_id]);
+    }
+    public function log_machine_history($machine_id, $job_num, $production_date, $shift)
+    {
+        return DB::table('history_header_machine as a')
+            ->leftJoin('users as b', 'b.employee_id', '=', 'a.employee_id')
+            ->where('a.machine_id', $machine_id)
+            ->where('a.job_num', $job_num)
+            ->where('a.production_date', $production_date)
+            ->where('a.shift', $shift)
+            ->select('a.*', 'b.name')
+            ->first();
+    }
+    public function log_downtime_history($machine_id, $job_num, $production_date, $shift)
+    {
+        return DB::table('log_downtime as a')
+            ->leftJoin('downtime_list as b', 'b.id', '=', 'a.downtime_id')
+            ->where('a.machine_id', $machine_id)
+            ->where('a.job_num', $job_num)
+            ->where('a.production_date', $production_date)
+            ->where('a.shift', $shift)
+            ->select(
+                DB::raw('COUNT(a.seq_id) as total_downtime'),
+                DB::raw('SUM(a.downtime) as total_duration')
+            )
+            ->first();
+    }
+    public function log_machine_history_tool($machine_id, $tool_id, $job_num, $production_date, $shift)
+    {
+        return DB::table('history_header_machine as a')
+            ->leftJoin('users as b', 'b.employee_id', '=', 'a.employee_id')
+            ->where('a.machine_id', $machine_id)
+            ->where('a.tool_id', $tool_id)
+            ->where('a.job_num', $job_num)
+            ->where('a.production_date', $production_date)
+            ->where('a.shift', $shift)
+            ->select('a.*', 'b.name')
+            ->first();
+    }
+    public function activity_history($machine_id, $job_num, $production_date, $shift)
+    {
+        return DB::table('log_activity')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->where('production_date', $production_date)
+            ->where('shift', $shift)
+            ->get();
+    }
+    public function activity_history_tool($machine_id, $tool_id, $job_num, $production_date, $shift)
+    {
+        return DB::table('log_activity')
+            ->where('machine_id', $machine_id)
+            ->where('tool_id', $tool_id)
+            ->where('job_num', $job_num)
+            ->where('production_date', $production_date)
+            ->where('shift', $shift)
+            ->get();
     }
 }

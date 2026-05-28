@@ -134,6 +134,28 @@ class ProfileController extends Controller
             ]);
         }
     }
+    public function history_main_dt(Request $request)
+    {
+        try {
+            $machineID = explode('/', $request->machineID);
+            if (!$machineID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Parameter machine wajib diisi'
+                ], 400);
+            }
+            $data = $this->profile->history_main_dt($machineID[3],$machineID[4],$machineID[5],urldecode($machineID[6]));
+            $tool_id = $data->tool_id ?? null;
+            return response()->json([
+                'dt_log' => $this->profile->dt_log($data->machine_id, $tool_id, $data->job_num, $data->shift, $data->production_date)
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
     public function progress_bar(Request $request)
     {
         try {
@@ -242,11 +264,73 @@ class ProfileController extends Controller
             'percentage_rata_rata' => min(100, round($oee_average, 2))
         ]);
     }
+    public function history_oee(Request $request)
+    {
+        $url = explode('/', $request->url);
+        $machine_id = $url[3];
+        $job_num = $url[4];
+        $production_date = $url[5];
+        $shift = urldecode($url[6]);
+        $data_machine = DB::table('history_header_machine')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->where('production_date', $production_date)
+            ->where('shift', $shift)
+            ->first();
+        if (!$data_machine) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data machine tidak ditemukan'
+            ], 404);
+        }
+        $downtimes = DB::table('log_downtime')
+            ->where('machine_id', $machine_id)
+            ->where('job_num', $job_num)
+            ->whereDate('production_date', $production_date)
+            ->where('shift', $shift)
+            ->get();
+
+        $totalDowntimeMinutes = $downtimes->sum('downtime');
+
+        $oee_quality = ($data_machine->qty_actual > 0 && $data_machine->qty_ng > 0)
+            ? 100 - ceil(($data_machine->qty_ng / $data_machine->qty_actual) * 100)
+            : 100;
+
+        $started_at = Carbon::parse($data_machine->started_at);
+        $finished_at = Carbon::now('Asia/Jakarta');
+
+        $operation_time = $finished_at->timestamp - $started_at->timestamp;
+
+        $operasi_time = $operation_time / 60;
+        $waktuOperasi = $operasi_time - $totalDowntimeMinutes;
+
+        if ($waktuOperasi <= 0) {
+            $oee_performance = 0;
+            $oee_availability = 0;
+        } else {
+
+            $standardCT = 60 / $data_machine->standard_sph;
+
+            $oee_performance = ($standardCT * $data_machine->qty_actual / $waktuOperasi) * 100;
+            $oee_availability = ($waktuOperasi / $operasi_time) * 100;
+        }
+        $oee_average = (
+            $oee_availability +
+            $oee_performance +
+            $oee_quality
+        ) / 3;
+        return response()->json([
+            'status' => true,
+            'oee_availability' => min(100, round($oee_availability, 2)),
+            'oee_performance' => min(100, round($oee_performance, 2)),
+            'oee_quality' => min(100, round($oee_quality, 2)),
+            'percentage_rata_rata' => min(100, round($oee_average, 2))
+        ]);
+    }
     public function main_gsph(Request $request)
     {
         $employee_id = $request->employee;
         $machineID = $request->machineID;
-
         if ($employee_id) {
             $main_gsph = $this->profile->main_gsph_by_employee($employee_id);
         } elseif ($machineID) {
@@ -257,6 +341,15 @@ class ProfileController extends Controller
                 'message' => 'Parameter employee atau machine wajib diisi'
             ], 400);
         }
+        return response()->json([
+            'status' => 'success',
+            'data' => $main_gsph
+        ]);
+    }
+    public function history_main_gsph(Request $request)
+    {
+        $url = explode('/', $request->machineID);
+        $main_gsph = $this->profile->history_main_gsph_by_machine($url[3], $url[4], $url[5], urldecode($url[6]));
         return response()->json([
             'status' => 'success',
             'data' => $main_gsph
@@ -409,5 +502,81 @@ class ProfileController extends Controller
             'activity' => $activity,
             'next_schedule' => $next_schedule
         ]);
+    }
+    public function history(Request $request)
+    {
+        $url = explode('/', $request->url);
+        if (count($url) == 7) {
+            $machine_id = $url[3];
+            $job_num = $url[4];
+            $production_date = $url[5];
+            $shift = urldecode($url[6]);
+            $log_machine = $this->profile->log_machine_history($machine_id, $job_num, $production_date, $shift);
+            $log_downtime = $this->profile->log_downtime_history($machine_id, $job_num, $production_date, $shift);
+            if (!$log_machine) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
+            return response()->json([
+                'status' => true,
+                'data' => $log_machine,
+                'downtime' => $log_downtime
+            ]);
+        } else if (count($url) == 8) {
+            $machine_id = $url[3];
+            $tool_id = $url[4];
+            $job_num = $url[5];
+            $production_date = $url[6];
+            $shift = $url[7];
+            $log_machine = $this->profile->log_machine_history_tool($machine_id, $tool_id, $job_num, $production_date, $shift);
+            if (!$log_machine) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
+            return response()->json([
+                'status' => true,
+                'data' => $log_machine
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'URL tidak valid'
+            ], 400);
+        }
+    }
+    public function activity_history(Request $request)
+    {
+        $url = explode('/', $request->url);
+        if (count($url) == 7) {
+            $machine_id = $url[3];
+            $job_num = $url[4];
+            $production_date = $url[5];
+            $shift = $url[6];
+            $activity_history = $this->profile->activity_history($machine_id, $job_num, $production_date, $shift);
+            return response()->json([
+                'status' => true,
+                'data' => $activity_history
+            ]);
+        } else if (count($url) == 8) {
+            $machine_id = $url[3];
+            $tool_id = $url[4];
+            $job_num = $url[5];
+            $production_date = $url[6];
+            $shift = $url[7];
+            $activity_history = $this->profile->activity_history_tool($machine_id, $tool_id, $job_num, $production_date, $shift);
+            return response()->json([
+                'status' => true,
+                'data' => $activity_history
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'message' => 'URL tidak valid'
+            ], 400);
+        }
     }
 }

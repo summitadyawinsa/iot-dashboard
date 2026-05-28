@@ -306,6 +306,19 @@
         }
 
         function submitExport() {
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
+
+            if (!start || !end) {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Tanggal start dan end wajib diisi'
+                });
+
+                return;
+            }
             let pathId = window.location.pathname.split('/');
             let lastPart = pathId[pathId.length - 1];
             let lineId = lastPart.split('#')[0];
@@ -668,7 +681,7 @@
                     $(row).css('background', backgroundStyle);
                     $(row).css('cursor', 'pointer');
                     $(row).off('click').on('click', function() {
-                        const numberShift = data.shift.split(' ')[1]
+                        const numberShift = data.shift
                         window.location.href =
                             `https://${window.location.host}/${linePage}/dashboard/${data.machine_id}/${data.job_num}/${data.production_date}/${numberShift}`;
                     });

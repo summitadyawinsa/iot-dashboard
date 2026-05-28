@@ -24,6 +24,10 @@ class HistoryLogMachineExport implements FromCollection, WithHeadings
     {
         if ($this->lineID == 'RBT-5H45') {
             $line = 'RSW-5H45';
+        } elseif ($this->lineID == 'SSW') {
+            $line = 'SSW';
+        } elseif ($this->lineID == 'RBT-5H47') {
+            $line = 'RSW-5H47';
         } else {
             $line = $this->lineID;
         }
